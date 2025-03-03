@@ -5,6 +5,7 @@ import SetupListing from '@/components/SetupListing.vue';
 import { Encoder, EncoderGroup, PushButton } from '@/domain/Encoder.ts';
 import { ref } from 'vue';
 
+// TODO: This is a temporary solution to get the encoder groups to render
 function createEncoderGroup() {
   const encoderIds = [
     '00',
@@ -26,11 +27,10 @@ function createEncoderGroup() {
   ];
   const encoders = encoderIds.map((id) => new Encoder(id));
   const pushButtons = encoderIds.map((id) => new PushButton(id));
-  return new EncoderGroup('GR01', 'GR01', encoders, pushButtons);
+  return new EncoderGroup('01', 'GR01', encoders, pushButtons);
 }
 
 const encoderGroups = ref<EncoderGroup[]>([createEncoderGroup()]);
-const foo = '';
 </script>
 
 <template>

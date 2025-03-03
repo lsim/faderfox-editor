@@ -1,6 +1,24 @@
+export type FieldType =
+  | 'channel'
+  | 'address'
+  | 'number_value'
+  | 'lower_limit'
+  | 'upper_limit'
+  | 'mode'
+  | 'type'
+  | 'scale' /* display */
+  | null;
 
-
-export type FieldType = 'channel' | 'address' | 'number_value' | 'lower_limit' | 'upper_limit' | 'mode' | 'type' | 'scale' /* display */ | null;
+export type EncoderType =
+  | 'CCR1'
+  | 'CCR2'
+  | 'CCab'
+  | 'PrgC'
+  | 'CCAh'
+  | 'PBnd'
+  | 'AftT'
+  | 'Note'
+  | 'NRPN';
 
 export class EncoderGroup {
   id: string;
@@ -35,7 +53,7 @@ export class Encoder {
   // The display/range of the encoder
   scale: string;
   // The type (cc, nrpn, note, etc)
-  type: string;
+  type: EncoderType;
   // Whether the encoder is linked to the next encoder
   link: boolean;
   // pb_channel: number;
@@ -58,7 +76,7 @@ export class Encoder {
     this.mode = 'div. by 8';
     this.scale = 'display off';
     // this.type = 'CC rel. 1';
-    this.type = 'nrpn';
+    this.type = 'NRPN';
     this.link = false;
     // this.pb_channel = 0;
     // this.pb_display = 'Off';
@@ -72,13 +90,12 @@ export class Encoder {
 }
 
 export class PushButton extends Encoder {
-
   constructor(id: string) {
     super(id);
     this.name = `PB${id}`;
     this.channel = 0;
     this.scale = 'Off';
-    this.type = 'Off';
+    this.type = 'Note';
     this.mode = 'Key';
     this.number = 0;
     this.lower = 0;
