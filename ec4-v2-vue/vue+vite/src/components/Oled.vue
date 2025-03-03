@@ -9,7 +9,10 @@ const props = defineProps<{
   activeField: FieldType,
 }>();
 
-const emit = defineEmits<(event: 'update:encoder', encoder: Encoder) => void>();
+const emit = defineEmits<{
+  (event: 'update:encoder', encoder: Encoder): void,
+  (event: 'update:activeField', field: FieldType): void,
+}>();
 
 const encoder = computed(() => ({...props.encoder} as Encoder));
 
