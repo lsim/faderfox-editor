@@ -4,7 +4,7 @@ import { type Encoder, type FieldType } from '@/domain/Encoder';
 
 const props = defineProps<{
   encoders: Encoder[];
-  selectedEncoder: Encoder;
+  selectedEncoder: Encoder | null;
   activeField: FieldType;
   mode: 'turn' | 'push';
 }>();
@@ -17,7 +17,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div id="ctrlcontainer" class="watchparams" data-mode="nothing">
+  <div id="ctrlcontainer">
     <!--    <div-->
     <!--      id="editnothing"-->
     <!--      data-action="edit-nothing"-->
@@ -37,28 +37,18 @@ const emit = defineEmits<{
         @click="emit('update:selectedEncoder', encoder)"
       />
     </div>
-    <div id="fillnumbers" title="Fill with ascending values in chosen direction">
-      Fill &quot;<span>Numbers</span>&quot;:
-      <a class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
-      <a class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
-    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.encoder-container {
-  overflow: hidden;
-  height: 100%;
-}
-
 #ctrlcontainer {
-  // A 4 x 4 grid of encoders
-  padding-left: 25px;
-  padding-top: 60px;
-  display: grid;
-  background-color: transparent;
-  grid-template-columns: repeat(4, 110px);
-  grid-template-rows: repeat(4, 110px);
-  gap: 1px;
+  .encoder-container {
+    // A 4 x 4 grid of encoders
+    display: grid;
+    background-color: transparent;
+    grid-template-columns: repeat(4, 110px);
+    grid-template-rows: repeat(4, 110px);
+    gap: 1px;
+  }
 }
 </style>

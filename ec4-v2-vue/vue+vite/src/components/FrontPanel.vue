@@ -25,6 +25,9 @@ function updateEncoder(encoder: Encoder) {
 <template>
   <main>
     <ModeSelector @update:mode="mode = $event" class="mode-selector" :mode="mode" />
+    <div class="margin-top"></div>
+    <div class="margin-left"></div>
+    <div class="margin-right"></div>
     <Oled
       :encoder="selectedEncoder"
       :active-field="activeField"
@@ -33,55 +36,84 @@ function updateEncoder(encoder: Encoder) {
       @update:encoder="updateEncoder"
     />
 
+    <div class="spacer"></div>
+
     <EncoderPanel
       @select-encoder="selectedEncoder = $event"
       class="encoders"
       :active-field="activeField"
-      :encoders="props.encoders"
+      :encoders="props.encoderGroup.encoders"
       :selected-encoder="selectedEncoder"
       :mode="mode"
     />
+
+    <div class="fillnumbers" title="Fill with ascending values in chosen direction">
+      Fill &quot;<span>Numbers</span>&quot;:
+      <a class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
+      <a class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
+    </div>
   </main>
 </template>
 
 <style scoped lang="scss">
 main {
+  // This grid was tweaked to fit the outlines of the EC4 controller
   display: grid;
-  grid-template-columns: 10px 1fr 10px;
-  grid-template-rows: 16px 10px 1fr 1fr 10px;
+  grid-template-columns: 24px 1fr 30px;
+  grid-template-rows: 16px 85px 132px 30px 480px 20px;
   grid-template-areas:
     'mode-selector mode-selector mode-selector'
     'margin-left margin-top margin-right'
     'margin-left oled margin-right'
+    'margin-left spacer margin-right'
     'margin-left encoders margin-right'
-    'margin-left margin-bottom margin-right';
+    'margin-left fillnumbers margin-right';
   box-sizing: border-box;
   margin: 0 auto;
   width: 500px;
   height: 818px;
   background: url('../assets/ec4.jpg') no-repeat;
   background-size: 100% 100%;
-  background-position-y: 16px;
-  position: relative;
+  text-align: center;
+
+  .mode-selector {
+    grid-area: mode-selector;
+  }
+
+  .margin-top {
+    grid-area: margin-top;
+  }
 
   .oled {
     grid-area: oled;
     position: relative;
-    left: 110px;
-    top: 90px;
-    width: calc(100% - 220px);
+    left: 95px;
+    width: calc(100% - 190px);
     height: 130px;
     border-radius: 6px;
     border: 1px solid #fff;
   }
 
-  .encoders {
-    grid-area: encoders;
-    //transform: translateX(-50%);
+  .spacer {
+    grid-area: spacer;
   }
 
-  .mode-selector {
-    grid-area: mode-selector;
+  .encoders {
+    grid-area: encoders;
+    padding-left: 5px;
+    padding-top: 10px;
+  }
+
+  .fillnumbers {
+    grid-area: fillnumbers;
+  }
+
+  .margin-left {
+    grid-area: margin-left;
+  }
+
+  .margin-right {
+    grid-area: margin-right;
   }
 }
 </style>
