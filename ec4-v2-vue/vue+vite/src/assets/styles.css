@@ -263,7 +263,7 @@ main {
   margin: 0 auto;
   width: 500px;
   height: 818px;
-  background: url('ec4.jpg') no-repeat;
+  background: url('../assets/ec4.jpg') no-repeat;
   background-size: 100% 100%;
   position: relative;
 }

@@ -1,0 +1,30 @@
+export default {
+
+  ENCODER_TYPE: 'type',
+  ENCODER_CHANNEL: 'channel',
+  ENCODER_NUMBER: 'number',
+  ENCODER_NUMBER_NOTE: 'number/note',
+  ENCODER_NUMBER_H: 'MSB',
+  ENCODER_NUMBER_NRPN: '#MSB/LSB',
+  ENCODER_LOWER: 'lower',
+  ENCODER_UPPER: 'upper',
+  ENCODER_MODE: 'mode',
+  ENCODER_SCALE: 'display',
+  ENCODER_PB_CHANNEL: 'channel',
+  ENCODER_PB_DISPLAY: 'display',
+  ENCODER_PB_TYPE: 'type',
+  ENCODER_PB_MODE: 'mode',
+  ENCODER_PB_NUMBER: 'number',
+  ENCODER_PB_LOWER: 'lower',
+  ENCODER_PB_UPPER: 'upper',
+
+  // Abbreviated labels for oled
+  OLED_ENCODER_NAME: 'ctrl',
+  OLED_CHANNEL: 'chan',
+  OLED_DISPLAY: 'disp',
+  OLED_NUMBER: 'numb',
+  OLED_TYPE: 'type',
+  OLED_LOWER: 'lower',
+  OLED_MODE: 'mode',
+  OLED_UPPER: 'upper',
+}

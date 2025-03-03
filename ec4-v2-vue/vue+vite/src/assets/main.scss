@@ -1,0 +1,20 @@
+
+body {
+  background-color: #000;
+}
+
+@font-face {
+  font-family: 'LCD5x8';
+  src: url('5x8_lcd_hd44780u_a02.eot?') format('eot'),
+  url('5x8_lcd_hd44780u_a02.svg#5x8-LCD-HD44780U-A02') format('svg'),
+  url('5x8_lcd_hd44780u_a02.woff') format('woff'),
+  url('5x8_lcd_hd44780u_a02.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.matrix_font {
+  font-family: 'LCD5x8', Courier, monospace;
+  font-size: 16px;
+  font-weight: bold;
+}
