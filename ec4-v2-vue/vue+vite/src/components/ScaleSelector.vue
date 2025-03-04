@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-const props = withDefaults(defineProps<{
-  modelValue: string | undefined,
-  abbreviated: boolean,
-}>(), {
-  abbreviated: false,
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue: string | undefined;
+    abbreviated?: boolean;
+  }>(),
+  {
+    abbreviated: false,
+  },
+);
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -40,17 +43,16 @@ const options = computed(() => {
   }
   return scaleOptions.value;
 });
-
 </script>
 
 <template>
-  <select data-watch="scale" :value="props.modelValue" @change="emit('update:modelValue', $event.target.value)">
+  <select
+    data-watch="scale"
+    :value="props.modelValue"
+    @change="emit('update:modelValue', $event.target.value)"
+  >
     <option v-for="n in options" :key="n.value" :value="n.value">{{ n.text }}</option>
   </select>
 </template>
 
-<style scoped lang="scss">
-select {
-  line-height: 95%;
-}
-</style>
+<style scoped lang="scss"></style>

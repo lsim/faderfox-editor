@@ -2,42 +2,18 @@
 import FrontPanel from '@/components/FrontPanel.vue';
 import MidiSettings from '@/components/MidiSettings.vue';
 import SetupListing from '@/components/SetupListing.vue';
-import { Encoder, EncoderGroup, PushButton } from '@/domain/Encoder.ts';
 import { ref } from 'vue';
 
-// TODO: This is a temporary solution to get the encoder groups to render
-function createEncoderGroup() {
-  const encoderIds = [
-    '00',
-    '01',
-    '02',
-    '03',
-    '04',
-    '05',
-    '06',
-    '07',
-    '08',
-    '09',
-    '10',
-    '11',
-    '12',
-    '13',
-    '14',
-    '15',
-  ];
-  const encoders = encoderIds.map((id) => new Encoder(id));
-  const pushButtons = encoderIds.map((id) => new PushButton(id));
-  return new EncoderGroup('01', 'GR01', encoders, pushButtons);
-}
+const groupId = ref<string>('01');
 
-const encoderGroups = ref<EncoderGroup[]>([createEncoderGroup()]);
+// const encoderGroups = ref<EncoderGroup[]>([createEncoderGroup()]);
 </script>
 
 <template>
   <main>
     <MidiSettings id="midisettings" />
     <SetupListing />
-    <FrontPanel :encoder-group="encoderGroups[0]" />
+    <FrontPanel :group-id="groupId" />
 
     <div class="credits">
       Web-MIDI Editor for the

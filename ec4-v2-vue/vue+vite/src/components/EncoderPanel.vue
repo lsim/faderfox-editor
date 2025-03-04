@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import SingleEncoder from '@/components/SingleEncoder.vue';
-import { type Encoder, type FieldType } from '@/domain/Encoder';
+import { type EncoderGroup, type FieldType } from '@/domain/Encoder';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import { computed } from 'vue';
 
 const props = defineProps<{
-  encoders: Encoder[];
-  selectedEncoder: Encoder | null;
+  groupId: string;
+  selectedEncoderId: string | null;
   activeField: FieldType;
   mode: 'turn' | 'push';
 }>();
 
 const emit = defineEmits<{
-  (event: 'update:selectedEncoder', encoder: Encoder): void;
-  (event: 'update:activeField', field: FieldType): void;
-  (event: 'update:encoder', encoder: Encoder): void;
+  (event: 'update:select-encoder', encoderId: string): void;
 }>();
+
+const { encoderGroups } = useEc4Store();
+
+const encoders = computed(() => {
+  const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  return props.mode === 'turn' ? group.encoders : group.pushButtons;
+});
 </script>
 
 <template>
@@ -27,14 +34,15 @@ const emit = defineEmits<{
     <!--    </div>-->
     <div class="encoder-container">
       <SingleEncoder
-        v-for="(encoder, index) in props.encoders"
+        v-for="(encoder, index) in encoders"
         :key="encoder.id"
-        :model-value="encoder"
-        @update:model-value="emit('update:encoder', $event)"
+        :encoder-id="encoder.id"
+        :group-id="props.groupId"
         :index="index"
         :active-field="props.activeField"
         :mode="props.mode"
-        @click="emit('update:selectedEncoder', encoder)"
+        @click="emit('update:select-encoder', encoder.id)"
+        :class="{ selected: encoder.id === props.selectedEncoderId }"
       />
     </div>
   </div>
@@ -49,6 +57,10 @@ const emit = defineEmits<{
     grid-template-columns: repeat(4, 110px);
     grid-template-rows: repeat(4, 110px);
     gap: 1px;
+
+    .selected {
+      border: 1px solid #fff;
+    }
   }
 }
 </style>

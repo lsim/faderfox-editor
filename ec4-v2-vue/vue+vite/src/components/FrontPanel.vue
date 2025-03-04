@@ -2,100 +2,93 @@
 import EncoderPanel from '@/components/EncoderPanel.vue';
 import ModeSelector from '@/components/ModeSelector.vue';
 import Oled from '@/components/Oled.vue';
-import type { Encoder, EncoderGroup, FieldType } from '@/domain/Encoder.ts';
-import { ref } from 'vue';
+import { type Encoder, type EncoderGroup, type FieldType } from '@/domain/Encoder.ts';
+import { computed, ref } from 'vue';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const props = defineProps<{
-  encoderGroup: EncoderGroup;
+  groupId: string;
 }>();
-
-const emit = defineEmits<(event: 'update:group', group: EncoderGroup) => void>();
 
 const mode = ref<'turn' | 'push'>('turn');
 
-const selectedEncoder = ref<Encoder | null>(null);
+const activeField = ref<FieldType>('address');
 
-const activeField = ref<FieldType>(null);
+const selectedEncoderId = ref<string | null>('00');
 
-function updateEncoder(encoder: Encoder) {
-  console.log('TODO updateEncoder', encoder);
-}
+const { encoderGroups } = useEc4Store();
+
+const selectedEncoder = computed(() => {
+  if (!selectedEncoderId.value) return null;
+  return encoderGroups
+    .find((g: EncoderGroup) => g.id === selectedEncoderId.value)
+    ?.encoders.find((e: Encoder) => e.id === selectedEncoderId.value);
+});
 </script>
 
 <template>
   <main>
     <ModeSelector @update:mode="mode = $event" class="mode-selector" :mode="mode" />
-    <div class="margin-top"></div>
-    <div class="margin-left"></div>
-    <div class="margin-right"></div>
     <Oled
-      :encoder="selectedEncoder"
+      v-if="selectedEncoderId"
+      :encoder-id="selectedEncoderId"
+      :group-id="props.groupId"
       :active-field="activeField"
       class="oled"
-      @update-active-field="activeField = $event"
-      @update:encoder="updateEncoder"
+      @update:active-field="activeField = $event"
     />
 
-    <div class="spacer"></div>
-
     <EncoderPanel
-      @select-encoder="selectedEncoder = $event"
+      @select-encoder="selectedEncoderId = $event"
       class="encoders"
       :active-field="activeField"
-      :encoders="props.encoderGroup.encoders"
-      :selected-encoder="selectedEncoder"
+      :group-id="groupId"
+      :selected-encoder-id="selectedEncoderId"
       :mode="mode"
     />
 
     <div class="fillnumbers" title="Fill with ascending values in chosen direction">
       Fill &quot;<span>Numbers</span>&quot;:
-      <a class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
-      <a class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
+      <a href class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
+      <a href class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
     </div>
   </main>
 </template>
 
 <style scoped lang="scss">
+$oled-height: 130px;
+$oled-width: 300px;
+
 main {
   // This grid was tweaked to fit the outlines of the EC4 controller
   display: grid;
   grid-template-columns: 24px 1fr 30px;
-  grid-template-rows: 16px 85px 132px 30px 480px 20px;
+  grid-template-rows: 73px 30px $oled-height 30px 480px 20px;
   grid-template-areas:
-    'mode-selector mode-selector mode-selector'
     'margin-left margin-top margin-right'
+    'margin-left mode-selector margin-right'
     'margin-left oled margin-right'
     'margin-left spacer margin-right'
     'margin-left encoders margin-right'
     'margin-left fillnumbers margin-right';
-  box-sizing: border-box;
+  justify-items: center;
   margin: 0 auto;
   width: 500px;
   height: 818px;
   background: url('../assets/ec4.jpg') no-repeat;
   background-size: 100% 100%;
-  text-align: center;
 
   .mode-selector {
     grid-area: mode-selector;
-  }
-
-  .margin-top {
-    grid-area: margin-top;
+    width: 100px;
   }
 
   .oled {
     grid-area: oled;
-    position: relative;
-    left: 95px;
-    width: calc(100% - 190px);
-    height: 130px;
+    width: $oled-width;
+    height: $oled-height;
     border-radius: 6px;
     border: 1px solid #fff;
-  }
-
-  .spacer {
-    grid-area: spacer;
   }
 
   .encoders {
@@ -106,14 +99,6 @@ main {
 
   .fillnumbers {
     grid-area: fillnumbers;
-  }
-
-  .margin-left {
-    grid-area: margin-left;
-  }
-
-  .margin-right {
-    grid-area: margin-right;
   }
 }
 </style>

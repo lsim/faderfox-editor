@@ -1,5 +1,4 @@
 export default {
-
   ENCODER_TYPE: 'type',
   ENCODER_CHANNEL: 'channel',
   ENCODER_NUMBER: 'number',
@@ -27,4 +26,7 @@ export default {
   OLED_LOWER: 'lower',
   OLED_MODE: 'mode',
   OLED_UPPER: 'upper',
-}
+
+  EDITOR_MODE_TURN: 'Turn',
+  EDITOR_MODE_PUSH: 'Push',
+};

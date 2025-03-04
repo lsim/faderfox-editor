@@ -36,6 +36,7 @@ export class EncoderGroup {
 
 export class Encoder {
   id: string;
+  groupId: string;
   // The name of the encoder
   name: string;
   // The channel of the encoder
@@ -65,8 +66,9 @@ export class Encoder {
   // pb_upper: number;
   // pb_link: boolean;
 
-  constructor(id: string) {
+  constructor(id: string, groupId: string) {
     this.id = id;
+    this.groupId = groupId;
     this.name = `EC${id}`;
     this.channel = 0;
     this.number = 0;
@@ -90,8 +92,8 @@ export class Encoder {
 }
 
 export class PushButton extends Encoder {
-  constructor(id: string) {
-    super(id);
+  constructor(id: string, groupId: string) {
+    super(id, groupId);
     this.name = `PB${id}`;
     this.channel = 0;
     this.scale = 'Off';
