@@ -2,9 +2,8 @@
 import EncoderPanel from '@/components/EncoderPanel.vue';
 import ModeSelector from '@/components/ModeSelector.vue';
 import Oled from '@/components/Oled.vue';
-import { type Encoder, type EncoderGroup, type FieldType } from '@/domain/Encoder.ts';
-import { computed, ref } from 'vue';
-import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import { type FieldType } from '@/domain/Encoder.ts';
+import { ref } from 'vue';
 
 const props = defineProps<{
   groupId: string;
@@ -15,15 +14,6 @@ const mode = ref<'turn' | 'push'>('turn');
 const activeField = ref<FieldType>('address');
 
 const selectedEncoderId = ref<string | null>('00');
-
-const { encoderGroups } = useEc4Store();
-
-const selectedEncoder = computed(() => {
-  if (!selectedEncoderId.value) return null;
-  return encoderGroups
-    .find((g: EncoderGroup) => g.id === selectedEncoderId.value)
-    ?.encoders.find((e: Encoder) => e.id === selectedEncoderId.value);
-});
 </script>
 
 <template>
