@@ -12,7 +12,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'update:select-encoder', encoderId: string): void;
+  (event: 'select-encoder', encoderId: string): void;
 }>();
 
 const { encoderGroups } = useEc4Store();
@@ -41,7 +41,7 @@ const encoders = computed(() => {
         :index="index"
         :active-field="props.activeField"
         :mode="props.mode"
-        @click="emit('update:select-encoder', encoder.id)"
+        @click="emit('select-encoder', encoder.id)"
         :class="{ selected: encoder.id === props.selectedEncoderId }"
       />
     </div>
