@@ -1,18 +1,22 @@
 <script lang="ts" setup>
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import { type Encoder, EncoderGroup, type FieldType } from '@/domain/Encoder.ts';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const { t } = useI18n();
-const { updateEncoder } = useEc4Store();
 
 const props = defineProps<{
   encoderId: string;
   groupId: string;
   activeField: FieldType;
   mode: 'turn' | 'push';
+  nameActive: boolean;
+}>();
+
+const emit = defineEmits<{
+  (event: 'update:name-active', nameActive: boolean): void;
 }>();
 
 const ec4Store = useEc4Store();
@@ -50,13 +54,10 @@ const encoderTypes = ref([
   { text: 'NRPN', value: 9 },
 ]);
 
-// watch(
-//   value,
-//   () => {
-//     updateEncoder(value.value);
-//   },
-//   { deep: true },
-// );
+// This governs tab order behavior
+function setNameActive(newVal: boolean) {
+  if (newVal != props.nameActive) emit('update:name-active', newVal);
+}
 </script>
 
 <template>
@@ -87,56 +88,114 @@ const encoderTypes = ref([
           maxlength="4"
           v-model="value.name"
           title="Edit name of encoder/button"
+          @focus="setNameActive(true)"
+          :tabindex="props.nameActive ? 0 : -1"
         />
       </div>
-      <div v-if="props.activeField === 'address' && value.type === 'CC'" class="number">
+      <template v-if="props.activeField === 'number' && value.type === 'CC'">
         <label>{{ t('ENCODER_NUMBER') }}</label>
-        <input class="width_3" maxlength="3" v-model="value.number" />
-      </div>
-      <div v-else-if="props.activeField === 'address' && value.type === 'NRPN'" class="number">
+        <input
+          class="width_3"
+          maxlength="3"
+          v-model="value.number"
+          @focus="setNameActive(false)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'number' && value.type === 'NRPN'">
         <label>{{ t('ENCODER_NUMBER_NRPN') }}</label>
         <div class="double-inputs">
-          <input class="width_3" maxlength="3" v-model="value.number_h" />
-          <input class="width_3" maxlength="3" v-model="value.number" />
+          <input
+            class="width_3"
+            maxlength="3"
+            v-model="value.number_h"
+            @focus="setNameActive(false)"
+            :tabindex="props.nameActive ? -1 : 0"
+          />
+          <input
+            class="width_3"
+            maxlength="3"
+            v-model="value.number"
+            @focus="setNameActive(false)"
+            :tabindex="props.nameActive ? -1 : 0"
+          />
         </div>
-      </div>
-      <div v-else-if="props.activeField === 'number_value' && value.type === 'Note'" class="note">
+      </template>
+      <template v-else-if="props.activeField === 'number_value' && value.type === 'Note'">
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
-        <div class="inputs">
+        <div class="note-inputs">
           <input class="width_3" v-model="value.number" maxlength="3" />
-          <select class="width_2" data-watch="number" v-model="value.number">
+          <select
+            class="width_2"
+            data-watch="number"
+            v-model="value.number"
+            @focus="setNameActive(false)"
+            :tabindex="props.nameActive ? -1 : 0"
+          >
             <option v-for="n in noteOptions" :key="n.value" :value="n.value">{{ n.text }}</option>
           </select>
         </div>
-      </div>
-      <div v-else-if="props.activeField === 'channel'" class="channel">
+      </template>
+      <template v-else-if="props.activeField === 'channel'">
         <label>{{ t('ENCODER_CHANNEL') }}</label>
-        <input class="width_2" v-model="value.channel" maxlength="2" />
-      </div>
-      <div v-else-if="props.activeField === 'lower_limit'" class="lower">
-        <label> {{ t('ENCODER_LOWER') }}</label>
-        <input class="width_4" v-model="value.lower" maxlength="4" />
-      </div>
-      <div v-else-if="props.activeField === 'upper_limit'" class="upper">
-        <label> {{ t('ENCODER_UPPER') }}</label>
-        <input class="width_4" v-model="value.upper" maxlength="4" />
-      </div>
-      <div v-else-if="props.activeField === 'scale'" class="scale">
-        <label> {{ t('ENCODER_SCALE') }}</label>
-        <ScaleSelector v-model="value.scale" />
-      </div>
-      <div v-else-if="props.activeField === 'type'" class="type">
+        <input
+          class="width_2"
+          v-model="value.channel"
+          maxlength="2"
+          @focus="setNameActive(false)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'lower_limit'">
+        <label>{{ t('ENCODER_LOWER') }}</label>
+        <input
+          class="width_4"
+          v-model="value.lower"
+          maxlength="4"
+          @focus="setNameActive(false)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'upper_limit'">
+        <label>{{ t('ENCODER_UPPER') }}</label>
+        <input
+          class="width_4"
+          v-model="value.upper"
+          maxlength="4"
+          @focus="setNameActive(false)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'scale'">
+        <label>{{ t('ENCODER_SCALE') }}</label>
+        <ScaleSelector
+          v-model="value.scale"
+          @focus="setNameActive(false)"
+          :tabindex="props.nameActive ? -1 : 0"
+          :mode="props.mode"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'type'">
         <label> {{ t('ENCODER_TYPE') }}</label>
-        <select data-watch="type" v-model="value.type">
+        <select
+          data-watch="type"
+          v-model="value.type"
+          @focus="setNameActive(false)"
+          :tabindex="props.nameActive ? -1 : 0"
+        >
           <option v-for="n in encoderTypes" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
-      </div>
-      <div v-else-if="props.activeField === 'mode'" class="mode">
+      </template>
+      <template v-else-if="props.activeField === 'mode'" class="mode">
         <label> {{ t('ENCODER_MODE') }}</label>
-        <select v-model="value.mode">
+        <select
+          v-model="value.mode"
+          @focus="setNameActive(false)"
+          :tabindex="props.nameActive ? -1 : 0"
+        >
           <option v-for="n in modeOptions" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
-      </div>
+      </template>
       <!--      <div class="pb_channel">-->
       <!--        <label>{{ t('ENCODER_PB_CHANNEL') }}</label>-->
       <!--        <input-->
@@ -259,10 +318,15 @@ const encoderTypes = ref([
     right: 0;
 
     display: grid;
-    grid-template-rows: 1fr 2fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
     align-items: center;
     justify-items: center;
     justify-content: center;
+
+    label {
+      text-transform: capitalize;
+      color: white;
+    }
 
     .double-inputs {
       input {
@@ -271,13 +335,11 @@ const encoderTypes = ref([
       }
     }
 
-    .number {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      label {
-        color: white;
-      }
+    select {
+      width: 100%;
+      text-align: center;
+      background-color: transparent;
+      color: white;
     }
   }
 
@@ -296,9 +358,6 @@ const encoderTypes = ref([
     z-index: 0;
     width: $knob-size;
     height: $knob-size;
-    //position: relative;
-    //left: 0;
-    //top: 0;
 
     // Center the knob background
     margin: auto;

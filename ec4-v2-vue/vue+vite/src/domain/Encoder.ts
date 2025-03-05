@@ -1,6 +1,8 @@
+import { ref } from 'vue';
+
 export type FieldType =
   | 'channel'
-  | 'address'
+  | 'number'
   | 'number_value'
   | 'lower_limit'
   | 'upper_limit'
@@ -19,6 +21,29 @@ export type EncoderType =
   | 'AftT'
   | 'Note'
   | 'NRPN';
+
+export type ScaleOption = {
+  text: string;
+  short: string;
+  value: number;
+};
+
+export const encoderScaleOptions: ScaleOption[] = [
+  { text: 'display off', short: 'off', value: 0 },
+  { text: '0...127', short: '127', value: 1 },
+  { text: '0...100', short: '100', value: 2 },
+  { text: '0...1000', short: '1000', value: 3 },
+  { text: '-63...+63', short: '±63', value: 4 },
+  { text: '-50...+50', short: '±50', value: 5 },
+  { text: '-500...+500', short: '±500', value: 6 },
+  { text: 'ON / OFF', short: 'ONOF', value: 7 },
+  { text: '9999', short: '9999', value: 8 },
+];
+
+export const pushButtonScaleOptions: ScaleOption[] = [
+  { text: 'display off', short: 'off', value: 0 },
+  { text: 'display on', short: 'on', value: 1 },
+];
 
 export class EncoderGroup {
   id: string;
@@ -52,7 +77,7 @@ export class Encoder {
   // The speed of the encoder
   mode: string;
   // The display/range of the encoder
-  scale: string;
+  scale: number;
   // The type (cc, nrpn, note, etc)
   type: EncoderType;
   // Whether the encoder is linked to the next encoder
@@ -76,7 +101,7 @@ export class Encoder {
     this.lower = 0;
     this.upper = 0;
     this.mode = 'div. by 8';
-    this.scale = 'display off';
+    this.scale = 1;
     // this.type = 'CC rel. 1';
     this.type = 'NRPN';
     this.link = false;
@@ -96,12 +121,8 @@ export class PushButton extends Encoder {
     super(id, groupId);
     this.name = `PB${id}`;
     this.channel = 0;
-    this.scale = 'Off';
+    this.scale = 1;
     this.type = 'Note';
     this.mode = 'Key';
-    this.number = 0;
-    this.lower = 0;
-    this.upper = 0;
-    this.link = false;
   }
 }

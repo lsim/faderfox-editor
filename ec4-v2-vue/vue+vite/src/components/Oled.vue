@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import type { Encoder, FieldType } from '@/domain/Encoder';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -11,6 +11,7 @@ const props = defineProps<{
   encoderId: string;
   groupId: string;
   activeField: FieldType;
+  mode: 'turn' | 'push';
 }>();
 
 const emit = defineEmits<{
@@ -30,7 +31,7 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
   // Select all the text in the input field for easier editing
   const select = (input) => input?.setSelectionRange(0, input?.value.length);
   setTimeout(() => {
-    if (input.value) select(input);
+    if (input.tagName === 'INPUT') select(input);
     else select(input.querySelector('input'));
   }, 100);
 }
@@ -55,19 +56,20 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
       :abbreviated="true"
       id="encoderScale"
       @focus="setActiveField('scale', $event.target)"
+      :mode="props.mode"
     />
     <template v-if="encoder.type === 'NRPN'">
       <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }">NRPN:</label>
       <span class="two-inputs">
         <input
-          id="encoderNumber"
           maxlength="3"
-          v-model="encoder.number"
+          v-model="encoder.number_h"
           @focus="setActiveField('number', $event.target)"
         />
         <input
+          id="encoderNumber"
           maxlength="3"
-          v-model="encoder.number_h"
+          v-model="encoder.number"
           @focus="setActiveField('number', $event.target)"
         />
       </span>

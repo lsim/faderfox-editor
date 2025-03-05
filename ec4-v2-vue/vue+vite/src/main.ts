@@ -8,7 +8,6 @@ import App from './App.vue';
 import router from './router';
 
 import localeEn from './i18n/en.ts';
-console.log('localeEn', localeEn);
 
 const i18n = createI18n({
   legacy: false,

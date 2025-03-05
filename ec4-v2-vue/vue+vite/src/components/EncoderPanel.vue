@@ -2,7 +2,7 @@
 import SingleEncoder from '@/components/SingleEncoder.vue';
 import { type EncoderGroup, type FieldType } from '@/domain/Encoder';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { computed } from 'vue';
+import { computed, watch, ref } from 'vue';
 
 const props = defineProps<{
   groupId: string;
@@ -21,6 +21,29 @@ const encoders = computed(() => {
   const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
   return props.mode === 'turn' ? group.encoders : group.pushButtons;
 });
+
+const nameActive = ref<boolean>(false);
+
+watch(
+  () => props.mode,
+  (newMode) => {
+    console.debug('mode changed to', newMode);
+  },
+);
+
+watch(
+  () => props.activeField,
+  (newActiveField) => {
+    console.debug('activeField changed to', newActiveField);
+  },
+);
+
+watch(
+  () => nameActive,
+  (newVal) => {
+    console.debug('Name active changed', newVal);
+  },
+);
 </script>
 
 <template>
@@ -41,7 +64,9 @@ const encoders = computed(() => {
         :index="index"
         :active-field="props.activeField"
         :mode="props.mode"
+        :name-active="nameActive"
         @click="emit('select-encoder', encoder.id)"
+        @update:name-active="nameActive = $event"
         :class="{ selected: encoder.id === props.selectedEncoderId }"
       />
     </div>

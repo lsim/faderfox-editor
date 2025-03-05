@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const mode = ref<'turn' | 'push'>('turn');
 
-const activeField = ref<FieldType>('address');
+const activeField = ref<FieldType>('number');
 
 const selectedEncoderId = ref<string | null>('00');
 </script>
@@ -26,6 +26,7 @@ const selectedEncoderId = ref<string | null>('00');
       :active-field="activeField"
       class="oled"
       @update:active-field="activeField = $event"
+      :mode="mode"
     />
 
     <EncoderPanel

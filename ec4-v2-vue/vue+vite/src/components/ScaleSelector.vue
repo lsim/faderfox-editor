@@ -1,57 +1,35 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ComputedRef } from 'vue';
+import { encoderScaleOptions, pushButtonScaleOptions, type ScaleOption } from '@/domain/Encoder.ts';
 
 const props = withDefaults(
   defineProps<{
-    modelValue: string | undefined;
+    modelValue: number;
     abbreviated?: boolean;
+    mode: 'turn' | 'push';
   }>(),
   {
     abbreviated: false,
   },
 );
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: number): void;
+}>();
 
-const scaleOptions = ref([
-  { text: 'display off', value: 0 },
-  { text: '0...127', value: 1 },
-  { text: '0...100', value: 2 },
-  { text: '0...1000', value: 3 },
-  { text: '-63...+63', value: 4 },
-  { text: '-50...+50', value: 5 },
-  { text: '-500...+500', value: 6 },
-  { text: 'ON / OFF', value: 7 },
-  { text: '9999', value: 8 },
-]);
-
-const abbreviatedOptions = ref([
-  { text: 'off', value: 0 },
-  { text: '127', value: 1 },
-  { text: '100', value: 2 },
-  { text: '1000', value: 3 },
-  { text: '±63', value: 4 },
-  { text: '±50', value: 5 },
-  { text: '±500', value: 6 },
-  { text: 'ONOF', value: 7 },
-  { text: '9999', value: 8 },
-]);
-
-const options = computed(() => {
-  if (props.abbreviated) {
-    return abbreviatedOptions.value;
-  }
-  return scaleOptions.value;
+const options: ComputedRef<ScaleOption[]> = computed(() => {
+  return props.mode === 'turn' ? encoderScaleOptions : pushButtonScaleOptions;
 });
 </script>
 
 <template>
   <select
-    data-watch="scale"
     :value="props.modelValue"
-    @change="emit('update:modelValue', $event.target.value)"
+    @change="emit('update:modelValue', parseInt($event.target.value, 10))"
   >
-    <option v-for="n in options" :key="n.value" :value="n.value">{{ n.text }}</option>
+    <option v-for="n in options" :key="n.value" :value="n.value">
+      {{ props.abbreviated ? n.short : n.text }}
+    </option>
   </select>
 </template>
 

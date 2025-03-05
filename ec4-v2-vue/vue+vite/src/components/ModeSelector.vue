@@ -6,7 +6,9 @@ const props = defineProps<{
   mode: 'turn' | 'push';
 }>();
 
-const emit = defineEmits<(event: 'update:mode', mode: 'turn' | 'push') => void>();
+const emit = defineEmits<{
+  (event: 'update:mode', mode: 'turn' | 'push'): void;
+}>();
 </script>
 
 <template>
