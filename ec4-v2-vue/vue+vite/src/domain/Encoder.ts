@@ -1,5 +1,3 @@
-import { ref } from 'vue';
-
 export type FieldType =
   | 'channel'
   | 'number'
@@ -11,16 +9,19 @@ export type FieldType =
   | 'scale' /* display */
   | null;
 
-export type EncoderType =
-  | 'CCR1'
-  | 'CCR2'
-  | 'CCab'
-  | 'PrgC'
-  | 'CCAh'
-  | 'PBnd'
-  | 'AftT'
-  | 'Note'
-  | 'NRPN';
+export type EncoderType = (typeof encoderTypes)[number]['short'];
+
+export const encoderTypes = [
+  { text: 'CC rel. 1', short: 'CCR1', value: 1 },
+  { text: 'CC rel. 2', short: 'CCR2', value: 2 },
+  { text: 'CC absolute', short: 'CCab', value: 3 },
+  { text: 'Program change', short: 'PrgC', value: 4 },
+  { text: 'CC 14bit absolute', short: 'CCAh', value: 5 },
+  { text: 'Pitch bend', short: 'PBnd', value: 6 },
+  { text: 'Aftertouch', short: 'AftT', value: 7 },
+  { text: 'Note', short: 'Note', value: 8 },
+  { text: 'NRPN', short: 'NRPN', value: 9 },
+];
 
 export type ScaleOption = {
   text: string;
@@ -82,28 +83,20 @@ export class Encoder {
   type: EncoderType;
   // Whether the encoder is linked to the next encoder
   link: boolean;
-  // pb_channel: number;
-  // pb_display: string;
-  // pb_type: string;
-  // pb_mode: string;
-  // pb_number: number;
-  // pb_lower: number;
-  // pb_upper: number;
-  // pb_link: boolean;
 
-  constructor(id: string, groupId: string) {
+  constructor(id: string, groupId: string, type?: EncoderType, mode?: string) {
     this.id = id;
     this.groupId = groupId;
-    this.name = `EC${id}`;
+    this.name = id;
     this.channel = 0;
     this.number = 0;
     this.number_h = 0;
     this.lower = 0;
     this.upper = 0;
-    this.mode = 'div. by 8';
+    this.mode = mode || 'div. by 8';
     this.scale = 1;
     // this.type = 'CC rel. 1';
-    this.type = 'NRPN';
+    this.type = type || 'CCab';
     this.link = false;
     // this.pb_channel = 0;
     // this.pb_display = 'Off';
@@ -118,11 +111,6 @@ export class Encoder {
 
 export class PushButton extends Encoder {
   constructor(id: string, groupId: string) {
-    super(id, groupId);
-    this.name = `PB${id}`;
-    this.channel = 0;
-    this.scale = 1;
-    this.type = 'Note';
-    this.mode = 'Key';
+    super(id, groupId, 'Note', 'Key');
   }
 }

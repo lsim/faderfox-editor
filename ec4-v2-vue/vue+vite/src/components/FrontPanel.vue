@@ -2,18 +2,28 @@
 import EncoderPanel from '@/components/EncoderPanel.vue';
 import ModeSelector from '@/components/ModeSelector.vue';
 import Oled from '@/components/Oled.vue';
-import { type FieldType } from '@/domain/Encoder.ts';
-import { ref } from 'vue';
+import { EncoderGroup, type FieldType } from '@/domain/Encoder.ts';
+import { computed, ref } from 'vue';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const props = defineProps<{
   groupId: string;
 }>();
 
+const { encoderGroups } = useEc4Store();
+
 const mode = ref<'turn' | 'push'>('turn');
 
 const activeField = ref<FieldType>('number');
 
-const selectedEncoderId = ref<string | null>('00');
+const selectedEncoderIndex = ref<number | null>(null);
+
+const selectedEncoderId = computed(() => {
+  if (selectedEncoderIndex.value == null) return null;
+  const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  const currentControls = mode.value === 'turn' ? group?.encoders : group?.pushButtons;
+  return currentControls?.[selectedEncoderIndex.value]?.id;
+});
 </script>
 
 <template>
@@ -30,10 +40,10 @@ const selectedEncoderId = ref<string | null>('00');
     />
 
     <EncoderPanel
-      @select-encoder="selectedEncoderId = $event"
+      @select-encoder="selectedEncoderIndex = $event"
       class="encoders"
       :active-field="activeField"
-      :group-id="groupId"
+      :group-id="props.groupId"
       :selected-encoder-id="selectedEncoderId"
       :mode="mode"
     />

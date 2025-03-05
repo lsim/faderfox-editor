@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 const { encoderGroups } = useEc4Store();
 
-const encoders = computed(() => {
+const controls = computed(() => {
   const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
   return props.mode === 'turn' ? group.encoders : group.pushButtons;
 });
@@ -34,7 +34,12 @@ watch(
 watch(
   () => props.activeField,
   (newActiveField) => {
-    console.debug('activeField changed to', newActiveField);
+    console.debug(
+      'activeField changed to',
+      newActiveField,
+      props.mode,
+      controls.value.find((c) => c.id === props.selectedEncoderId)?.type,
+    );
   },
 );
 
@@ -48,32 +53,27 @@ watch(
 
 <template>
   <div id="ctrlcontainer">
-    <!--    <div-->
-    <!--      id="editnothing"-->
-    <!--      data-action="edit-nothing"-->
-    <!--      title="Hide value fields"-->
-    <!--    >-->
-    <!--      &#x2715;-->
-    <!--    </div>-->
     <div class="encoder-container">
       <SingleEncoder
-        v-for="(encoder, index) in encoders"
-        :key="encoder.id"
-        :encoder-id="encoder.id"
+        v-for="(control, index) in controls"
+        :key="control.id"
+        :encoder-id="control.id"
         :group-id="props.groupId"
         :index="index"
         :active-field="props.activeField"
         :mode="props.mode"
         :name-active="nameActive"
-        @click="emit('select-encoder', encoder.id)"
+        @click.capture="emit('select-encoder', index)"
+        @focus.capture="emit('select-encoder', index)"
         @update:name-active="nameActive = $event"
-        :class="{ selected: encoder.id === props.selectedEncoderId }"
+        :class="{ selected: control.id === props.selectedEncoderId }"
       />
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+@use '../assets/main.scss' as *;
 #ctrlcontainer {
   .encoder-container {
     // A 4 x 4 grid of encoders
@@ -81,10 +81,15 @@ watch(
     background-color: transparent;
     grid-template-columns: repeat(4, 110px);
     grid-template-rows: repeat(4, 110px);
-    gap: 1px;
+    //gap: 1px;
+    color: white;
+    > * {
+      border-left: 1px solid #333;
+      border-top: 1px solid #333;
+    }
 
     .selected {
-      border: 1px solid #fff;
+      background-color: #222;
     }
   }
 }

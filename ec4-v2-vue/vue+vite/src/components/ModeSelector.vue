@@ -29,6 +29,7 @@ const emit = defineEmits<{
 </template>
 
 <style scoped lang="scss">
+@use '../assets/main.scss' as *;
 #modeselect {
   border: 1px solid white;
   border-bottom: none;
@@ -37,7 +38,7 @@ const emit = defineEmits<{
   display: flex;
   justify-content: space-around;
   align-items: center;
-  color: gray;
+  color: $textColor;
   padding: 4px;
 
   a {
@@ -45,10 +46,9 @@ const emit = defineEmits<{
     color: inherit;
 
     &.active {
-      background-color: yellow;
-      color: black;
+      background-color: $active-field-color;
       border-radius: 0.3em;
-      box-shadow: 0 0 10px yellow;
+      box-shadow: 0 0 10px $active-field-color;
     }
   }
 }

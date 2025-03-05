@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import ScaleSelector from '@/components/ScaleSelector.vue';
-import { type Encoder, EncoderGroup, type FieldType } from '@/domain/Encoder.ts';
-import { computed, ref } from 'vue';
+import { type Encoder, EncoderGroup, type FieldType, encoderTypes } from '@/domain/Encoder.ts';
+import { computed, ref, ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -19,40 +19,28 @@ const emit = defineEmits<{
   (event: 'update:name-active', nameActive: boolean): void;
 }>();
 
-const ec4Store = useEc4Store();
+const { encoderGroups } = useEc4Store();
 
-// Make sure the model properties are writable for v-model in the template
-const value = computed(() => {
-  return ec4Store.encoderGroups
-    .find((g: EncoderGroup) => g.id === props.groupId)
-    ?.encoders.find((e: Encoder) => e.id === props.encoderId);
+const control: ComputedRef<Encoder | null> = computed(() => {
+  const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  const controls = props.mode === 'turn' ? group?.encoders : group?.pushButtons;
+  return controls?.find((e: Encoder) => e.id === props.encoderId);
 });
 
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 function noteToObject(n: number) {
   const name = noteNames[n % 12];
-  const octave = n / 12 - 2;
+  const octave = Math.round(n / 12) - 2;
+  console.debug('noteToObject', n, name, octave);
   return {
-    text: name + octave,
+    text: `${name}-${octave}`,
     value: n,
   };
 }
 
 // From C-2 to G-8
 const noteOptions = ref([...Array(128).keys()].map((n) => noteToObject(n)));
-
-const encoderTypes = ref([
-  { text: 'CC rel. 1', value: 1 },
-  { text: 'CC rel. 2', value: 2 },
-  { text: 'CC absolute', value: 3 },
-  { text: 'Program change', value: 4 },
-  { text: 'CC 14bit absolute', value: 5 },
-  { text: 'Pitch bend', value: 6 },
-  { text: 'Aftertouch', value: 7 },
-  { text: 'Note', value: 8 },
-  { text: 'NRPN', value: 9 },
-]);
 
 // This governs tab order behavior
 function setNameActive(newVal: boolean) {
@@ -81,54 +69,53 @@ function setNameActive(newVal: boolean) {
     <!--      data-action="mode-push"-->
     <!--      alt="Turn mode (click to toggle)"-->
     <!--    />-->
-    <div class="inputs">
+    <div class="inputs" v-if="control">
       <div class="name">
         <input
           class="matrixfont width_4"
           maxlength="4"
-          v-model="value.name"
+          v-model="control.name"
           title="Edit name of encoder/button"
           @focus="setNameActive(true)"
           :tabindex="props.nameActive ? 0 : -1"
         />
       </div>
-      <template v-if="props.activeField === 'number' && value.type === 'CC'">
+      <template v-if="props.activeField === 'number' && control.type === 'CCab'">
         <label>{{ t('ENCODER_NUMBER') }}</label>
         <input
           class="width_3"
           maxlength="3"
-          v-model="value.number"
+          v-model="control.number"
           @focus="setNameActive(false)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'number' && value.type === 'NRPN'">
+      <template v-else-if="props.activeField === 'number' && control.type === 'NRPN'">
         <label>{{ t('ENCODER_NUMBER_NRPN') }}</label>
         <div class="double-inputs">
           <input
             class="width_3"
             maxlength="3"
-            v-model="value.number_h"
+            v-model="control.number_h"
             @focus="setNameActive(false)"
             :tabindex="props.nameActive ? -1 : 0"
           />
           <input
             class="width_3"
             maxlength="3"
-            v-model="value.number"
+            v-model="control.number"
             @focus="setNameActive(false)"
             :tabindex="props.nameActive ? -1 : 0"
           />
         </div>
       </template>
-      <template v-else-if="props.activeField === 'number_value' && value.type === 'Note'">
+      <template v-else-if="props.activeField === 'number' && control.type === 'Note'">
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
         <div class="note-inputs">
-          <input class="width_3" v-model="value.number" maxlength="3" />
+          <input class="width_3" v-model="control.number" maxlength="3" />
           <select
             class="width_2"
-            data-watch="number"
-            v-model="value.number"
+            v-model="control.number"
             @focus="setNameActive(false)"
             :tabindex="props.nameActive ? -1 : 0"
           >
@@ -140,8 +127,15 @@ function setNameActive(newVal: boolean) {
         <label>{{ t('ENCODER_CHANNEL') }}</label>
         <input
           class="width_2"
-          v-model="value.channel"
-          maxlength="2"
+          :value="control.channel"
+          @input="
+            control.channel = $event.target.checkValidity()
+              ? parseInt($event.target.value, 10)
+              : control.channel
+          "
+          type="number"
+          min="1"
+          max="16"
           @focus="setNameActive(false)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -150,7 +144,7 @@ function setNameActive(newVal: boolean) {
         <label>{{ t('ENCODER_LOWER') }}</label>
         <input
           class="width_4"
-          v-model="value.lower"
+          v-model="control.lower"
           maxlength="4"
           @focus="setNameActive(false)"
           :tabindex="props.nameActive ? -1 : 0"
@@ -160,7 +154,7 @@ function setNameActive(newVal: boolean) {
         <label>{{ t('ENCODER_UPPER') }}</label>
         <input
           class="width_4"
-          v-model="value.upper"
+          v-model="control.upper"
           maxlength="4"
           @focus="setNameActive(false)"
           :tabindex="props.nameActive ? -1 : 0"
@@ -169,7 +163,7 @@ function setNameActive(newVal: boolean) {
       <template v-else-if="props.activeField === 'scale'">
         <label>{{ t('ENCODER_SCALE') }}</label>
         <ScaleSelector
-          v-model="value.scale"
+          v-model="control.scale"
           @focus="setNameActive(false)"
           :tabindex="props.nameActive ? -1 : 0"
           :mode="props.mode"
@@ -178,18 +172,19 @@ function setNameActive(newVal: boolean) {
       <template v-else-if="props.activeField === 'type'">
         <label> {{ t('ENCODER_TYPE') }}</label>
         <select
-          data-watch="type"
-          v-model="value.type"
+          v-model="control.type"
           @focus="setNameActive(false)"
           :tabindex="props.nameActive ? -1 : 0"
         >
-          <option v-for="n in encoderTypes" :key="n.value" :value="n.value">{{ n.text }}</option>
+          <option v-for="n in encoderTypes" :key="n.value" :value="n.short" :title="n.text">
+            {{ n.short }}
+          </option>
         </select>
       </template>
       <template v-else-if="props.activeField === 'mode'" class="mode">
         <label> {{ t('ENCODER_MODE') }}</label>
         <select
-          v-model="value.mode"
+          v-model="control.mode"
           @focus="setNameActive(false)"
           :tabindex="props.nameActive ? -1 : 0"
         >
@@ -305,6 +300,8 @@ function setNameActive(newVal: boolean) {
 </template>
 
 <style scoped lang="scss">
+@use '../assets/main.scss' as *;
+
 .encoder-container {
   overflow: hidden;
   position: relative;
@@ -325,7 +322,19 @@ function setNameActive(newVal: boolean) {
 
     label {
       text-transform: capitalize;
-      color: white;
+      color: $textColor;
+    }
+
+    input {
+      background-color: transparent;
+      color: $textColor;
+      text-align: center;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
     }
 
     .double-inputs {
@@ -339,7 +348,7 @@ function setNameActive(newVal: boolean) {
       width: 100%;
       text-align: center;
       background-color: transparent;
-      color: white;
+      color: $textColor;
     }
   }
 
@@ -350,7 +359,7 @@ function setNameActive(newVal: boolean) {
     width: 1.3em;
   }
   .width_4 {
-    width: 2.4em;
+    width: 2.6em;
   }
 
   $knob-size: 64px;

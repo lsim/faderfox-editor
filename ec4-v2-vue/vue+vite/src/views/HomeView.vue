@@ -4,9 +4,7 @@ import MidiSettings from '@/components/MidiSettings.vue';
 import SetupListing from '@/components/SetupListing.vue';
 import { ref } from 'vue';
 
-const groupId = ref<string>('01');
-
-// const encoderGroups = ref<EncoderGroup[]>([createEncoderGroup()]);
+const groupId = ref<string>('GR01');
 </script>
 
 <template>
