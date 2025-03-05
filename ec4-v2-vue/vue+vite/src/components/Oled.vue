@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import type { Encoder, FieldType } from '@/domain/Encoder';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -38,11 +38,14 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
 </script>
 
 <template>
-  <!-- TODO: i18n for labels -->
   <div id="oled" class="oled watchparams typed matrix_font">
-    <label for="encoderName" :class="{ 'active-field': activeField === 'name' }">Ctrl:</label>
+    <label for="encoderName" :class="{ 'active-field': activeField === 'name' }"
+      >{{ t('OLED_ENCODER_NAME') }}:</label
+    >
     <input id="encoderName" v-model="encoder.name" disabled />
-    <label for="encoderChannel" :class="{ 'active-field': activeField === 'channel' }">Chan:</label>
+    <label for="encoderChannel" :class="{ 'active-field': activeField === 'channel' }"
+      >{{ t('OLED_CHANNEL') }}:</label
+    >
     <input
       id="encoderChannel"
       maxlength="2"
@@ -50,7 +53,9 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
       @input="encoder.channel = parseInt($event.target.value, 10)"
       @focus="setActiveField('channel', $event.target)"
     />
-    <label for="encoderScale" :class="{ 'active-field': activeField === 'scale' }">Disp:</label>
+    <label for="encoderScale" :class="{ 'active-field': activeField === 'scale' }"
+      >{{ t('OLED_DISPLAY') }}:</label
+    >
     <ScaleSelector
       v-model="encoder.scale"
       :abbreviated="true"
@@ -59,7 +64,9 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
       :mode="props.mode"
     />
     <template v-if="encoder.type === 'NRPN'">
-      <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }">NRPN:</label>
+      <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }"
+        >{{ t('OLED_NUMBER') }}:</label
+      >
       <span class="two-inputs">
         <input
           maxlength="3"
@@ -75,7 +82,9 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
       </span>
     </template>
     <template v-else>
-      <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }">Numb:</label>
+      <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }"
+        >{{ t('OLED_NUMBER') }}:</label
+      >
       <input
         id="encoderNumber"
         maxlength="3"
@@ -322,6 +331,7 @@ $active-field-color: #660;
       background-color: $active-field-color;
     }
     cursor: pointer;
+    text-transform: capitalize;
   }
 
   .two-inputs {
