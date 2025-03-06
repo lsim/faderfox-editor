@@ -8,24 +8,23 @@ const props = defineProps<{
   groupId: string;
   selectedEncoderId: string | null;
   activeField: FieldType;
-  mode: 'turn' | 'push';
 }>();
 
 const emit = defineEmits<{
   (event: 'select-encoder', encoderIndex: number): void;
 }>();
 
-const { encoderGroups } = useEc4Store();
+const ec4 = useEc4Store();
 
 const controls = computed(() => {
-  const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-  return props.mode === 'turn' ? group?.encoders || [] : group?.pushButtons || [];
+  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  return ec4.editorMode === 'turn' ? group?.encoders || [] : group?.pushButtons || [];
 });
 
 const nameActive = ref<boolean>(false);
 
 watch(
-  () => props.mode,
+  () => ec4.editorMode,
   (newMode) => {
     console.debug('mode changed to', newMode);
   },
@@ -37,7 +36,7 @@ watch(
     console.debug(
       'activeField changed to',
       newActiveField,
-      props.mode,
+      ec4.editorMode,
       controls.value.find((c) => c.id === props.selectedEncoderId)?.type,
     );
   },
@@ -50,12 +49,16 @@ watch(
   },
 );
 
+function idToEncoderIndex(id: string | null): number | undefined {
+  if (id === null) return undefined;
+  return controls.value.findIndex((control) => control.id === id);
+}
+
 function handleKeyDown(e: KeyboardEvent) {
   // Let Ctrl + s/d/f/e keys move focus between encoders
   if (e.ctrlKey || e.metaKey) {
-    const selectedEncoderIndex = controls.value.findIndex(
-      (control) => control.id === props.selectedEncoderId,
-    );
+    const selectedEncoderIndex = idToEncoderIndex(props.selectedEncoderId);
+    if (selectedEncoderIndex === undefined) return;
     const selectedRow = Math.floor(selectedEncoderIndex / 4);
     const selectedCol = selectedEncoderIndex % 4;
     let newSelectedRow = selectedRow;
@@ -96,7 +99,6 @@ function handleKeyDown(e: KeyboardEvent) {
         :group-id="props.groupId"
         :index="index"
         :active-field="props.activeField"
-        :mode="props.mode"
         :name-active="nameActive"
         @click.capture="emit('select-encoder', index)"
         @focus.capture="emit('select-encoder', index)"
@@ -113,18 +115,28 @@ function handleKeyDown(e: KeyboardEvent) {
   .encoder-container {
     // A 4 x 4 grid of encoders
     display: grid;
-    background-color: transparent;
     grid-template-columns: repeat(4, 110px);
     grid-template-rows: repeat(4, 110px);
-    //gap: 1px;
-    color: white;
-    > * {
-      border-left: 1px solid #333;
-      border-top: 1px solid #333;
-    }
 
     .selected {
-      background-color: #222;
+      // Mark the selected encoder
+      border: 1px solid #555;
+      border-radius: 20px;
+
+      // Gently pulse the selected encoder
+      animation: pulse 5s ease-in infinite;
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(#555, 1);
+        }
+        15% {
+          box-shadow: 0 0 0 4px rgba(#555, 1);
+        }
+        30% {
+          box-shadow: 0 0 0 0 rgba(#555, 1);
+        }
+      }
     }
   }
 }

@@ -1,24 +1,26 @@
 <script setup lang="ts">
 import { computed, type ComputedRef } from 'vue';
 import { encoderScaleOptions, pushButtonScaleOptions, type ScaleOption } from '@/domain/Encoder.ts';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const props = withDefaults(
   defineProps<{
     modelValue: number;
     abbreviated?: boolean;
-    mode: 'turn' | 'push';
   }>(),
   {
     abbreviated: false,
   },
 );
 
+const ec4 = useEc4Store();
+
 const emit = defineEmits<{
   (event: 'update:modelValue', value: number): void;
 }>();
 
 const options: ComputedRef<ScaleOption[]> = computed(() => {
-  return props.mode === 'turn' ? encoderScaleOptions : pushButtonScaleOptions;
+  return ec4.editorMode === 'turn' ? encoderScaleOptions : pushButtonScaleOptions;
 });
 
 function handleChange(e: Event) {

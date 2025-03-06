@@ -10,9 +10,7 @@ const props = defineProps<{
   groupId: string;
 }>();
 
-const { encoderGroups } = useEc4Store();
-
-const mode = ref<'turn' | 'push'>('turn');
+const ec4 = useEc4Store();
 
 const activeField = ref<FieldType>('number');
 
@@ -20,15 +18,15 @@ const selectedEncoderIndex = ref<number | null>(null);
 
 const selectedEncoderId = computed(() => {
   if (selectedEncoderIndex.value == null) return null;
-  const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-  const currentControls = mode.value === 'turn' ? group?.encoders : group?.pushButtons;
+  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  const currentControls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
   return currentControls?.[selectedEncoderIndex.value]?.id || null;
 });
 </script>
 
 <template>
   <main>
-    <ModeSelector @update:mode="mode = $event" class="mode-selector" :mode="mode" />
+    <ModeSelector class="mode-selector" />
     <Oled
       v-if="selectedEncoderId"
       :encoder-id="selectedEncoderId"
@@ -36,7 +34,6 @@ const selectedEncoderId = computed(() => {
       :active-field="activeField"
       class="oled"
       @update:active-field="activeField = $event"
-      :mode="mode"
     />
 
     <EncoderPanel
@@ -45,7 +42,6 @@ const selectedEncoderId = computed(() => {
       :active-field="activeField"
       :group-id="props.groupId"
       :selected-encoder-id="selectedEncoderId"
-      :mode="mode"
     />
 
     <div class="fillnumbers" title="Fill with ascending values in chosen direction">

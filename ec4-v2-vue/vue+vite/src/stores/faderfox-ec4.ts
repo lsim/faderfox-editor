@@ -31,32 +31,15 @@ function createEncoderGroup(groupId: string) {
 export const useEc4Store = defineStore('ec4', () => {
   const encoderGroups = ref<EncoderGroup[]>([createEncoderGroup('GR01')]);
 
-  // function updateEncoderGroup(encoderGroup: EncoderGroup) {
-  //   const index = encoderGroups.value.findIndex((g) => g.id === encoderGroup.id);
-  //   if (index >= 0) {
-  //     encoderGroups.value[index] = encoderGroup;
-  //   } else {
-  //     console.warn('Could not find encoder group', encoderGroup);
-  //   }
-  // }
+  const editorMode = ref<'push' | 'turn'>('turn');
 
-  // function updateEncoder(encoder: Encoder) {
-  //   const group = encoderGroups.value.find((g) => g.id === encoder.groupId);
-  //   if (group) {
-  //     const index = group.encoders.findIndex((e) => e.id === encoder.id);
-  //     if (index >= 0) {
-  //       group.encoders[index] = encoder;
-  //     } else {
-  //       console.warn('Could not find encoder', encoder);
-  //     }
-  //   } else {
-  //     console.warn('Could not find encoder group', encoder);
-  //   }
-  // }
+  function setEditorMode(mode: 'push' | 'turn') {
+    editorMode.value = mode;
+  }
 
   return {
     encoderGroups,
-    // updateEncoderGroup,
-    // updateEncoder,
+    editorMode,
+    setEditorMode,
   };
 });

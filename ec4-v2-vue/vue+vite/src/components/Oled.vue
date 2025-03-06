@@ -18,18 +18,17 @@ const props = defineProps<{
   encoderId: string;
   groupId: string;
   activeField: FieldType;
-  mode: 'turn' | 'push';
 }>();
 
 const emit = defineEmits<{
   (event: 'update:active-field', field: FieldType): void;
 }>();
 
-const { encoderGroups } = useEc4Store();
+const ec4 = useEc4Store();
 
 const control: ComputedRef<Partial<Encoder>> = computed(() => {
-  const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-  const controls = props.mode === 'turn' ? group?.encoders : group?.pushButtons;
+  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  const controls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
   return controls?.find((e: Encoder) => e.id === props.encoderId) || {};
 });
 
@@ -81,7 +80,6 @@ function setActiveField(field: FieldType, input: EventTarget | null) {
       :abbreviated="true"
       id="encoderScale"
       @focus="setActiveField('scale', $event.target)"
-      :mode="props.mode"
     />
     <template v-if="control.type === typeByName('NRPN')">
       <!-- Encoder number - NRPN -->

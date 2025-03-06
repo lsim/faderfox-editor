@@ -1,28 +1,24 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const { t } = useI18n();
-const props = defineProps<{
-  mode: 'turn' | 'push';
-}>();
 
-const emit = defineEmits<{
-  (event: 'update:mode', mode: 'turn' | 'push'): void;
-}>();
+const ec4 = useEc4Store();
 </script>
 
 <template>
   <div id="modeselect" title="Select encoder function to edit: Turn or push button">
     <a
       href=""
-      @click.prevent="emit('update:mode', 'turn')"
-      :class="{ active: props.mode === 'turn' }"
+      @click.prevent="ec4.setEditorMode('turn')"
+      :class="{ active: ec4.editorMode === 'turn' }"
       >{{ t('EDITOR_MODE_TURN') }}</a
     >
     <a
       href=""
-      @click.prevent="emit('update:mode', 'push')"
-      :class="{ active: props.mode === 'push' }"
+      @click.prevent="ec4.setEditorMode('push')"
+      :class="{ active: ec4.editorMode === 'push' }"
       >{{ t('EDITOR_MODE_PUSH') }}</a
     >
   </div>

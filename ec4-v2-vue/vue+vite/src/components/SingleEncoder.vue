@@ -18,7 +18,6 @@ const props = defineProps<{
   encoderId: string;
   groupId: string;
   activeField: FieldType;
-  mode: 'turn' | 'push';
   nameActive: boolean;
 }>();
 
@@ -26,11 +25,11 @@ const emit = defineEmits<{
   (event: 'update:name-active', nameActive: boolean): void;
 }>();
 
-const { encoderGroups } = useEc4Store();
+const ec4 = useEc4Store();
 
 const control: ComputedRef<Encoder | null> = computed(() => {
-  const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-  const controls = props.mode === 'turn' ? group?.encoders : group?.pushButtons;
+  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  const controls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
   return controls?.find((e: Encoder) => e.id === props.encoderId) || null;
 });
 
@@ -58,24 +57,6 @@ function setNameActive(newVal: boolean, source: any) {
 <template>
   <div class="enc typed encoder-container">
     <div class="knob"></div>
-    <!--    <img-->
-    <!--      v-if="props.mode === 'push'"-->
-    <!--      src="../assets/tap-svgrepo-com.svg"-->
-    <!--      width="24px"-->
-    <!--      class="tapicon"-->
-    <!--      title="Push button mode (click to toggle)"-->
-    <!--      data-action="mode-turn"-->
-    <!--      alt="Push button mode (click to toggle)"-->
-    <!--    />-->
-    <!--    <img-->
-    <!--      v-if="props.mode === 'turn'"-->
-    <!--      src="../assets/rotate-svgrepo-com.svg"-->
-    <!--      width="24px"-->
-    <!--      class="rotateicon"-->
-    <!--      title="Turn mode (click to toggle)"-->
-    <!--      data-action="mode-push"-->
-    <!--      alt="Turn mode (click to toggle)"-->
-    <!--    />-->
     <div class="inputs" v-if="control">
       <div class="name">
         <input
@@ -179,7 +160,6 @@ function setNameActive(newVal: boolean, source: any) {
           @update:modelValue="control.scale = $event"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
-          :mode="props.mode"
         />
       </template>
       <template v-else-if="props.activeField === 'type'">
@@ -204,6 +184,26 @@ function setNameActive(newVal: boolean, source: any) {
           <option v-for="n in encoderModes" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
       </template>
+
+      <img
+        v-if="ec4.editorMode === 'push'"
+        src="../assets/tap-svgrepo-com.svg"
+        width="24px"
+        class="tapicon clickable"
+        title="Push button mode (click to toggle)"
+        alt="Push button mode (click to toggle)"
+        @click.capture="ec4.setEditorMode('turn')"
+      />
+      <img
+        v-if="ec4.editorMode === 'turn'"
+        src="../assets/rotate-svgrepo-com.svg"
+        width="24px"
+        class="rotateicon clickable"
+        title="Turn mode (click to toggle)"
+        alt="Turn mode (click to toggle)"
+        @click.capture="ec4.setEditorMode('push')"
+      />
+
       <!--      <div class="pb_channel">-->
       <!--        <label>{{ t('ENCODER_PB_CHANNEL') }}</label>-->
       <!--        <input-->
