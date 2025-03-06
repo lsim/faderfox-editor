@@ -43,8 +43,9 @@ function noteToObject(n: number) {
 const noteOptions = ref([...Array(128).keys()].map((n) => noteToObject(n)));
 
 // This governs tab order behavior
-function setNameActive(newVal: boolean) {
+function setNameActive(newVal: boolean, source: HTMLElement) {
   if (newVal != props.nameActive) emit('update:name-active', newVal);
+  source.select?.();
 }
 </script>
 
@@ -76,7 +77,7 @@ function setNameActive(newVal: boolean) {
           maxlength="4"
           v-model="control.name"
           title="Edit name of encoder/button"
-          @focus="setNameActive(true)"
+          @focus="setNameActive(true, $event.target)"
           :tabindex="props.nameActive ? 0 : -1"
         />
       </div>
@@ -86,7 +87,7 @@ function setNameActive(newVal: boolean) {
           class="width_3"
           maxlength="3"
           v-model="control.number"
-          @focus="setNameActive(false)"
+          @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
@@ -97,14 +98,14 @@ function setNameActive(newVal: boolean) {
             class="width_3"
             maxlength="3"
             v-model="control.number_h"
-            @focus="setNameActive(false)"
+            @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           />
           <input
             class="width_3"
             maxlength="3"
             v-model="control.number"
-            @focus="setNameActive(false)"
+            @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           />
         </div>
@@ -116,7 +117,7 @@ function setNameActive(newVal: boolean) {
           <select
             class="width_2"
             v-model="control.number"
-            @focus="setNameActive(false)"
+            @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           >
             <option v-for="n in noteOptions" :key="n.value" :value="n.value">{{ n.text }}</option>
@@ -136,7 +137,7 @@ function setNameActive(newVal: boolean) {
           type="number"
           min="1"
           max="16"
-          @focus="setNameActive(false)"
+          @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
@@ -146,7 +147,7 @@ function setNameActive(newVal: boolean) {
           class="width_4"
           v-model="control.lower"
           maxlength="4"
-          @focus="setNameActive(false)"
+          @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
@@ -156,7 +157,7 @@ function setNameActive(newVal: boolean) {
           class="width_4"
           v-model="control.upper"
           maxlength="4"
-          @focus="setNameActive(false)"
+          @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
@@ -173,7 +174,7 @@ function setNameActive(newVal: boolean) {
         <label> {{ t('ENCODER_TYPE') }}</label>
         <select
           v-model="control.type"
-          @focus="setNameActive(false)"
+          @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         >
           <option v-for="n in encoderTypes" :key="n.value" :value="n.short" :title="n.text">
@@ -185,7 +186,7 @@ function setNameActive(newVal: boolean) {
         <label> {{ t('ENCODER_MODE') }}</label>
         <select
           v-model="control.mode"
-          @focus="setNameActive(false)"
+          @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         >
           <option v-for="n in modeOptions" :key="n.value" :value="n.value">{{ n.text }}</option>

@@ -29,10 +29,9 @@ const control = computed(() => {
 function setActiveField(field: FieldType, input: HTMLInputElement) {
   emit('update:active-field', field);
   // Select all the text in the input field for easier editing
-  const select = (input) => input?.setSelectionRange(0, input?.value.length);
   setTimeout(() => {
-    if (input.tagName === 'INPUT' && input.type !== 'number') select(input);
-    else select(input.querySelector('input'));
+    if (input.tagName === 'INPUT') input.select();
+    else input.querySelector('input')?.select();
   }, 100);
 }
 </script>
