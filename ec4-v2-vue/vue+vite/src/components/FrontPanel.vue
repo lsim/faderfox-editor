@@ -22,7 +22,7 @@ const selectedEncoderId = computed(() => {
   if (selectedEncoderIndex.value == null) return null;
   const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
   const currentControls = mode.value === 'turn' ? group?.encoders : group?.pushButtons;
-  return currentControls?.[selectedEncoderIndex.value]?.id;
+  return currentControls?.[selectedEncoderIndex.value]?.id || null;
 });
 </script>
 
@@ -50,8 +50,8 @@ const selectedEncoderId = computed(() => {
 
     <div class="fillnumbers" title="Fill with ascending values in chosen direction">
       Fill &quot;<span>Numbers</span>&quot;:
-      <a href class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
-      <a href class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
+      <a href="" class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
+      <a href="" class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
     </div>
   </main>
 </template>

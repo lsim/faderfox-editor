@@ -1,27 +1,34 @@
 export type FieldType =
   | 'channel'
   | 'number'
-  | 'number_value'
   | 'lower_limit'
   | 'upper_limit'
   | 'mode'
   | 'type'
   | 'scale' /* display */
+  | 'name'
   | null;
 
-export type EncoderType = (typeof encoderTypes)[number]['short'];
+export type EncoderType = {
+  text: string;
+  short: string;
+  value: number;
+};
 
-export const encoderTypes = [
-  { text: 'CC rel. 1', short: 'CCR1', value: 1 },
-  { text: 'CC rel. 2', short: 'CCR2', value: 2 },
-  { text: 'CC absolute', short: 'CCab', value: 3 },
-  { text: 'Program change', short: 'PrgC', value: 4 },
-  { text: 'CC 14bit absolute', short: 'CCAh', value: 5 },
-  { text: 'Pitch bend', short: 'PBnd', value: 6 },
-  { text: 'Aftertouch', short: 'AftT', value: 7 },
-  { text: 'Note', short: 'Note', value: 8 },
-  { text: 'NRPN', short: 'NRPN', value: 9 },
+export const encoderTypes: EncoderType[] = [
+  { text: 'CC rel. 1', short: 'CCR1', value: 0 },
+  { text: 'CC rel. 2', short: 'CCR2', value: 1 },
+  { text: 'CC absolute', short: 'CCab', value: 2 },
+  { text: 'Program change', short: 'PrgC', value: 3 },
+  { text: 'CC 14bit absolute', short: 'CCAh', value: 4 },
+  { text: 'Pitch bend', short: 'PBnd', value: 5 },
+  { text: 'Aftertouch', short: 'AftT', value: 6 },
+  { text: 'Note', short: 'Note', value: 7 },
+  { text: 'NRPN', short: 'NRPN', value: 8 },
 ];
+
+export const typeByName = (name: (typeof encoderTypes)[number]['short']) =>
+  encoderTypes.findIndex((t) => t.short === name);
 
 export type ScaleOption = {
   text: string;
@@ -40,11 +47,38 @@ export const encoderScaleOptions: ScaleOption[] = [
   { text: 'ON / OFF', short: 'ONOF', value: 7 },
   { text: '9999', short: '9999', value: 8 },
 ];
+export const optionByName = (name: (typeof encoderScaleOptions)[number]['short']) =>
+  encoderScaleOptions.findIndex((t) => t.short === name);
 
 export const pushButtonScaleOptions: ScaleOption[] = [
   { text: 'display off', short: 'off', value: 0 },
   { text: 'display on', short: 'on', value: 1 },
 ];
+
+export type ModeOption = {
+  text: string;
+  value: number;
+};
+
+export const pushButtonModes: ModeOption[] = [
+  { text: 'Togl', value: 0 },
+  { text: 'Key', value: 1 },
+];
+
+export const encoderModes: ModeOption[] = [
+  { text: 'LSp6', value: 0 },
+  { text: 'LSp4', value: 1 },
+  { text: 'LSp2', value: 2 },
+  { text: 'Acc3', value: 3 },
+  { text: 'Acc2', value: 4 },
+  { text: 'Acc1', value: 5 },
+  { text: 'Acc0', value: 6 },
+  { text: 'Div2', value: 7 },
+  { text: 'Div4', value: 8 },
+  { text: 'Div8', value: 9 },
+];
+const modeByName = (name: (typeof encoderModes)[number]['text']) =>
+  encoderModes.findIndex((t) => t.text === name);
 
 export class EncoderGroup {
   id: string;
@@ -76,15 +110,15 @@ export class Encoder {
   // The upper limit of the encoder
   upper: number;
   // The speed of the encoder
-  mode: string;
+  mode: number;
   // The display/range of the encoder
   scale: number;
   // The type (cc, nrpn, note, etc)
-  type: EncoderType;
+  type: number;
   // Whether the encoder is linked to the next encoder
   link: boolean;
 
-  constructor(id: string, groupId: string, type?: EncoderType, mode?: string) {
+  constructor(id: string, groupId: string, type?: number, mode?: number) {
     this.id = id;
     this.groupId = groupId;
     this.name = id;
@@ -93,24 +127,15 @@ export class Encoder {
     this.number_h = 0;
     this.lower = 0;
     this.upper = 0;
-    this.mode = mode || 'div. by 8';
+    this.mode = mode || encoderModes.findIndex((m) => m.text === 'Acc3');
     this.scale = 1;
-    // this.type = 'CC rel. 1';
-    this.type = type || 'CCab';
+    this.type = type || typeByName('CCab');
     this.link = false;
-    // this.pb_channel = 0;
-    // this.pb_display = 'Off';
-    // this.pb_type = 'Off';
-    // this.pb_mode = 'Key';
-    // this.pb_number = 0;
-    // this.pb_lower = 0;
-    // this.pb_upper = 0;
-    // this.pb_link = false;
   }
 }
 
 export class PushButton extends Encoder {
   constructor(id: string, groupId: string) {
-    super(id, groupId, 'Note', 'Key');
+    super(id, groupId, typeByName('Note'), modeByName('Key'));
   }
 }

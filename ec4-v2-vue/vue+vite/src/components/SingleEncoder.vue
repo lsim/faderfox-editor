@@ -1,7 +1,14 @@
 <script lang="ts" setup>
 import ScaleSelector from '@/components/ScaleSelector.vue';
-import { type Encoder, EncoderGroup, type FieldType, encoderTypes } from '@/domain/Encoder.ts';
-import { computed, ref, ComputedRef } from 'vue';
+import {
+  type Encoder,
+  EncoderGroup,
+  type FieldType,
+  encoderTypes,
+  encoderModes,
+  typeByName,
+} from '@/domain/Encoder.ts';
+import { computed, ref, type ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -24,7 +31,7 @@ const { encoderGroups } = useEc4Store();
 const control: ComputedRef<Encoder | null> = computed(() => {
   const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
   const controls = props.mode === 'turn' ? group?.encoders : group?.pushButtons;
-  return controls?.find((e: Encoder) => e.id === props.encoderId);
+  return controls?.find((e: Encoder) => e.id === props.encoderId) || null;
 });
 
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -32,9 +39,8 @@ const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', '
 function noteToObject(n: number) {
   const name = noteNames[n % 12];
   const octave = Math.round(n / 12) - 2;
-  console.debug('noteToObject', n, name, octave);
   return {
-    text: `${name}-${octave}`,
+    text: `${name} ${octave || ''}`,
     value: n,
   };
 }
@@ -43,9 +49,9 @@ function noteToObject(n: number) {
 const noteOptions = ref([...Array(128).keys()].map((n) => noteToObject(n)));
 
 // This governs tab order behavior
-function setNameActive(newVal: boolean, source: HTMLElement) {
+function setNameActive(newVal: boolean, source: any) {
   if (newVal != props.nameActive) emit('update:name-active', newVal);
-  source.select?.();
+  if (typeof source?.select === 'function') source.select();
 }
 </script>
 
@@ -81,7 +87,7 @@ function setNameActive(newVal: boolean, source: HTMLElement) {
           :tabindex="props.nameActive ? 0 : -1"
         />
       </div>
-      <template v-if="props.activeField === 'number' && control.type === 'CCab'">
+      <template v-if="props.activeField === 'number' && control.type === typeByName('CCab')">
         <label>{{ t('ENCODER_NUMBER') }}</label>
         <input
           class="width_3"
@@ -91,7 +97,7 @@ function setNameActive(newVal: boolean, source: HTMLElement) {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'number' && control.type === 'NRPN'">
+      <template v-else-if="props.activeField === 'number' && control.type === typeByName('NRPN')">
         <label>{{ t('ENCODER_NUMBER_NRPN') }}</label>
         <div class="double-inputs">
           <input
@@ -110,10 +116,15 @@ function setNameActive(newVal: boolean, source: HTMLElement) {
           />
         </div>
       </template>
-      <template v-else-if="props.activeField === 'number' && control.type === 'Note'">
+      <template v-else-if="props.activeField === 'number' && control.type === typeByName('Note')">
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
         <div class="note-inputs">
-          <input class="width_3" v-model="control.number" maxlength="3" />
+          <input
+            class="width_3"
+            v-model="control.number"
+            maxlength="3"
+            @focus="setNameActive(false, $event.target)"
+          />
           <select
             class="width_2"
             v-model="control.number"
@@ -130,8 +141,8 @@ function setNameActive(newVal: boolean, source: HTMLElement) {
           class="width_2"
           :value="control.channel"
           @input="
-            control.channel = $event.target.checkValidity()
-              ? parseInt($event.target.value, 10)
+            control.channel = ($event.target as HTMLInputElement).checkValidity()
+              ? parseInt(($event.target as HTMLInputElement).value, 10)
               : control.channel
           "
           type="number"
@@ -164,8 +175,9 @@ function setNameActive(newVal: boolean, source: HTMLElement) {
       <template v-else-if="props.activeField === 'scale'">
         <label>{{ t('ENCODER_SCALE') }}</label>
         <ScaleSelector
-          v-model="control.scale"
-          @focus="setNameActive(false)"
+          :model-value="control.scale || 0"
+          @update:modelValue="control.scale = $event"
+          @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
           :mode="props.mode"
         />
@@ -189,7 +201,7 @@ function setNameActive(newVal: boolean, source: HTMLElement) {
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         >
-          <option v-for="n in modeOptions" :key="n.value" :value="n.value">{{ n.text }}</option>
+          <option v-for="n in encoderModes" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
       </template>
       <!--      <div class="pb_channel">-->

@@ -23,9 +23,9 @@ export default {
   OLED_DISPLAY: 'disp',
   OLED_NUMBER: 'numb',
   OLED_TYPE: 'type',
-  OLED_LOWER: 'lower',
+  OLED_LOWER: 'low',
   OLED_MODE: 'mode',
-  OLED_UPPER: 'upper',
+  OLED_UPPER: 'high',
 
   EDITOR_MODE_TURN: 'Turn',
   EDITOR_MODE_PUSH: 'Push',

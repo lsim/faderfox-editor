@@ -12,14 +12,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'select-encoder', encoderId: string): void;
+  (event: 'select-encoder', encoderIndex: number): void;
 }>();
 
 const { encoderGroups } = useEc4Store();
 
 const controls = computed(() => {
   const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-  return props.mode === 'turn' ? group.encoders : group.pushButtons;
+  return props.mode === 'turn' ? group?.encoders || [] : group?.pushButtons || [];
 });
 
 const nameActive = ref<boolean>(false);

@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import ScaleSelector from '@/components/ScaleSelector.vue';
-import { type Encoder, type FieldType, encoderTypes, EncoderGroup } from '@/domain/Encoder';
-import { computed } from 'vue';
+import {
+  type Encoder,
+  type FieldType,
+  encoderTypes,
+  encoderModes,
+  EncoderGroup,
+  typeByName,
+} from '@/domain/Encoder';
+import { computed, type ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -20,29 +27,32 @@ const emit = defineEmits<{
 
 const { encoderGroups } = useEc4Store();
 
-const control = computed(() => {
+const control: ComputedRef<Partial<Encoder>> = computed(() => {
   const group = encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
   const controls = props.mode === 'turn' ? group?.encoders : group?.pushButtons;
-  return controls?.find((e: Encoder) => e.id === props.encoderId);
+  return controls?.find((e: Encoder) => e.id === props.encoderId) || {};
 });
 
-function setActiveField(field: FieldType, input: HTMLInputElement) {
+function isInput(input: EventTarget | null): input is HTMLInputElement {
+  return (input as HTMLInputElement | null)?.type === 'INPUT';
+}
+
+function setActiveField(field: FieldType, input: EventTarget | null) {
   emit('update:active-field', field);
   // Select all the text in the input field for easier editing
-  setTimeout(() => {
-    if (input.tagName === 'INPUT') input.select();
-    else input.querySelector('input')?.select();
-  }, 100);
+  if (!isInput(input)) input = (input as Element | null)?.querySelector('input') || null;
+  if (!isInput(input)) return;
+  setTimeout(() => input.select(), 100);
 }
 </script>
 
 <template>
-  <div id="oled" class="oled typed matrix_font">
+  <div id="oled" class="oled typed matrix_font" v-if="control">
     <!-- Encoder name -->
     <label for="encoderName" :class="{ 'active-field': activeField === 'name' }"
       >{{ t('OLED_ENCODER_NAME') }}:</label
     >
-    <input id="encoderName" v-model="control.name" />
+    <input id="encoderName" v-model="control.name" @focus="setActiveField('name', $event.target)" />
     <!-- Encoder channel -->
     <label for="encoderChannel" :class="{ 'active-field': activeField === 'channel' }"
       >{{ t('OLED_CHANNEL') }}:</label
@@ -55,8 +65,8 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
       max="16"
       :value="control.channel"
       @input="
-        control.channel = $event.target.checkValidity()
-          ? parseInt($event.target.value, 10)
+        control.channel = ($event.target as HTMLInputElement | null)?.checkValidity()
+          ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
           : control.channel
       "
       @focus="setActiveField('channel', $event.target)"
@@ -66,13 +76,14 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
       >{{ t('OLED_DISPLAY') }}:</label
     >
     <ScaleSelector
-      v-model="control.scale"
+      :model-value="control.scale || 0"
+      @update:modelValue="control.scale = $event"
       :abbreviated="true"
       id="encoderScale"
       @focus="setActiveField('scale', $event.target)"
       :mode="props.mode"
     />
-    <template v-if="control.type === 'NRPN'">
+    <template v-if="control.type === typeByName('NRPN')">
       <!-- Encoder number - NRPN -->
       <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }"
         >{{ t('OLED_NUMBER') }}:</label
@@ -110,6 +121,25 @@ function setActiveField(field: FieldType, input: HTMLInputElement) {
     <select id="encoderType" v-model="control.type" @focus="setActiveField('type', $event.target)">
       <option v-for="n in encoderTypes" :key="n.value" :value="n.short" :title="n.text">
         {{ n.short }}
+      </option>
+    </select>
+    <!-- Lower limit -->
+    <label for="encoderLowerLimit" :class="{ 'active-field': activeField === 'lower_limit' }"
+      >{{ t('OLED_LOWER') }}:</label
+    >
+    <input
+      id="encoderLowerLimit"
+      v-model="control.lower"
+      @focus="setActiveField('lower_limit', $event.target)"
+      type="number"
+    />
+    <!-- Encoder mode -->
+    <label for="encoderMode" :class="{ 'active-field': activeField === 'mode' }"
+      >{{ t('OLED_MODE') }}:</label
+    >
+    <select id="encoderMode" v-model="control.mode" @focus="setActiveField('mode', $event.target)">
+      <option v-for="n in encoderModes" :key="n.value" :value="n.value" :title="n.text">
+        {{ n.text }}
       </option>
     </select>
 

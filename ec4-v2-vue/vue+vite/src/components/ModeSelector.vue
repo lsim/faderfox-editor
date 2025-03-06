@@ -14,13 +14,13 @@ const emit = defineEmits<{
 <template>
   <div id="modeselect" title="Select encoder function to edit: Turn or push button">
     <a
-      href
+      href=""
       @click.prevent="emit('update:mode', 'turn')"
       :class="{ active: props.mode === 'turn' }"
       >{{ t('EDITOR_MODE_TURN') }}</a
     >
     <a
-      href
+      href=""
       @click.prevent="emit('update:mode', 'push')"
       :class="{ active: props.mode === 'push' }"
       >{{ t('EDITOR_MODE_PUSH') }}</a
