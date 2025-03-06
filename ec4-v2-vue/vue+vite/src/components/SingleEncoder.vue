@@ -8,7 +8,7 @@ import {
   encoderModes,
   typeByName,
 } from '@/domain/Encoder.ts';
-import { computed, ref, type ComputedRef } from 'vue';
+import { computed, ref, type ComputedRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -19,6 +19,7 @@ const props = defineProps<{
   groupId: string;
   activeField: FieldType;
   nameActive: boolean;
+  selected: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -35,6 +36,8 @@ const control: ComputedRef<Encoder | null> = computed(() => {
 
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
+const nameInput = ref<HTMLInputElement | null>(null);
+
 function noteToObject(n: number) {
   const name = noteNames[n % 12];
   const octave = Math.round(n / 12) - 2;
@@ -43,6 +46,14 @@ function noteToObject(n: number) {
     value: n,
   };
 }
+
+watch(
+  () => ec4.appFocused,
+  (focused) => {
+    if (!focused || !props.selected) return;
+    nameInput.value?.focus();
+  },
+);
 
 // From C-2 to G-8
 const noteOptions = ref([...Array(128).keys()].map((n) => noteToObject(n)));
@@ -60,6 +71,7 @@ function setNameActive(newVal: boolean, source: any) {
     <div class="inputs" v-if="control">
       <div class="name">
         <input
+          ref="nameInput"
           class="matrixfont width_4"
           maxlength="4"
           v-model="control.name"

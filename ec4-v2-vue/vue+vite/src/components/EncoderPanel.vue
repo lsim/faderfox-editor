@@ -104,6 +104,7 @@ function handleKeyDown(e: KeyboardEvent) {
         @focus.capture="emit('select-encoder', index)"
         @update:name-active="nameActive = $event"
         :class="{ selected: control.id === props.selectedEncoderId }"
+        :selected="control.id === props.selectedEncoderId"
       />
     </div>
   </div>

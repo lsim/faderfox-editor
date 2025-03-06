@@ -33,6 +33,15 @@ export const useEc4Store = defineStore('ec4', () => {
 
   const editorMode = ref<'push' | 'turn'>('turn');
 
+  const appFocused = ref(true);
+
+  window.addEventListener('focus', () => {
+    appFocused.value = true;
+  });
+  window.addEventListener('blur', () => {
+    appFocused.value = false;
+  });
+
   function setEditorMode(mode: 'push' | 'turn') {
     editorMode.value = mode;
   }
@@ -41,5 +50,6 @@ export const useEc4Store = defineStore('ec4', () => {
     encoderGroups,
     editorMode,
     setEditorMode,
+    appFocused,
   };
 });
