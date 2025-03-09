@@ -3,12 +3,22 @@ import FrontPanel from '@/components/FrontPanel.vue';
 import MidiSettings from '@/components/MidiSettings.vue';
 import SetupListing from '@/components/SetupListing.vue';
 import { ref } from 'vue';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const groupId = ref<string>('GR01');
+
+const ec4 = useEc4Store();
+
+// Insist that focus doesn't leave the editor
+function handleFocusOut(e: FocusEvent) {
+  if (!e.relatedTarget) {
+    (e.target as HTMLElement | undefined)?.focus?.();
+  }
+}
 </script>
 
 <template>
-  <main>
+  <main @focusout="handleFocusOut">
     <MidiSettings id="midisettings" />
     <SetupListing />
     <FrontPanel :group-id="groupId" />

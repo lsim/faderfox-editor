@@ -14,30 +14,99 @@ const ec4 = useEc4Store();
 
 const activeField = ref<FieldType>('number');
 
-const selectedEncoderIndex = ref<number | null>(null);
-
 const selectedEncoderId = computed(() => {
-  if (selectedEncoderIndex.value == null) return null;
+  if (ec4.selectedEncoderIndex == null) return null;
   const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
   const currentControls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
-  return currentControls?.[selectedEncoderIndex.value]?.id || null;
+  return currentControls?.[ec4.selectedEncoderIndex]?.id || null;
 });
+
+const oled = ref<InstanceType<typeof Oled> | null>(null);
+
+function handleEncoderNav(e: KeyboardEvent) {
+  if (ec4.selectedEncoderIndex == null) return;
+  const selectedRow = Math.floor(ec4.selectedEncoderIndex / 4);
+  const selectedCol = ec4.selectedEncoderIndex % 4;
+  let newSelectedRow = selectedRow;
+  let newSelectedCol = selectedCol;
+  switch (e.key) {
+    case 'o':
+      const focused = document.activeElement as HTMLInputElement | null;
+      const isInOled = focused?.closest('.oled');
+      if (isInOled) {
+        // Switch focus to active encoder
+        const idx = ec4.selectedEncoderIndex;
+        ec4.selectedEncoderIndex = null;
+        setTimeout(() => (ec4.selectedEncoderIndex = idx));
+      } else {
+        // Switch focus to active field in oled
+      }
+      return; // skip index change
+    case 'e':
+      newSelectedRow = Math.round((selectedRow - 1 + 4) % 4);
+      break;
+    case 'd':
+      newSelectedRow = Math.round((selectedRow + 1 + 4) % 4);
+      break;
+    case 'f':
+      newSelectedCol = Math.round((selectedCol + 1 + 4) % 4);
+      break;
+    case 's':
+      newSelectedCol = Math.round((4 + selectedCol - 1) % 4);
+      break;
+    default:
+      return;
+  }
+  ec4.selectedEncoderIndex = newSelectedRow * 4 + newSelectedCol;
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+function handleKeyDown(e: KeyboardEvent) {
+  // Let Ctrl + s/d/f/e keys move focus between encoders
+  if (e.ctrlKey || e.metaKey) {
+    if (['e', 'd', 'f', 's'].includes(e.key)) {
+      handleEncoderNav(e);
+      return;
+    }
+    switch (e.key) {
+      case 'o':
+        const focused = document.activeElement as HTMLInputElement | null;
+        const isInOled = focused?.closest('.oled');
+        if (isInOled) {
+          // Switch focus to active encoder
+          const idx = ec4.selectedEncoderIndex;
+          ec4.selectedEncoderIndex = null;
+          setTimeout(() => (ec4.selectedEncoderIndex = idx));
+        } else {
+          // Switch focus to active field in oled
+          oled.value?.focusActiveField();
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      default:
+        break;
+    }
+  }
+}
 </script>
 
 <template>
-  <main>
+  <main @keydown.capture="handleKeyDown">
     <ModeSelector class="mode-selector" />
     <Oled
       v-if="selectedEncoderId"
       :encoder-id="selectedEncoderId"
       :group-id="props.groupId"
       :active-field="activeField"
+      ref="oled"
       class="oled"
       @update:active-field="activeField = $event"
     />
 
     <EncoderPanel
-      @select-encoder="selectedEncoderIndex = $event"
+      @select-encoder="ec4.selectedEncoderIndex = $event"
       class="encoders"
       :active-field="activeField"
       :group-id="props.groupId"

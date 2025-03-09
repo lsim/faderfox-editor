@@ -48,48 +48,10 @@ watch(
     console.debug('Name active changed', newVal);
   },
 );
-
-function idToEncoderIndex(id: string | null): number | undefined {
-  if (id === null) return undefined;
-  return controls.value.findIndex((control) => control.id === id);
-}
-
-function handleKeyDown(e: KeyboardEvent) {
-  // Let Ctrl + s/d/f/e keys move focus between encoders
-  if (e.ctrlKey || e.metaKey) {
-    const selectedEncoderIndex = idToEncoderIndex(props.selectedEncoderId);
-    if (selectedEncoderIndex === undefined) return;
-    const selectedRow = Math.floor(selectedEncoderIndex / 4);
-    const selectedCol = selectedEncoderIndex % 4;
-    let newSelectedRow = selectedRow;
-    let newSelectedCol = selectedCol;
-
-    switch (e.key) {
-      case 'e':
-        newSelectedRow = Math.round((selectedRow - 1 + 4) % 4);
-        break;
-      case 'd':
-        newSelectedRow = Math.round((selectedRow + 1 + 4) % 4);
-        break;
-      case 'f':
-        newSelectedCol = Math.round((selectedCol + 1 + 4) % 4);
-        break;
-      case 's':
-        newSelectedCol = Math.round((4 + selectedCol - 1) % 4);
-        break;
-      default:
-        return;
-    }
-    const newSelectedEncoderIndex = newSelectedRow * 4 + newSelectedCol;
-    emit('select-encoder', newSelectedEncoderIndex);
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}
 </script>
 
 <template>
-  <div id="ctrlcontainer" @keydown.capture="handleKeyDown">
+  <div id="ctrlcontainer">
     <div class="encoder-container">
       <SingleEncoder
         v-for="(control, index) in controls"

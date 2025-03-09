@@ -46,10 +46,16 @@ export const useEc4Store = defineStore('ec4', () => {
     editorMode.value = mode;
   }
 
+  const selectedEncoderIndex = ref<number | null>(null);
+
+  const newInputFocus = ref<'mode' | 'high' | 'enc-0' | 'enc-3' | null>(null);
+
   return {
     encoderGroups,
     editorMode,
     setEditorMode,
     appFocused,
+    selectedEncoderIndex,
+    newInputFocus,
   };
 });

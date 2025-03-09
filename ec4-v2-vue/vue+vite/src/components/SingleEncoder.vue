@@ -50,6 +50,7 @@ function noteToObject(n: number) {
 const encoderInput = ref<HTMLInputElement | null>(null);
 
 function focusInput() {
+  if (!props.selected) return;
   if (props.nameActive) {
     nameInput.value?.focus();
   } else {
@@ -60,7 +61,7 @@ function focusInput() {
 watch(
   () => ec4.appFocused,
   (focused) => {
-    if (!focused || !props.selected) return;
+    if (!focused) return;
     focusInput();
   },
 );
