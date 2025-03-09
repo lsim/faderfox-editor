@@ -84,7 +84,6 @@ function handleKeyDown(e: KeyboardEvent) {
     emit('select-encoder', newSelectedEncoderIndex);
     e.preventDefault();
     e.stopPropagation();
-    // TODO: focus the input of the new selected encoder
   }
 }
 </script>

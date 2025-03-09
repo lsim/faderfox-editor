@@ -47,11 +47,29 @@ function noteToObject(n: number) {
   };
 }
 
+const encoderInput = ref<HTMLInputElement | null>(null);
+
+function focusInput() {
+  if (props.nameActive) {
+    nameInput.value?.focus();
+  } else {
+    encoderInput.value?.focus();
+  }
+}
+
 watch(
   () => ec4.appFocused,
   (focused) => {
     if (!focused || !props.selected) return;
-    nameInput.value?.focus();
+    focusInput();
+  },
+);
+
+// Focus the input of the new selected encoder (depending on the nameActive props)
+watch(
+  () => props.selected,
+  (newVal) => {
+    if (newVal) focusInput();
   },
 );
 
@@ -85,6 +103,7 @@ function setNameActive(newVal: boolean, source: any) {
         <input
           class="width_3"
           maxlength="3"
+          ref="encoderInput"
           v-model="control.number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
@@ -96,6 +115,7 @@ function setNameActive(newVal: boolean, source: any) {
           <input
             class="width_3"
             maxlength="3"
+            ref="encoderInput"
             v-model="control.number_h"
             @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
@@ -115,6 +135,7 @@ function setNameActive(newVal: boolean, source: any) {
           <input
             class="width_3"
             v-model="control.number"
+            ref="encoderInput"
             maxlength="3"
             @focus="setNameActive(false, $event.target)"
           />
@@ -141,6 +162,7 @@ function setNameActive(newVal: boolean, source: any) {
           type="number"
           min="1"
           max="16"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -151,6 +173,7 @@ function setNameActive(newVal: boolean, source: any) {
           class="width_4"
           v-model="control.lower"
           maxlength="4"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -161,6 +184,7 @@ function setNameActive(newVal: boolean, source: any) {
           class="width_4"
           v-model="control.upper"
           maxlength="4"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -170,6 +194,7 @@ function setNameActive(newVal: boolean, source: any) {
         <ScaleSelector
           :model-value="control.scale || 0"
           @update:modelValue="control.scale = $event"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -178,6 +203,7 @@ function setNameActive(newVal: boolean, source: any) {
         <label> {{ t('ENCODER_TYPE') }}</label>
         <select
           v-model="control.type"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         >
@@ -191,6 +217,7 @@ function setNameActive(newVal: boolean, source: any) {
         <select
           v-model="control.mode"
           @focus="setNameActive(false, $event.target)"
+          ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"
         >
           <option v-for="n in encoderModes" :key="n.value" :value="n.value">{{ n.text }}</option>
