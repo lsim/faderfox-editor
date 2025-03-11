@@ -18,10 +18,11 @@ function handleFocusOut(e: FocusEvent) {
 </script>
 
 <template>
-  <main @focusout="handleFocusOut">
-    <MidiSettings id="midisettings" />
-    <SetupListing />
-    <FrontPanel :group-id="groupId" />
+  <main @focusout="handleFocusOut" id="home">
+    <h1 class="header">Web-MIDI Editor for the faderfox EC4-MIDI controller</h1>
+    <MidiSettings class="midi-settings" />
+    <SetupListing class="group-selector" />
+    <FrontPanel :group-id="groupId" class="front-panel" />
 
     <div class="credits">
       Web-MIDI Editor for the
@@ -39,4 +40,44 @@ function handleFocusOut(e: FocusEvent) {
   </main>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+#home {
+  margin: 0 10%;
+  width: auto;
+  display: grid;
+  grid-template-areas:
+    'header header header'
+    'midi-settings midi-settings midi-settings'
+    'group-selector front-panel margin-right'
+    'footer footer footer';
+  grid-template-columns: 1fr 1fr 1fr;
+
+  .header {
+    justify-self: center;
+    grid-area: header;
+    margin-bottom: 3em;
+  }
+
+  .midi-settings {
+    grid-area: midi-settings;
+  }
+
+  .group-selector {
+    grid-area: group-selector;
+    align-self: baseline;
+    justify-self: end;
+  }
+
+  .front-panel {
+    grid-area: front-panel;
+    justify-self: start;
+  }
+
+  .credits {
+    margin-left: 30%;
+    margin-right: 30%;
+    justify-self: end;
+    grid-area: footer;
+  }
+}
+</style>

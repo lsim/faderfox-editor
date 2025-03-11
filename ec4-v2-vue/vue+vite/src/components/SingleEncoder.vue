@@ -91,7 +91,7 @@ function setNameActive(newVal: boolean, source: any) {
       <div class="name">
         <input
           ref="nameInput"
-          class="matrixfont width_4"
+          class="matrix_font name"
           maxlength="4"
           v-model="control.name"
           title="Edit name of encoder/button"
@@ -387,6 +387,18 @@ function setNameActive(newVal: boolean, source: any) {
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
+      }
+
+      &.name {
+        background-color: $active-field-color;
+        color: $yellow;
+        border-style: none;
+        width: 3.3em;
+        &:focus {
+          margin-top: -1px;
+        }
+        box-sizing: border-box;
+        text-align: center;
       }
     }
 

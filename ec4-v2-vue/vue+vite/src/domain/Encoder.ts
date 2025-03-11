@@ -85,12 +85,32 @@ export class EncoderGroup {
   name: string;
   encoders: Encoder[];
   pushButtons: PushButton[];
+  setupId: string;
 
-  constructor(id: string, name: string, encoders: Encoder[], pushButtons: PushButton[]) {
+  constructor(
+    id: string,
+    setupId: string,
+    name: string,
+    encoders: Encoder[],
+    pushButtons: PushButton[],
+  ) {
     this.id = id;
     this.name = name;
     this.encoders = encoders;
     this.pushButtons = pushButtons;
+    this.setupId = setupId;
+  }
+}
+
+export class EncoderSetup {
+  id: string;
+  name: string;
+  groups: EncoderGroup[];
+
+  constructor(id: string, name: string, groups: EncoderGroup[]) {
+    this.id = id;
+    this.name = name;
+    this.groups = groups;
   }
 }
 
@@ -121,7 +141,7 @@ export class Encoder {
   constructor(id: string, groupId: string, type?: number, mode?: number) {
     this.id = id;
     this.groupId = groupId;
-    this.name = id;
+    this.name = '----';
     this.channel = 0;
     this.number = 0;
     this.number_h = 0;

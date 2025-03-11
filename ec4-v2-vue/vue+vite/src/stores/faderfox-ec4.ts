@@ -1,46 +1,50 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { EncoderGroup, PushButton } from '@/domain/Encoder.ts';
+import { EncoderGroup, EncoderSetup, PushButton } from '@/domain/Encoder.ts';
 import { Encoder } from '@/domain/Encoder.ts';
 
-// TODO: This is a temporary solution to get the encoder groups to render
-function createEncoderGroup(groupId: string) {
-  const encoderIds = [
-    '00',
-    '01',
-    '02',
-    '03',
-    '04',
-    '05',
-    '06',
-    '07',
-    '08',
-    '09',
-    '10',
-    '11',
-    '12',
-    '13',
-    '14',
-    '15',
-  ];
-  const encoders = encoderIds.map((id) => new Encoder(`EC${id}`, groupId));
-  const pushButtons = encoderIds.map((id) => new PushButton(`PB${id}`, groupId));
-  return new EncoderGroup(groupId, groupId, encoders, pushButtons);
+function* generateIds(prefix: string) {
+  for (let i = 0; i < 16; i++) {
+    const paddedNumber = i.toString().padStart(2, '0');
+    yield `${prefix}${paddedNumber}`;
+  }
 }
 
+function createEmptyEncoderGroup(groupId: string, setupId: string) {
+  const encoderIds = Array.from(generateIds('EC'));
+  const encoders = encoderIds.map((id) => new Encoder(id, groupId));
+  const pushButtons = encoderIds.map((id) => new PushButton(`PB${id}`, groupId));
+  return new EncoderGroup(groupId, setupId, groupId, encoders, pushButtons);
+}
+
+function createEmptyEncoderSetups() {
+  const setupIds = Array.from(generateIds('SE'));
+
+  return setupIds.map((setupId) => {
+    const encoderGroups = Array.from(generateIds('GR')).map((groupId) => {
+      return createEmptyEncoderGroup(groupId, setupId);
+    });
+    return new EncoderSetup(setupId, setupId, encoderGroups);
+  });
+}
+
+const appFocused = ref(true);
+
+window.addEventListener('focus', () => {
+  appFocused.value = true;
+});
+window.addEventListener('blur', () => {
+  appFocused.value = false;
+});
+
 export const useEc4Store = defineStore('ec4', () => {
-  const encoderGroups = ref<EncoderGroup[]>([createEncoderGroup('GR01')]);
+  const encoderSetups = ref<EncoderSetup[]>(createEmptyEncoderSetups());
+  const selectedSetupIndex = ref<number>(0);
+
+  const encoderGroups = computed(() => encoderSetups.value[selectedSetupIndex.value].groups);
+  const selectedGroupIndex = ref<number>(0);
 
   const editorMode = ref<'push' | 'turn'>('turn');
-
-  const appFocused = ref(true);
-
-  window.addEventListener('focus', () => {
-    appFocused.value = true;
-  });
-  window.addEventListener('blur', () => {
-    appFocused.value = false;
-  });
 
   function setEditorMode(mode: 'push' | 'turn') {
     editorMode.value = mode;
@@ -48,14 +52,14 @@ export const useEc4Store = defineStore('ec4', () => {
 
   const selectedEncoderIndex = ref<number | null>(null);
 
-  const newInputFocus = ref<'mode' | 'high' | 'enc-0' | 'enc-3' | null>(null);
-
   return {
+    encoderSetups,
+    selectedSetupIndex,
     encoderGroups,
+    selectedGroupIndex,
     editorMode,
     setEditorMode,
     appFocused,
     selectedEncoderIndex,
-    newInputFocus,
   };
 });

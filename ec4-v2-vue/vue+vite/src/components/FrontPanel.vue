@@ -23,6 +23,8 @@ const selectedEncoderId = computed(() => {
 
 const oled = ref<InstanceType<typeof Oled> | null>(null);
 
+// IDEA: Shift + Ctrl + nav could select a range of encoders (eg for inserting incremental values
+
 function handleEncoderNav(e: KeyboardEvent) {
   if (ec4.selectedEncoderIndex == null) return;
   const selectedRow = Math.floor(ec4.selectedEncoderIndex / 4);
