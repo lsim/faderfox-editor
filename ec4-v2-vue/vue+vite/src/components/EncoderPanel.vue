@@ -5,8 +5,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { computed, watch, ref } from 'vue';
 
 const props = defineProps<{
-  groupId: string;
-  selectedEncoderId: string | null;
+  selectedEncoderId: number | null;
   activeField: FieldType;
 }>();
 
@@ -17,7 +16,7 @@ const emit = defineEmits<{
 const ec4 = useEc4Store();
 
 const controls = computed(() => {
-  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === ec4.selectedGroupIndex);
   return ec4.editorMode === 'turn' ? group?.encoders || [] : group?.pushButtons || [];
 });
 
@@ -57,7 +56,6 @@ watch(
         v-for="(control, index) in controls"
         :key="control.id"
         :encoder-id="control.id"
-        :group-id="props.groupId"
         :index="index"
         :active-field="props.activeField"
         :name-active="nameActive"

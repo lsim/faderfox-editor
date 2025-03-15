@@ -5,7 +5,7 @@ import SetupListing from '@/components/SetupListing.vue';
 import { ref } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
-const groupId = ref<string>('GR01');
+const groupId = ref<number>(0);
 
 const ec4 = useEc4Store();
 
@@ -20,7 +20,9 @@ function handleFocusOut(e: FocusEvent) {
 <template>
   <main @focusout="handleFocusOut" id="home">
     <h1 class="header">Web-MIDI Editor for the faderfox EC4-MIDI controller</h1>
-    <MidiSettings class="midi-settings" />
+    <Suspense>
+      <MidiSettings class="midi-settings" />
+    </Suspense>
     <SetupListing class="group-selector" />
     <FrontPanel :group-id="groupId" class="front-panel" />
 

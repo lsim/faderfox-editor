@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import { computed, toRefs } from 'vue';
+import { type EncoderGroup, EncoderSetup } from '@/domain/Encoder.ts';
 
 const ec4 = useEc4Store();
+
+const gridRows = computed(() => {
+  return ec4.encoderSetups.map((s, i) => [s, ec4.encoderGroups[i]]);
+});
 </script>
 
 <template>
   <div id="setupsandgroups" title="Select setup, group and edit name.">
     <h3>Setup</h3>
     <h3>Group</h3>
-    <template v-for="(s, idx) in ec4.encoderSetups" :key="s.id">
+    <template v-for="([s, g], idx) in gridRows" :key="s.id">
       <input
         v-model="s.name"
         :class="{ selected: idx === ec4.selectedSetupIndex }"
@@ -17,7 +23,8 @@ const ec4 = useEc4Store();
         maxlength="4"
       />
       <input
-        v-model="s.groups[idx].name"
+        v-if="g"
+        v-model="g.name"
         :class="{ selected: idx === ec4.selectedGroupIndex }"
         class="group-name matrix_font"
         @focus="ec4.selectedGroupIndex = idx"
@@ -59,14 +66,16 @@ const ec4 = useEc4Store();
     background-color: transparent;
 
     &.selected {
-      background-color: red;
+      background-color: red !important;
     }
 
     &.setup-name {
+      //grid-area: setups;
     }
 
     &.group-name {
-      text-align: center;
+      //grid-area: groups;
+      //text-align: center;
       background-color: $active-field-color;
     }
   }

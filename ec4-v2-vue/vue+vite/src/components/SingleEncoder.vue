@@ -15,8 +15,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 const { t } = useI18n();
 
 const props = defineProps<{
-  encoderId: string;
-  groupId: string;
+  encoderId: number;
   activeField: FieldType;
   nameActive: boolean;
   selected: boolean;
@@ -29,7 +28,7 @@ const emit = defineEmits<{
 const ec4 = useEc4Store();
 
 const control: ComputedRef<Encoder | null> = computed(() => {
-  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === ec4.selectedGroupIndex);
   const controls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
   return controls?.find((e: Encoder) => e.id === props.encoderId) || null;
 });
@@ -168,7 +167,7 @@ function setNameActive(newVal: boolean, source: any) {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'lower_limit'">
+      <template v-else-if="props.activeField === 'lower'">
         <label>{{ t('ENCODER_LOWER') }}</label>
         <input
           class="width_4"
@@ -179,7 +178,7 @@ function setNameActive(newVal: boolean, source: any) {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'upper_limit'">
+      <template v-else-if="props.activeField === 'upper'">
         <label>{{ t('ENCODER_UPPER') }}</label>
         <input
           class="width_4"

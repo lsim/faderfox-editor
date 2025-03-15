@@ -15,8 +15,8 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 const { t } = useI18n();
 
 const props = defineProps<{
-  encoderId: string;
-  groupId: string;
+  encoderId: number;
+  groupId: number;
   activeField: FieldType;
 }>();
 
@@ -61,9 +61,9 @@ function focusActiveField() {
     scaleInput.value?.focus();
   } else if (props.activeField === 'number') {
     numberInput.value?.focus();
-  } else if (props.activeField === 'lower_limit') {
+  } else if (props.activeField === 'lower') {
     lowerLimitInput.value?.focus();
-  } else if (props.activeField === 'upper_limit') {
+  } else if (props.activeField === 'upper') {
     upperLimitInput.value?.focus();
   } else if (props.activeField === 'mode') {
     modeSelect.value?.focus();
@@ -163,14 +163,14 @@ defineExpose({ focusActiveField });
       </option>
     </select>
     <!-- Lower limit -->
-    <label for="encoderLowerLimit" :class="{ 'active-field': activeField === 'lower_limit' }"
+    <label for="encoderLowerLimit" :class="{ 'active-field': activeField === 'lower' }"
       >{{ t('OLED_LOWER') }}:</label
     >
     <input
       id="encoderLowerLimit"
       ref="lowerLimitInput"
       v-model="control.lower"
-      @focus="setActiveField('lower_limit', $event.target)"
+      @focus="setActiveField('lower', $event.target)"
       type="number"
     />
     <!-- Encoder mode -->
@@ -188,14 +188,14 @@ defineExpose({ focusActiveField });
       </option>
     </select>
     <!-- Upper limit -->
-    <label for="encoderUpperLimit" :class="{ 'active-field': activeField === 'upper_limit' }"
+    <label for="encoderUpperLimit" :class="{ 'active-field': activeField === 'upper' }"
       >{{ t('OLED_UPPER') }}:</label
     >
     <input
       id="encoderUpperLimit"
       ref="upperLimitInput"
       v-model="control.upper"
-      @focus="setActiveField('upper_limit', $event.target)"
+      @focus="setActiveField('upper', $event.target)"
       type="number"
     />
 

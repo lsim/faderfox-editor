@@ -7,19 +7,19 @@ import { computed, ref } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const props = defineProps<{
-  groupId: string;
+  groupId: number;
 }>();
 
 const ec4 = useEc4Store();
 
 const activeField = ref<FieldType>('number');
 
-const selectedEncoderId = computed(() => {
-  if (ec4.selectedEncoderIndex == null) return null;
-  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-  const currentControls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
-  return currentControls?.[ec4.selectedEncoderIndex]?.id || null;
-});
+// const selectedEncoderId = computed(() => {
+//   if (ec4.selectedEncoderIndex == null) return null;
+//   const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
+//   const currentControls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
+//   return currentControls?.[ec4.selectedEncoderIndex]?.id || null;
+// });
 
 const oled = ref<InstanceType<typeof Oled> | null>(null);
 
@@ -98,9 +98,9 @@ function handleKeyDown(e: KeyboardEvent) {
   <main @keydown.capture="handleKeyDown">
     <ModeSelector class="mode-selector" />
     <Oled
-      v-if="selectedEncoderId"
-      :encoder-id="selectedEncoderId"
-      :group-id="props.groupId"
+      v-if="ec4.selectedEncoderIndex != null"
+      :encoder-id="ec4.selectedEncoderIndex"
+      :group-id="ec4.selectedGroupIndex"
       :active-field="activeField"
       ref="oled"
       class="oled"
@@ -112,7 +112,7 @@ function handleKeyDown(e: KeyboardEvent) {
       class="encoders"
       :active-field="activeField"
       :group-id="props.groupId"
-      :selected-encoder-id="selectedEncoderId"
+      :selected-encoder-id="ec4.selectedEncoderIndex"
     />
 
     <div class="fillnumbers" title="Fill with ascending values in chosen direction">
