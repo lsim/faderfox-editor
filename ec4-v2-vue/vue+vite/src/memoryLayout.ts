@@ -291,6 +291,12 @@ const P = {
     },
   } as Record<string, MemSpec>,
 
+  _getMemAddr: function (spec: MemSpec, setupId: number, groupId: number) {
+    let startAddr = 'memstart' in spec ? (spec.memstart ?? 0) : MEM.addrPresets;
+    let lengthGroup = 'grouplen' in spec ? (spec.grouplen ?? 0) : MEM.lengthGroup;
+    return startAddr + (setupId * 16 + groupId) * lengthGroup + spec.pos;
+  },
+
   get: function <TRes>(
     data: Uint8Array<ArrayBufferLike>,
     setupId: number,
@@ -306,7 +312,7 @@ const P = {
       console.log('Get unknown parameter type: ' + type);
       throw Error('Get unknown parameter type: ' + type);
     }
-    let addr = MEM.addrPresets + (setupId * 16 + groupId) * MEM.lengthGroup + spec.pos;
+    let addr = this._getMemAddr(spec, setupId, groupId);
     if (type === P.name) {
       addr += encoderId * 4;
       return P.stringFromPosition(data, addr) as TRes;
@@ -413,6 +419,8 @@ export function parseSetupsFromSysex(sysexData: Uint8Array<ArrayBufferLike>) {
 
 export type MemField =
   | Exclude<FieldType, null>
+  | 'lower_msb'
+  | 'upper_msb'
   | 'pb_channel'
   | 'pb_display'
   | 'pb_type'
@@ -422,14 +430,53 @@ export type MemField =
   | 'pb_upper'
   | 'pb_link';
 
-export function getMemField<Tres>(
+function useHighres(
   data: Uint8Array<ArrayBufferLike>,
   setupId: number,
   groupId: number,
   encoderId: number,
-  type: MemField,
 ) {
-  return P.get<Tres>(data, setupId, groupId, encoderId, type);
+  const enc_type = P.get<number>(data, setupId, groupId, encoderId, 'type');
+  const enc_disp = P.get<number>(data, setupId, groupId, encoderId, 'scale');
+  return (
+    (enc_type == 4 || enc_type == 5 || enc_type == 8) &&
+    (enc_disp == 0 || enc_disp == 3 || enc_disp == 6 || enc_disp == 8)
+  );
+}
+
+export function getMemField(
+  data: Uint8Array<ArrayBufferLike>,
+  setupId: number,
+  groupId: number,
+  encoderId: number,
+  type: Exclude<MemField, 'name'>,
+): number {
+  let value = P.get<number>(data, setupId, groupId, encoderId, type);
+  if (type === 'lower' || type === 'upper') {
+    if (useHighres(data, setupId, groupId, encoderId)) {
+      if (type == 'lower') {
+        value += P.get<number>(data, setupId, groupId, encoderId, 'lower_msb') << 8;
+      } else {
+        value += P.get<number>(data, setupId, groupId, encoderId, 'upper_msb') << 8;
+      }
+      if (value > 4094) {
+        value = 16383;
+      }
+    } else {
+      value = P.get<number>(data, setupId, groupId, encoderId, type) & 0x7f;
+    }
+  }
+
+  return value;
+}
+
+export function getEncoderName(
+  data: Uint8Array<ArrayBufferLike>,
+  setupId: number,
+  groupId: number,
+  encoderId: number,
+): string {
+  return P.get<string>(data, setupId, groupId, encoderId, 'name');
 }
 
 export function getSetupName(data: Uint8Array<ArrayBufferLike>, setupId: number) {

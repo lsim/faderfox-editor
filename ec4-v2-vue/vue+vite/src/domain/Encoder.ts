@@ -1,5 +1,5 @@
 import { generateIds } from '@/stores/faderfox-ec4.ts';
-import { getMemField, getSetupName, getGroupName } from '@/memoryLayout.ts';
+import { getMemField, getSetupName, getGroupName, getEncoderName } from '@/memoryLayout.ts';
 
 export type FieldType =
   | 'channel'
@@ -11,6 +11,7 @@ export type FieldType =
   | 'type'
   | 'scale' /* display */
   | 'name'
+  | 'link'
   | null;
 
 export type EncoderType = {
@@ -78,25 +79,27 @@ export const pushButtonScaleOptions: ScaleOption[] = [
 export type ModeOption = {
   text: string;
   value: number;
+  long: string;
 };
 
 export const pushButtonModes: ModeOption[] = [
-  { text: 'Togl', value: 0 },
-  { text: 'Key', value: 1 },
+  { text: 'Togl', value: 0, long: 'Toggle' },
+  { text: 'Key', value: 1, long: 'While held' },
 ];
 
 export const encoderModes: ModeOption[] = [
-  { text: 'LSp6', value: 0 },
-  { text: 'LSp4', value: 1 },
-  { text: 'LSp2', value: 2 },
-  { text: 'Acc3', value: 3 },
-  { text: 'Acc2', value: 4 },
-  { text: 'Acc1', value: 5 },
-  { text: 'Acc0', value: 6 },
-  { text: 'Div2', value: 7 },
-  { text: 'Div4', value: 8 },
-  { text: 'Div8', value: 9 },
+  { text: 'Div8', value: 0, long: 'Div. by 8' },
+  { text: 'Div4', value: 1, long: 'Div. by 4' },
+  { text: 'Div2', value: 2, long: 'Div. by 2' },
+  { text: 'Acc0', value: 3, long: 'No acceleration' },
+  { text: 'Acc1', value: 4, long: 'Low acceleration' },
+  { text: 'Acc2', value: 5, long: 'Mid acceleration' },
+  { text: 'Acc3', value: 6, long: 'Max acceleration' },
+  { text: 'LSp2', value: 7, long: 'Large step 2' },
+  { text: 'LSp4', value: 8, long: 'Large step 4' },
+  { text: 'LSp6', value: 9, long: 'Large step 6' },
 ];
+
 const modeByName = (name: (typeof encoderModes)[number]['text']) =>
   encoderModes.findIndex((t) => t.text === name);
 
@@ -218,7 +221,8 @@ export class Encoder {
     res.upper = getMemField(bytes, setupId, groupId, encoderId, 'upper');
     res.mode = getMemField(bytes, setupId, groupId, encoderId, 'mode');
     res.scale = getMemField(bytes, setupId, groupId, encoderId, 'scale');
-    res.name = getMemField(bytes, setupId, groupId, encoderId, 'name');
+    res.link = getMemField(bytes, setupId, groupId, encoderId, 'link') !== 0;
+    res.name = getEncoderName(bytes, setupId, groupId, encoderId);
 
     return res;
   }
@@ -244,8 +248,8 @@ export class PushButton extends Encoder {
     res.number = getMemField(bytes, setupId, groupId, encoderId, 'pb_number');
     res.lower = getMemField(bytes, setupId, groupId, encoderId, 'pb_lower');
     res.upper = getMemField(bytes, setupId, groupId, encoderId, 'pb_upper');
-    res.link = getMemField(bytes, setupId, groupId, encoderId, 'pb_link');
-    res.name = getMemField(bytes, setupId, groupId, encoderId, 'name');
+    res.link = getMemField(bytes, setupId, groupId, encoderId, 'pb_link') !== 0;
+    res.name = getEncoderName(bytes, setupId, groupId, encoderId);
     return res;
   }
 }

@@ -8,6 +8,7 @@ import {
   encoderModes,
   EncoderGroup,
   typeByName,
+  pushButtonModes,
 } from '@/domain/Encoder';
 import { computed, type ComputedRef, ref, defineExpose, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -129,6 +130,17 @@ const controlTypes = computed(() => {
       return encoderTypes;
     case 'push':
       return pushbuttonTypes;
+    default:
+      throw Error('Unknown editor mode ' + ec4.editorMode);
+  }
+});
+
+const controlModes = computed(() => {
+  switch (ec4.editorMode) {
+    case 'turn':
+      return encoderModes;
+    case 'push':
+      return pushButtonModes;
     default:
       throw Error('Unknown editor mode ' + ec4.editorMode);
   }
@@ -268,7 +280,7 @@ defineExpose({ focusActiveField });
       ref="modeSelect"
       :class="{ hidden: isHidden('mode', control) }"
     >
-      <option v-for="n in encoderModes" :key="n.value" :value="n.value" :title="n.text">
+      <option v-for="n in controlModes" :key="n.value" :value="n.value" :title="n.long">
         {{ n.text }}
       </option>
     </select>
