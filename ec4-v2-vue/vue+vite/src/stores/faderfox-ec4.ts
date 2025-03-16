@@ -2,7 +2,7 @@ import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderGroup, EncoderSetup, PushButton } from '@/domain/Encoder.ts';
 import { Encoder } from '@/domain/Encoder.ts';
-import { MEM, MEMORY_OFFSET, MEMORY_SIZE, parseSysexData } from '@/composables/useMemLayout.ts';
+import { parseSetupsFromSysex } from '@/memoryLayout.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -45,37 +45,22 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
-function prepareSysexBytes(sysexData: Uint8Array<ArrayBufferLike>) {
-  const result = new Uint8Array(MEMORY_SIZE);
-  const version = parseSysexData(
-    sysexData,
-    (chunk) => {},
-    (addr, pageData) => {
-      result.set(pageData, addr - MEMORY_OFFSET);
-    },
-  );
-  return result;
-}
-
-function parseSetupsFromSysex(sysexData: Uint8Array<ArrayBufferLike>) {
-  const preparedBytes = prepareSysexBytes(sysexData);
-  return Array.from(generateIds()).map((setupId) => {
-    return EncoderSetup.fromBytes(preparedBytes, setupId);
-  });
-}
-
 function getCachedSysexData(): number[] {
   return JSON.parse(localStorage.getItem('sysexDataArr') || '[]');
 }
 
 export const useEc4Store = defineStore('ec4', () => {
   const dataFromDevice = new Uint8Array(getCachedSysexData());
-  console.debug('Starting parsing of EC4 sysex data', dataFromDevice);
-  const res = parseSetupsFromSysex(dataFromDevice);
-  console.log('parsed setups', res);
 
-  const encoderSetups = ref<EncoderSetup[]>(createEmptyEncoderSetups());
-  encoderSetups.value = res;
+  let initial: EncoderSetup[];
+  try {
+    initial = parseSetupsFromSysex(dataFromDevice);
+  } catch (e) {
+    console.error('Error parsing sysex data', e);
+    initial = createEmptyEncoderSetups();
+  }
+
+  const encoderSetups = ref<EncoderSetup[]>(initial);
   const selectedSetupIndex = ref<number>(0);
 
   const encoderGroups = computed(() => encoderSetups.value[selectedSetupIndex.value].groups);
