@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const ec4 = useEc4Store();
 
-const activeField = ref<FieldType>('number');
+const activeField = ref<FieldType>(null);
 
 // const selectedEncoderId = computed(() => {
 //   if (ec4.selectedEncoderIndex == null) return null;

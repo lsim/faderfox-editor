@@ -4,11 +4,12 @@ import {
   type Encoder,
   type FieldType,
   encoderTypes,
+  pushbuttonTypes,
   encoderModes,
   EncoderGroup,
   typeByName,
 } from '@/domain/Encoder';
-import { computed, type ComputedRef, ref, defineExpose } from 'vue';
+import { computed, type ComputedRef, ref, defineExpose, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -69,6 +70,70 @@ function focusActiveField() {
     modeSelect.value?.focus();
   }
 }
+
+function isHidden(field: FieldType, control: Partial<Encoder>): boolean {
+  let excludingTypes: number[] = [];
+  if (control.controlType === 'encoder') {
+    switch (field) {
+      case 'lower':
+      case 'upper':
+        // Hidden for CCR1, CCR2, Note
+        excludingTypes = [0, 1, 7];
+        break;
+      case 'number':
+        // Hidden for PrgC, PBnd, AftT
+        excludingTypes = [3, 5, 6];
+        break;
+      case 'mode':
+        // Hidden for Note
+        excludingTypes = [7];
+        break;
+    }
+  } else if (control.controlType === 'push-button') {
+    switch (field) {
+      case 'scale':
+        // Hidden for Off
+        excludingTypes = [0];
+        break;
+      case 'channel':
+        // Hidden for Off, Acc0, Acc3, LSp6, Min, Max
+        excludingTypes = [0, 8, 9, 10, 11, 12];
+        break;
+      case 'mode':
+      case 'lower':
+      case 'upper':
+      case 'number':
+        // Like channel but also hidden for Grp, Set
+        excludingTypes = [0, 6, 7, 8, 9, 10, 11, 12];
+        break;
+    }
+  }
+  return excludingTypes.includes(control.type ?? -1);
+}
+
+// When control.type changes, we may need to clear the active field as it may no longer be valid
+watch(
+  () => control.value.type,
+  (newType) => {
+    const newFieldHidden = isHidden(props.activeField, control.value);
+    if (newFieldHidden) {
+      setActiveField(null, null);
+    }
+  },
+);
+
+// Encoders have one set of options, push buttons have another
+const controlTypes = computed(() => {
+  switch (ec4.editorMode) {
+    case 'turn':
+      return encoderTypes;
+    case 'push':
+      return pushbuttonTypes;
+    default:
+      throw Error('Unknown editor mode ' + ec4.editorMode);
+  }
+});
+
 defineExpose({ focusActiveField });
 </script>
 
@@ -85,8 +150,10 @@ defineExpose({ focusActiveField });
       @focus="setActiveField('name', $event.target)"
     />
     <!-- Encoder channel -->
-    <label for="encoderChannel" :class="{ 'active-field': activeField === 'channel' }"
-      >{{ t('OLED_CHANNEL') }}:</label
+    <label
+      for="encoderChannel"
+      :class="{ 'active-field': activeField === 'channel', hidden: isHidden('channel', control) }"
+      >{{ control.type === 6 ? t('OLED_GROUP') : t('OLED_CHANNEL') }}:</label
     >
     <input
       id="encoderChannel"
@@ -102,9 +169,12 @@ defineExpose({ focusActiveField });
           : control.channel
       "
       @focus="setActiveField('channel', $event.target)"
+      :class="{ hidden: isHidden('channel', control) }"
     />
     <!-- Encoder display -->
-    <label for="encoderScale" :class="{ 'active-field': activeField === 'scale' }"
+    <label
+      for="encoderScale"
+      :class="{ 'active-field': activeField === 'scale', hidden: isHidden('scale', control) }"
       >{{ t('OLED_DISPLAY') }}:</label
     >
     <ScaleSelector
@@ -114,13 +184,16 @@ defineExpose({ focusActiveField });
       id="encoderScale"
       ref="scaleInput"
       @focus="setActiveField('scale', $event.target)"
+      :class="{ hidden: isHidden('scale', control) }"
     />
     <template v-if="control.type === typeByName('NRPN')">
       <!-- Encoder number - NRPN -->
-      <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }"
+      <label
+        for="encoderNumber"
+        :class="{ 'active-field': activeField === 'number', hidden: isHidden('number', control) }"
         >{{ t('OLED_NUMBER') }}:</label
       >
-      <span class="two-inputs">
+      <span class="two-inputs" :class="{ hidden: isHidden('number', control) }">
         <input
           id="encoderNumber"
           ref="numberInput"
@@ -137,7 +210,9 @@ defineExpose({ focusActiveField });
     </template>
     <template v-else>
       <!-- Encoder number - other -->
-      <label for="encoderNumber" :class="{ 'active-field': activeField === 'number' }"
+      <label
+        for="encoderNumber"
+        :class="{ 'active-field': activeField === 'number', hidden: isHidden('number', control) }"
         >{{ t('OLED_NUMBER') }}:</label
       >
       <input
@@ -146,6 +221,7 @@ defineExpose({ focusActiveField });
         maxlength="3"
         v-model="control.number"
         @focus="setActiveField('number', $event.target)"
+        :class="{ hidden: isHidden('number', control) }"
       />
     </template>
     <!-- Encoder type -->
@@ -158,12 +234,17 @@ defineExpose({ focusActiveField });
       @focus="setActiveField('type', $event.target)"
       ref="typeSelect"
     >
-      <option v-for="n in encoderTypes" :key="n.value" :value="n.short" :title="n.text">
+      <option v-for="n in controlTypes" :key="n.value" :value="n.value" :title="n.text">
         {{ n.short }}
       </option>
     </select>
     <!-- Lower limit -->
-    <label for="encoderLowerLimit" :class="{ 'active-field': activeField === 'lower' }"
+    <label
+      for="encoderLowerLimit"
+      :class="{
+        'active-field': activeField === 'lower',
+        hidden: isHidden('lower', control),
+      }"
       >{{ t('OLED_LOWER') }}:</label
     >
     <input
@@ -171,10 +252,13 @@ defineExpose({ focusActiveField });
       ref="lowerLimitInput"
       v-model="control.lower"
       @focus="setActiveField('lower', $event.target)"
+      :class="{ hidden: isHidden('lower', control) }"
       type="number"
     />
     <!-- Encoder mode -->
-    <label for="encoderMode" :class="{ 'active-field': activeField === 'mode' }"
+    <label
+      for="encoderMode"
+      :class="{ 'active-field': activeField === 'mode', hidden: isHidden('mode', control) }"
       >{{ t('OLED_MODE') }}:</label
     >
     <select
@@ -182,13 +266,16 @@ defineExpose({ focusActiveField });
       v-model="control.mode"
       @focus="setActiveField('mode', $event.target)"
       ref="modeSelect"
+      :class="{ hidden: isHidden('mode', control) }"
     >
       <option v-for="n in encoderModes" :key="n.value" :value="n.value" :title="n.text">
         {{ n.text }}
       </option>
     </select>
     <!-- Upper limit -->
-    <label for="encoderUpperLimit" :class="{ 'active-field': activeField === 'upper' }"
+    <label
+      for="encoderUpperLimit"
+      :class="{ 'active-field': activeField === 'upper', hidden: isHidden('upper', control) }"
       >{{ t('OLED_UPPER') }}:</label
     >
     <input
@@ -196,6 +283,7 @@ defineExpose({ focusActiveField });
       ref="upperLimitInput"
       v-model="control.upper"
       @focus="setActiveField('upper', $event.target)"
+      :class="{ hidden: isHidden('upper', control) }"
       type="number"
     />
 
@@ -431,6 +519,10 @@ defineExpose({ focusActiveField });
   }
   select:focus {
     outline: $yellow groove 1px;
+  }
+
+  .hidden {
+    visibility: hidden;
   }
 
   label {

@@ -1,5 +1,5 @@
 import { generateIds } from '@/stores/faderfox-ec4.ts';
-import { parseSetupsFromSysex, getMemField, getSetupName, getGroupName } from '@/memoryLayout.ts';
+import { getMemField, getSetupName, getGroupName } from '@/memoryLayout.ts';
 
 export type FieldType =
   | 'channel'
@@ -29,6 +29,22 @@ export const encoderTypes: EncoderType[] = [
   { text: 'Aftertouch', short: 'AftT', value: 6 },
   { text: 'Note', short: 'Note', value: 7 },
   { text: 'NRPN', short: 'NRPN', value: 8 },
+];
+
+export const pushbuttonTypes: EncoderType[] = [
+  { text: 'Off', short: 'Off', value: 0 },
+  { text: 'Note', short: 'Note', value: 1 },
+  { text: 'CC', short: 'CC', value: 2 },
+  { text: 'PrgC', short: 'PrgC', value: 3 },
+  { text: 'PBnd', short: 'PBnd', value: 4 },
+  { text: 'AftT', short: 'AftT', value: 5 },
+  { text: 'Grp', short: 'Grp', value: 6 },
+  { text: 'Set', short: 'Set', value: 7 },
+  { text: 'Acc0', short: 'Acc0', value: 8 },
+  { text: 'Acc3', short: 'Acc3', value: 9 },
+  { text: 'LSp6', short: 'LSp6', value: 10 },
+  { text: 'Min', short: 'Min', value: 11 },
+  { text: 'Max', short: 'Max', value: 12 },
 ];
 
 export const typeByName = (name: (typeof encoderTypes)[number]['short']) =>
@@ -111,10 +127,13 @@ export class EncoderGroup {
     groupId: number,
   ): EncoderGroup {
     const encoders = Array.from(generateIds()).map((encoderId) => {
-      return Encoder.fromBytes(bytes, setupId, groupId, encoderId);
+      return Encoder.encoderFromBytes(bytes, setupId, groupId, encoderId);
+    });
+    const pushButtons = Array.from(generateIds()).map((encoderId) => {
+      return PushButton.pushButtonFromBytes(bytes, setupId, groupId, encoderId);
     });
     const groupName = getGroupName(bytes, setupId, groupId);
-    return new EncoderGroup(groupId, setupId, groupName, encoders, []);
+    return new EncoderGroup(groupId, setupId, groupName, encoders, pushButtons);
   }
 }
 
@@ -137,7 +156,7 @@ export class EncoderSetup {
     return new EncoderSetup(setupId, setupName, groups);
   }
 }
-
+export type ControlType = 'encoder' | 'push-button';
 export class Encoder {
   id: number;
   groupId: number;
@@ -163,6 +182,9 @@ export class Encoder {
   // Whether the encoder is linked to the next encoder
   link: boolean;
 
+  // Extra info
+  controlType: ControlType = 'encoder';
+
   constructor(id: number, groupId: number, setupId: number, type?: number, mode?: number) {
     this.id = id;
     this.groupId = groupId;
@@ -179,7 +201,7 @@ export class Encoder {
     this.link = false;
   }
 
-  static fromBytes(
+  static encoderFromBytes(
     bytes: Uint8Array<ArrayBufferLike>,
     setupId: number,
     groupId: number,
@@ -203,7 +225,27 @@ export class Encoder {
 }
 
 export class PushButton extends Encoder {
+  controlType: ControlType = 'push-button';
   constructor(id: number, groupId: number) {
     super(id, groupId, typeByName('Note'), modeByName('Key'));
+  }
+
+  static pushButtonFromBytes(
+    bytes: Uint8Array<ArrayBufferLike>,
+    setupId: number,
+    groupId: number,
+    encoderId: number,
+  ): PushButton {
+    const res = new PushButton(encoderId, groupId);
+    res.channel = getMemField(bytes, setupId, groupId, encoderId, 'pb_channel');
+    res.scale = getMemField(bytes, setupId, groupId, encoderId, 'pb_display');
+    res.type = getMemField(bytes, setupId, groupId, encoderId, 'pb_type');
+    res.mode = getMemField(bytes, setupId, groupId, encoderId, 'pb_mode');
+    res.number = getMemField(bytes, setupId, groupId, encoderId, 'pb_number');
+    res.lower = getMemField(bytes, setupId, groupId, encoderId, 'pb_lower');
+    res.upper = getMemField(bytes, setupId, groupId, encoderId, 'pb_upper');
+    res.link = getMemField(bytes, setupId, groupId, encoderId, 'pb_link');
+    res.name = getMemField(bytes, setupId, groupId, encoderId, 'name');
+    return res;
   }
 }

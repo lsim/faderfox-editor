@@ -1,6 +1,7 @@
 export default {
   ENCODER_TYPE: 'type',
   ENCODER_CHANNEL: 'channel',
+  ENCODER_GROUP: 'group',
   ENCODER_NUMBER: 'number',
   ENCODER_NUMBER_NOTE: 'number/note',
   ENCODER_NUMBER_H: 'MSB',
@@ -20,6 +21,7 @@ export default {
   // Abbreviated labels for oled
   OLED_ENCODER_NAME: 'ctrl',
   OLED_CHANNEL: 'chan',
+  OLED_GROUP: 'group',
   OLED_DISPLAY: 'disp',
   OLED_NUMBER: 'numb',
   OLED_TYPE: 'type',

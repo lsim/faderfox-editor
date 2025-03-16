@@ -189,19 +189,28 @@ const P = {
   mode: 'mode',
   scale: 'scale',
   name: 'name',
+  link: 'link',
+  pb_channel: 'pb_channel',
+  pb_display: 'pb_display',
+  pb_type: 'pb_type',
+  pb_mode: 'pb_mode',
+  pb_number: 'pb_number',
+  pb_lower: 'pb_lower',
+  pb_upper: 'pb_upper',
+  pb_link: 'pb_link',
 
-  labels: {
-    type: 'Type',
-    channel: 'Channel',
-    number: 'Number',
-    number_h: 'MSB',
-    number_nrpn: '#MSB/LSB',
-    lower: 'Lower',
-    upper: 'Upper',
-    mode: 'Mode',
-    scale: 'Display',
-  },
-
+  // labels: {
+  //   type: 'Type',
+  //   channel: 'Channel',
+  //   number: 'Number',
+  //   number_h: 'MSB',
+  //   number_nrpn: '#MSB/LSB',
+  //   lower: 'Lower',
+  //   upper: 'Upper',
+  //   mode: 'Mode',
+  //   scale: 'Display',
+  // },
+  //
   _dataFormat: {
     type: { pos: 0, mask: 0xf0, lsb: 4, min: 0, max: 8, default: 2 },
     channel: { pos: 0, mask: 0x0f },
@@ -287,7 +296,7 @@ const P = {
     setupId: number,
     groupId: number,
     encoderId: number,
-    type: Exclude<FieldType, null>,
+    type: MemField,
   ): TRes {
     // if (type === 'select-encoder') {
     //   return;
@@ -312,7 +321,7 @@ const P = {
             val = spec.default ?? 0;
           }
         }
-        if (type === P.channel) val++;
+        if (type === P.channel || type === 'pb_channel') val++;
         return val as TRes;
       } else {
         return data[addr] as TRes;
@@ -402,12 +411,23 @@ export function parseSetupsFromSysex(sysexData: Uint8Array<ArrayBufferLike>) {
   });
 }
 
+export type MemField =
+  | Exclude<FieldType, null>
+  | 'pb_channel'
+  | 'pb_display'
+  | 'pb_type'
+  | 'pb_mode'
+  | 'pb_number'
+  | 'pb_lower'
+  | 'pb_upper'
+  | 'pb_link';
+
 export function getMemField<Tres>(
   data: Uint8Array<ArrayBufferLike>,
   setupId: number,
   groupId: number,
   encoderId: number,
-  type: Exclude<FieldType, null>,
+  type: MemField,
 ) {
   return P.get<Tres>(data, setupId, groupId, encoderId, type);
 }

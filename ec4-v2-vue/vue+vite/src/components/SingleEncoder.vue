@@ -5,6 +5,7 @@ import {
   EncoderGroup,
   type FieldType,
   encoderTypes,
+  pushbuttonTypes,
   encoderModes,
   typeByName,
 } from '@/domain/Encoder.ts';
@@ -47,6 +48,18 @@ function noteToObject(n: number) {
 }
 
 const encoderInput = ref<HTMLInputElement | null>(null);
+
+// Encoders have one set of options, push buttons have another
+const controlTypes = computed(() => {
+  switch (ec4.editorMode) {
+    case 'turn':
+      return encoderTypes;
+    case 'push':
+      return pushbuttonTypes;
+    default:
+      throw Error('Unknown editor mode ' + ec4.editorMode);
+  }
+});
 
 function focusInput() {
   if (!props.selected) return;
@@ -150,7 +163,7 @@ function setNameActive(newVal: boolean, source: any) {
         </div>
       </template>
       <template v-else-if="props.activeField === 'channel'">
-        <label>{{ t('ENCODER_CHANNEL') }}</label>
+        <label>{{ control.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
         <input
           class="width_2"
           :value="control.channel"
@@ -207,7 +220,7 @@ function setNameActive(newVal: boolean, source: any) {
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         >
-          <option v-for="n in encoderTypes" :key="n.value" :value="n.short" :title="n.text">
+          <option v-for="n in controlTypes" :key="n.value" :value="n.value" :title="n.text">
             {{ n.short }}
           </option>
         </select>
