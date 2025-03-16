@@ -10,7 +10,7 @@ import {
   typeByName,
   pushButtonModes,
 } from '@/domain/Encoder';
-import { computed, type ComputedRef, ref, defineExpose, watch } from 'vue';
+import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
