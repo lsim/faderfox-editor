@@ -340,21 +340,10 @@ export class MidiOutput extends Midi {
   }
 }
 
-export default async function useMidi() {
+export default function useMidi() {
   console.debug('Initializing MIDI');
 
   const midiSupport = ref<boolean>();
-  const m: MIDIAccess | null = await midi.then(
-    (_m) => {
-      midiSupport.value = true;
-      return _m;
-    },
-    () => {
-      midiSupport.value = false;
-      return null;
-    },
-  );
-
   const inputs = ref<Array<MidiInput>>([]);
   const outputs = ref<Array<MidiOutput>>([]);
 
@@ -375,13 +364,24 @@ export default async function useMidi() {
     }
   }
 
-  if (m) m.onstatechange = updateDevices;
-
-  updateDevices();
+  let m: MIDIAccess | null = null;
+  midi.then(
+    (_m) => {
+      midiSupport.value = true;
+      m = _m;
+      m.onstatechange = updateDevices;
+      updateDevices();
+    },
+    () => {
+      midiSupport.value = false;
+    },
+  );
 
   function dispose() {
-    if (!m) return;
-    m.onstatechange = null;
+    midi.then((_m) => {
+      if (!m) return;
+      m.onstatechange = null;
+    });
     for (const i of inputs.value) (i.device as MIDIInput).onmidimessage = null;
   }
 

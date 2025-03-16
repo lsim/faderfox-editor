@@ -5,7 +5,7 @@ import { ref, watch, onBeforeUnmount } from 'vue';
 import useConfirm from '@/composables/confirm.ts';
 import Confirm from '@/components/Confirm.vue';
 
-const midi = await useMidi();
+const midi = useMidi();
 
 const confirm = useConfirm();
 
@@ -53,7 +53,7 @@ function loadSysexFromFile() {
 </script>
 
 <template>
-  <form id="midisettings" class="pico">
+  <form id="midisettings" class="pico" v-if="midi.midiSupport.value">
     <Confirm>
       <!--      <template v-slot:message>Foobar</template>-->
     </Confirm>
@@ -62,7 +62,6 @@ function loadSysexFromFile() {
       id="midiInDeviceId"
       title="Please select the MIDI interface your EC4 is connected to for input."
       tabindex="-1"
-      :disabled="midi.midiSupport.value === false"
       v-model="selectedInput"
     >
       <option v-if="midi.inputs.value.length === 0">(No devices)</option>
@@ -73,7 +72,6 @@ function loadSysexFromFile() {
       id="midiOutDeviceId"
       title="Please select the MIDI interface your EC4 is connected to for output."
       tabindex="-1"
-      :disabled="midi.midiSupport.value === false"
       v-model="selectedOutput"
     >
       <option v-if="midi.outputs.value.length === 0">(No devices)</option>
@@ -104,12 +102,11 @@ function loadSysexFromFile() {
 
 <style scoped lang="scss">
 #midisettings {
+  max-width: 200px;
   label {
     white-space: nowrap;
   }
   display: grid;
-  grid-template-columns: 1fr 2fr;
   align-items: baseline;
-  gap: 1em;
 }
 </style>

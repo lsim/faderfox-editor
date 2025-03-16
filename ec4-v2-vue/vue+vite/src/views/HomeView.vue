@@ -20,9 +20,7 @@ function handleFocusOut(e: FocusEvent) {
 <template>
   <main @focusout="handleFocusOut" id="home">
     <h1 class="header">Web-MIDI Editor for the faderfox EC4-MIDI controller</h1>
-    <Suspense>
-      <MidiSettings class="midi-settings" />
-    </Suspense>
+    <MidiSettings class="midi-settings" />
     <SetupListing class="group-selector" />
     <FrontPanel :group-id="groupId" class="front-panel" />
 
