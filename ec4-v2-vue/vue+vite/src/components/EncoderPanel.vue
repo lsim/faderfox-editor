@@ -23,13 +23,6 @@ const controls = computed(() => {
 const nameActive = ref<boolean>(false);
 
 watch(
-  () => ec4.editorMode,
-  (newMode) => {
-    console.debug('mode changed to', newMode);
-  },
-);
-
-watch(
   () => props.activeField,
   (newActiveField) => {
     console.debug(
