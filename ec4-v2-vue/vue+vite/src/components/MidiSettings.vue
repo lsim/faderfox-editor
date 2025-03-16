@@ -82,9 +82,7 @@ function loadSysexFromFile() {
     <!--    <button type="button" id="btnreceive" title="Receive settings from your EC4" tabindex="-1">-->
     <!--      Receive from EC4-->
     <!--    </button>-->
-    <button type="button" id="btntransfer" title="Send editor data to your EC4" tabindex="-1">
-      Send to EC4
-    </button>
+    <button type="button" title="Send editor data to your EC4" tabindex="-1">Send to EC4 ⮕</button>
     <button
       @click="loadSysexFromFile"
       type="button"
@@ -97,6 +95,24 @@ function loadSysexFromFile() {
       Save file
     </button>
     <a href="#" id="upgradeFirmware">Upgrade EC4 to firmware 2.0</a>
+    <table>
+      <thead>
+        <tr>
+          <th>Received</th>
+          <th># Setups</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>23:30:10</td>
+          <td>16</td>
+        </tr>
+        <tr>
+          <td>14:20:50</td>
+          <td>1</td>
+        </tr>
+      </tbody>
+    </table>
   </form>
 </template>
 
