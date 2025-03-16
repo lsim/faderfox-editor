@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { EncoderGroup, EncoderSetup, PushButton } from '@/domain/Encoder.ts';
-import { Encoder } from '@/domain/Encoder.ts';
+import { EncoderGroup, EncoderSetup, PushButton, Encoder } from '@/domain/Encoder.ts';
 import { parseSetupsFromSysex } from '@/memoryLayout.ts';
 
 export function* generateIds() {

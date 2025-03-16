@@ -313,7 +313,6 @@ function parseMidiMessage(bytes: Uint8Array<ArrayBufferLike> | null): MidiMessag
 export class MidiInput extends Midi {
   constructor(device: MIDIInput) {
     super(device);
-    console.debug('MIDI: New input', device);
     device.onmidimessage = this.handleMidiMessage;
   }
 

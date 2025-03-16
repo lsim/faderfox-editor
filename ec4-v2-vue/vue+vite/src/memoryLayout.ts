@@ -122,7 +122,6 @@ function parseSysexData(
           throw new Error(STR.sysex.error_checksum);
         } else {
           if (emitPage) {
-            console.debug('emitPage', ix, pageNumber);
             emitPage(pageNumber, pageData);
           }
           // start new page
