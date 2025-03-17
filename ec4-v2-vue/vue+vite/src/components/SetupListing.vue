@@ -8,6 +8,12 @@ const ec4 = useEc4Store();
 const gridRows = computed(() => {
   return ec4.encoderSetups.map((s, i) => [s, ec4.encoderGroups[i]]);
 });
+
+function handleFocus(e: Event, setupId: number, groupId: number) {
+  ec4.selectedSetupIndex = setupId;
+  ec4.selectedGroupIndex = groupId;
+  (e.target as any)?.select();
+}
 </script>
 
 <template>
@@ -19,7 +25,7 @@ const gridRows = computed(() => {
         v-model="s.name"
         :class="{ selected: idx === ec4.selectedSetupIndex }"
         class="setup-name matrix_font"
-        @focus="ec4.selectedSetupIndex = idx"
+        @focus="handleFocus($event, idx, ec4.selectedGroupIndex)"
         maxlength="4"
       />
       <input
@@ -27,7 +33,7 @@ const gridRows = computed(() => {
         v-model="g.name"
         :class="{ selected: idx === ec4.selectedGroupIndex }"
         class="group-name matrix_font"
-        @focus="ec4.selectedGroupIndex = idx"
+        @focus="handleFocus($event, ec4.selectedSetupIndex, idx)"
         maxlength="4"
       />
     </template>
@@ -59,9 +65,19 @@ const gridRows = computed(() => {
 #setupsandgroups {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #ccc;
+  padding: 5px;
+  border-radius: 6px;
+  margin-top: 24px;
+  text-align: center;
 
   input {
-    width: 3em;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+
     color: $yellow;
     background-color: transparent;
 
