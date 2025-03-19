@@ -130,7 +130,7 @@ $oled-width: 300px;
 main {
   // This grid was tweaked to fit the outlines of the EC4 controller
   display: grid;
-  grid-template-columns: 24px 1fr 30px;
+  grid-template-columns: 1fr 2fr 1fr;
   grid-template-rows: 73px 30px $oled-height 30px 480px 20px;
   grid-template-areas:
     'margin-left margin-top margin-right'
@@ -140,11 +140,11 @@ main {
     'margin-left encoders margin-right'
     'margin-left fillnumbers margin-right';
   justify-items: center;
-  margin: 0 auto;
   width: 500px;
   height: 818px;
   background: url('../assets/ec4.jpg') no-repeat;
-  background-size: 100% 100%;
+  // The picture has a few too many pixels on the right, so make it a bit too big on that axis
+  background-size: 101% 100%;
 
   .mode-selector {
     grid-area: mode-selector;
@@ -167,6 +167,7 @@ main {
 
   .fillnumbers {
     grid-area: fillnumbers;
+    display: none;
   }
 }
 </style>

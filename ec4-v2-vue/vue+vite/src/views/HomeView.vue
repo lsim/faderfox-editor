@@ -24,19 +24,19 @@ function handleFocusOut(e: FocusEvent) {
     <SetupListing class="group-selector" />
     <FrontPanel :group-id="groupId" class="front-panel" />
 
-    <div class="credits">
-      Web-MIDI Editor for the
-      <a href="http://faderfox.de/ec4.html" tabindex="-1">faderfox EC4-MIDI controller</a>.
-      Developed by Peter Witzel (<a href="https://www.privatepublic.de" tabindex="-1"
-        >privatepublic.de</a
-      >) in co-operation with Faderfox. Source code available on
-      <a href="https://github.com/privatepublic-de/faderfox-editor" tabindex="-1">github</a>.
-      <p class="privacydeclaration">
-        <b>Complete Privacy:</b> This web application (page) does not track, store or dispatch any
-        data entered here. Visits, appliance or any other interactions with this page are not
-        tracked. If in doubt, feel free to check the source code.
-      </p>
-    </div>
+    <!--    <div class="credits">-->
+    <!--      Web-MIDI Editor for the-->
+    <!--      <a href="http://faderfox.de/ec4.html" tabindex="-1">faderfox EC4-MIDI controller</a>.-->
+    <!--      Developed by Peter Witzel (<a href="https://www.privatepublic.de" tabindex="-1"-->
+    <!--        >privatepublic.de</a-->
+    <!--      >) in co-operation with Faderfox. Source code available on-->
+    <!--      <a href="https://github.com/privatepublic-de/faderfox-editor" tabindex="-1">github</a>.-->
+    <!--      <p class="privacydeclaration">-->
+    <!--        <b>Complete Privacy:</b> This web application (page) does not track, store or dispatch any-->
+    <!--        data entered here. Visits, appliance or any other interactions with this page are not-->
+    <!--        tracked. If in doubt, feel free to check the source code.-->
+    <!--      </p>-->
+    <!--    </div>-->
   </main>
 </template>
 
@@ -49,7 +49,7 @@ function handleFocusOut(e: FocusEvent) {
     'header header header'
     'group-selector front-panel midi-settings'
     'footer footer footer';
-  grid-template-columns: 1fr 2fr 2fr;
+  grid-template-columns: 1fr auto 1fr;
 
   .header {
     justify-self: center;

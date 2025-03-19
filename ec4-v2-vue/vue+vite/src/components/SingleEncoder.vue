@@ -236,6 +236,10 @@ function setNameActive(newVal: boolean, source: any) {
           <option v-for="n in encoderModes" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
       </template>
+      <template v-else>
+        <div></div>
+        <div></div>
+      </template>
 
       <img
         v-if="ec4.editorMode === 'push'"
@@ -366,6 +370,7 @@ function setNameActive(newVal: boolean, source: any) {
 
 <style scoped lang="scss">
 @use '../assets/main.scss' as *;
+@use '@picocss/pico/scss/colors/index.scss' as *;
 
 .encoder-container {
   overflow: hidden;

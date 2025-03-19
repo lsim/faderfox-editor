@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import useMidi from '@/composables/useMidi.ts';
-import { Midi } from '@/composables/useMidi.ts';
-import { ref, watch, onBeforeUnmount } from 'vue';
+import { watch, onBeforeUnmount } from 'vue';
 import useConfirm from '@/composables/confirm.ts';
 import Confirm from '@/components/Confirm.vue';
 
@@ -11,14 +10,12 @@ const confirm = useConfirm();
 
 onBeforeUnmount(() => midi.dispose());
 
-const selectedInput = ref<Midi | null>(null);
-const selectedOutput = ref<Midi | null>(null);
-
 watch(
   () => midi.inputs.value,
   (newInputs) => {
     if (newInputs.length > 0) {
-      selectedInput.value = newInputs.find((i) => i.device.name === 'Faderfox EC4') || newInputs[0];
+      midi.selectedInput.value =
+        newInputs.find((i) => i.device.name === 'Faderfox EC4') || newInputs[0];
     }
   },
   { immediate: true },
@@ -28,7 +25,7 @@ watch(
   () => midi.outputs.value,
   (newOutputs) => {
     if (newOutputs.length > 0) {
-      selectedOutput.value =
+      midi.selectedOutput.value =
         newOutputs.find((o) => o.device.name === 'Faderfox EC4') || newOutputs[0];
     }
   },
@@ -36,6 +33,22 @@ watch(
 );
 
 function loadSysexFromFile() {
+  midi.protocol.value
+    ?.setSetupAndGroup(0, 0)
+    .then(() => {
+      return midi.protocol.value?.getSetupAndGroup();
+    })
+    .then((setupAndGroup) => {
+      if (!setupAndGroup) return;
+      console.log(
+        'Setup and group response',
+        Array.from(setupAndGroup).map((x) => x.toString(16)),
+      );
+      return midi.protocol.value?.requestGroupSnapshot();
+    })
+    .then((response) => {
+      console.log('Snapshot response', response);
+    });
   confirm
     .showIt(
       'Load Sysex File',
@@ -62,7 +75,7 @@ function loadSysexFromFile() {
       id="midiInDeviceId"
       title="Please select the MIDI interface your EC4 is connected to for input."
       tabindex="-1"
-      v-model="selectedInput"
+      v-model="midi.selectedInput"
     >
       <option v-if="midi.inputs.value.length === 0">(No devices)</option>
       <option v-for="(i, k) in midi.inputs.value" :key="k" :value="i">{{ i.device.name }}</option>
@@ -72,7 +85,7 @@ function loadSysexFromFile() {
       id="midiOutDeviceId"
       title="Please select the MIDI interface your EC4 is connected to for output."
       tabindex="-1"
-      v-model="selectedOutput"
+      v-model="midi.selectedOutput"
     >
       <option v-if="midi.outputs.value.length === 0">(No devices)</option>
       <option v-for="(o, k) in midi.outputs.value" :key="k" :value="o">
@@ -118,7 +131,11 @@ function loadSysexFromFile() {
 
 <style scoped lang="scss">
 #midisettings {
-  max-width: 200px;
+  max-width: 255px;
+  border: 3px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+
   label {
     white-space: nowrap;
   }

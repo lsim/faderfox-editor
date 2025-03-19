@@ -1,4 +1,6 @@
-import { ref } from 'vue';
+import { computed, type ComputedRef, ref, watch } from 'vue';
+import { filter, lastValueFrom, map, Subject, take, timeout } from 'rxjs';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 /**
  * Web MIDI interface handler
@@ -201,14 +203,6 @@ const midi: Promise<MIDIAccess> = navigator.requestMIDIAccess({ sysex: true });
 // Single setup bytes: 14294
 // All setups bytes: 14294 * 16 = 22112? No it's 229340 bytes
 
-export class Midi {
-  device: MIDIPort;
-
-  constructor(device: MIDIPort) {
-    this.device = device;
-  }
-}
-
 /* MIDI Message data format
 Status Byte|Data Byte 1|Data Byte 2|Message|	        Legend
 1000nnnn	  0kkkkkkk	  0vvvvvvv	  Note Off	        n=channel* k=key # 0-127 (60=middle C) v=velocity (0-127)
@@ -310,33 +304,110 @@ function parseMidiMessage(bytes: Uint8Array<ArrayBufferLike> | null): MidiMessag
   };
 }
 
-export class MidiInput extends Midi {
+export class Midi<T extends MIDIOutput | MIDIInput> {
+  device: T;
+
+  constructor(device: T) {
+    this.device = device;
+  }
+}
+
+export class MidiInput extends Midi<MIDIInput> {
+  readonly receivedMessages$: Subject<[MidiMessage, Uint8Array]>;
+
   constructor(device: MIDIInput) {
     super(device);
-    device.onmidimessage = this.handleMidiMessage;
+    this.receivedMessages$ = new Subject<[MidiMessage, Uint8Array]>();
+    device.onmidimessage = this.handleMidiMessage.bind(this);
+    console.log('MidiInput constructor', this.receivedMessages$);
   }
 
   handleMidiMessage(ev: MIDIMessageEvent) {
     const bytes = ev.data;
+    if (!bytes) return;
     const msg = parseMidiMessage(bytes);
-    console.debug('MIDI: Received message', msg);
-    if (msg && msg.type === 'sysex') {
-      console.log(`MIDI: Sysex received ${bytes?.length}`, bytes);
-      // Save it to local storage for now
-      if (bytes && bytes.length > 100) {
-        localStorage.setItem(
-          'sysexDataArr',
-          bytes ? JSON.stringify(Array.from(new Uint8Array(bytes.buffer))) : '[]',
-        );
-      }
-      return;
-    }
+    if (!msg) return;
+    console.log(
+      'MidiInput received message',
+      this.receivedMessages$,
+      msg,
+      Array.from(bytes).map((x) => x.toString(16)),
+    );
+    this.receivedMessages$.next([msg, bytes]);
   }
 }
 
-export class MidiOutput extends Midi {
+export class MidiOutput extends Midi<MIDIOutput> {
   constructor(device: MIDIOutput) {
     super(device);
+  }
+
+  send(data: Uint8Array) {
+    if (!this.device) throw Error('MIDI device not found');
+    this.device.send(Array.from(data));
+  }
+}
+
+export class EC4SysexProtocol {
+  input: MidiInput;
+  output: MidiOutput;
+
+  constructor(input: MidiInput, output: MidiOutput) {
+    this.input = input;
+    this.output = output;
+  }
+
+  private sendRaw(data: Uint8Array) {
+    this.output.send(data);
+  }
+
+  private async roundtrip(data: number[], timeoutMs: number = 1000) {
+    console.log(
+      'sending request',
+      data.map((x) => x.toString(16)),
+    );
+
+    const responsePromise = lastValueFrom(
+      this.input.receivedMessages$.pipe(
+        filter(([msg]) => msg.type === 'sysex'),
+        take(1),
+        timeout({ first: timeoutMs }),
+        map(([, bytes]) => bytes),
+      ),
+    );
+    this.sendRaw(new Uint8Array(data));
+    return await responsePromise;
+  }
+
+  async getSetupAndGroup() {
+    const response = await this.roundtrip([0xf0, 0x00, 0x00, 0x00, 0x4e, 0x20, 0x10, 0xf7]);
+    const groupId = response[12] & 0xf;
+    const setupId = response[9] & 0xf;
+    return [setupId, groupId];
+  }
+
+  async setSetupAndGroup(setupId: number, groupId: number) {
+    const setBoth = [
+      0xf0,
+      0x00,
+      0x00,
+      0x00,
+      0x4e,
+      0x2c,
+      0x1b,
+      0x4e,
+      0x28,
+      0x10 | setupId,
+      0x4e,
+      0x24,
+      0x10 | groupId,
+      0xf7,
+    ];
+    await this.roundtrip(setBoth);
+  }
+
+  async requestGroupSnapshot() {
+    await this.roundtrip([0xf0, 0x00, 0x00, 0x00, 0x4e, 0x2c, 0x1b, 0x4e, 0x26, 0x10, 0xf7]);
   }
 }
 
@@ -385,10 +456,32 @@ export default function useMidi() {
     for (const i of inputs.value) (i.device as MIDIInput).onmidimessage = null;
   }
 
+  const ec4 = useEc4Store();
+
+  const selectedInput = ref<MidiInput | null>(null);
+  const selectedOutput = ref<MidiOutput | null>(null);
+
+  const protocol: ComputedRef<EC4SysexProtocol | null> = computed(() => {
+    if (!selectedInput.value || !selectedOutput.value) return null;
+    return new EC4SysexProtocol(selectedInput.value as MidiInput, selectedOutput.value);
+  });
+
+  watch(
+    () => [ec4.selectedSetupIndex, ec4.selectedGroupIndex],
+    (newVal) => {
+      console.log('new setup/group', newVal);
+      protocol.value?.setSetupAndGroup(newVal[0], newVal[1]);
+    },
+    { deep: true },
+  );
+
   return {
     midiSupport,
     inputs,
     outputs,
+    protocol,
+    selectedInput,
+    selectedOutput,
     dispose,
   };
 }

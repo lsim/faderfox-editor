@@ -497,6 +497,7 @@ defineExpose({ focusActiveField });
 
 <style scoped lang="scss">
 @use '../assets/main.scss' as *;
+@use '@picocss/pico/scss/colors/index.scss' as *;
 #oled {
   display: grid;
   grid-template-columns: 0.9fr 0.9fr 0.9fr 1.3fr;
