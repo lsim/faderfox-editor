@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderGroup, EncoderSetup, PushButton, Encoder } from '@/domain/Encoder.ts';
 import { parseSetupsFromSysex } from '@/memoryLayout.ts';
@@ -44,20 +44,20 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
-function getCachedSysexData(): number[] {
-  return JSON.parse(localStorage.getItem('sysexDataArr') || '[]');
-}
+// function getCachedSysexData(): number[] {
+//   return JSON.parse(localStorage.getItem('sysexDataArr') || '[]');
+// }
 
 export const useEc4Store = defineStore('ec4', () => {
-  const dataFromDevice = new Uint8Array(getCachedSysexData());
+  // const dataFromDevice = new Uint8Array(getCachedSysexData());
 
   let initial: EncoderSetup[];
-  try {
-    initial = parseSetupsFromSysex(dataFromDevice);
-  } catch (e) {
-    console.error('Error parsing sysex data', e);
-    initial = createEmptyEncoderSetups();
-  }
+  // try {
+  //   initial = parseSetupsFromSysex(dataFromDevice);
+  // } catch (e) {
+  //   console.error('Error parsing sysex data', e);
+  initial = createEmptyEncoderSetups();
+  // }
 
   const encoderSetups = ref<EncoderSetup[]>(initial);
   const selectedSetupIndex = ref<number>(0);

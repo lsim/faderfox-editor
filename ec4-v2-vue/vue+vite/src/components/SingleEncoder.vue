@@ -50,7 +50,7 @@ function noteToObject(n: number) {
 const encoderInput = ref<HTMLInputElement | null>(null);
 
 // Encoders have one set of options, push buttons have another
-const controlTypes = computed(() => {
+const typeOptions = computed(() => {
   switch (ec4.editorMode) {
     case 'turn':
       return encoderTypes;
@@ -144,28 +144,28 @@ function setNameActive(newVal: boolean, source: any) {
       </template>
       <template v-else-if="props.activeField === 'number' && control.type === typeByName('Note')">
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
-        <div class="note-inputs">
-          <input
+        <span class="note-inputs"
+          ><input
             class="width_3"
             v-model="control.number"
             ref="encoderInput"
             maxlength="3"
             @focus="setNameActive(false, $event.target)"
-          />
-          <select
-            class="width_2"
+          /><select
+            class="width_3"
             v-model="control.number"
             @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           >
             <option v-for="n in noteOptions" :key="n.value" :value="n.value">{{ n.text }}</option>
           </select>
-        </div>
+        </span>
       </template>
+      <template v-else-if="props.activeField === 'number'"> </template>
       <template v-else-if="props.activeField === 'channel'">
         <label>{{ control.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
         <input
-          class="width_2"
+          class="width_3"
           :value="control.channel"
           @input="
             control.channel = ($event.target as HTMLInputElement).checkValidity()
@@ -220,7 +220,7 @@ function setNameActive(newVal: boolean, source: any) {
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         >
-          <option v-for="n in controlTypes" :key="n.value" :value="n.value" :title="n.text">
+          <option v-for="n in typeOptions" :key="n.value" :value="n.value" :title="n.text">
             {{ n.short }}
           </option>
         </select>
@@ -395,6 +395,11 @@ function setNameActive(newVal: boolean, source: any) {
       color: $textColor;
     }
 
+    .note-inputs {
+      display: flex;
+      flex-direction: row;
+    }
+
     input {
       background-color: transparent;
       color: $textColor;
@@ -434,11 +439,8 @@ function setNameActive(newVal: boolean, source: any) {
     }
   }
 
-  .width_2 {
-    width: 1.2em;
-  }
   .width_3 {
-    width: 1.3em;
+    width: 2.3em;
   }
   .width_4 {
     width: 2.6em;

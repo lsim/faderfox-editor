@@ -409,6 +409,76 @@ export class EC4SysexProtocol {
   async requestGroupSnapshot() {
     await this.roundtrip([0xf0, 0x00, 0x00, 0x00, 0x4e, 0x2c, 0x1b, 0x4e, 0x26, 0x10, 0xf7]);
   }
+
+  lsn(n: number) {
+    return n & 0xf;
+  }
+
+  msn(n: number) {
+    return (n >> 4) & 0xf;
+  }
+  //   F0 00 00 00 4E 2C 1B 4E 22 10 4A 23 1C 4D 25 12 4D 26 15 4D 27 13 4D 26 1F F7 (write ctrl name display)
+  //               ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^
+  //               device-id     type  address     data     data     data     data
+  //               i=11   	     t=0     a=61      d='R'    d='e'    d='s'    d='o'
+  //                         ctrl nam  ctrl 16
+  async setEncoderDisplay(type: number, address: number, data: string) {
+    // const cmd = [
+    //   0xf0, 0x00, 0x00, 0x00, 0x4e, 0x2c, 0x1b, 0x4e, 0x22, 0x10, 0x4a, 0x23, 0x1c, 0x4d, 0x25,
+    //   0x12, 0x4d, 0x26, 0x15, 0x4d, 0x27, 0x13, 0x4d, 0x26, 0x1f, 0xf7,
+    // ];
+    const cmd = [
+      0xf0,
+      0x00,
+      0x00,
+      0x00,
+      // device-id
+      0x4e,
+      0x2c,
+      0x1b,
+      // type
+      0x4e,
+      0x22,
+      0x10 | this.lsn(type),
+      // address
+      0x4a,
+      0x20 | this.msn(address),
+      0x10 | this.lsn(address),
+      // Char 1
+      0x4d,
+      0x20 | this.msn(data[0].charCodeAt(0)),
+      0x10 | this.lsn(data[0].charCodeAt(0)),
+      // Char 2
+      0x4d,
+      0x20 | this.msn(data[1].charCodeAt(0)),
+      0x10 | this.lsn(data[1].charCodeAt(0)),
+      // Char 3
+      0x4d,
+      0x20 | this.msn(data[2].charCodeAt(0)),
+      0x10 | this.lsn(data[2].charCodeAt(0)),
+      // Char 4
+      0x4d,
+      0x20 | this.msn(data[3].charCodeAt(0)),
+      0x10 | this.lsn(data[3].charCodeAt(0)),
+      0xf7,
+    ];
+
+    await this.roundtrip(cmd);
+  }
+
+  async setFullDisplay() {
+    const cmd = [
+      0xf0, 0x00, 0x00, 0x00, 0x4e, 0x2c, 0x1b, 0x4e, 0x22, 0x13, 0x4a, 0x21, 0x1c, 0x4d, 0x25,
+      0x12, 0x4d, 0x26, 0x15, 0x4d, 0x27, 0x13, 0x4d, 0x26, 0x1f, 0x4e, 0x22, 0x14, 0xf7,
+    ];
+    await this.roundtrip(cmd);
+  }
+
+  async fullDisplay(enable: boolean) {
+    // F0 00 00 00 4E 2C 1B 4E 22 14 F7
+    const cmd = [0xf0, 0x00, 0x00, 0x00, 0x4e, 0x2c, 0x1b, 0x4e, 0x22, enable ? 0x14 : 0x15, 0xf7];
+    await this.roundtrip(cmd);
+  }
 }
 
 export default function useMidi() {
@@ -468,9 +538,11 @@ export default function useMidi() {
 
   watch(
     () => [ec4.selectedSetupIndex, ec4.selectedGroupIndex],
-    (newVal) => {
-      console.log('new setup/group', newVal);
-      protocol.value?.setSetupAndGroup(newVal[0], newVal[1]);
+    async ([newSetupId, newGroupId]) => {
+      console.log('new setup/group', newSetupId, newGroupId);
+      // await protocol.value?.setSetupAndGroup(newVal[0], newVal[1]);
+      // await protocol.value?.setEncoderDisplay(newSetupId, newGroupId, 'fooo');
+      // await protocol.value?.showFullDisplay();
     },
     { deep: true },
   );
