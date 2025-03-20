@@ -7,7 +7,7 @@ import {
   encoderTypes,
   pushbuttonTypes,
   encoderModes,
-  typeByName,
+  encoderTypeByName,
 } from '@/domain/Encoder.ts';
 import { computed, ref, type ComputedRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -111,7 +111,7 @@ function setNameActive(newVal: boolean, source: any) {
           :tabindex="props.nameActive ? 0 : -1"
         />
       </div>
-      <template v-if="props.activeField === 'number' && control.type === typeByName('CCab')">
+      <template v-if="props.activeField === 'number' && control.type === encoderTypeByName('CCab')">
         <label>{{ t('ENCODER_NUMBER') }}</label>
         <input
           class="width_3"
@@ -122,7 +122,9 @@ function setNameActive(newVal: boolean, source: any) {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'number' && control.type === typeByName('NRPN')">
+      <template
+        v-else-if="props.activeField === 'number' && control.type === encoderTypeByName('NRPN')"
+      >
         <label>{{ t('ENCODER_NUMBER_NRPN') }}</label>
         <div class="double-inputs">
           <input
@@ -142,7 +144,9 @@ function setNameActive(newVal: boolean, source: any) {
           />
         </div>
       </template>
-      <template v-else-if="props.activeField === 'number' && control.type === typeByName('Note')">
+      <template
+        v-else-if="props.activeField === 'number' && control.type === encoderTypeByName('Note')"
+      >
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
         <span class="note-inputs"
           ><input

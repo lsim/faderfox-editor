@@ -20,7 +20,7 @@ const defaultSetupNames = Array.from(generateDefaultNames('SE'));
 function createEmptyEncoderGroup(groupId: number, setupId: number) {
   const encoderIds = Array.from(generateIds());
   const encoders = encoderIds.map((id) => new Encoder(id, groupId, setupId));
-  const pushButtons = encoderIds.map((id) => new PushButton(id, groupId));
+  const pushButtons = encoderIds.map((id) => new PushButton(id, groupId, setupId));
   return new EncoderGroup(groupId, setupId, defaultGroupNames[groupId], encoders, pushButtons);
 }
 
@@ -71,7 +71,7 @@ export const useEc4Store = defineStore('ec4', () => {
     editorMode.value = mode;
   }
 
-  const selectedEncoderIndex = ref<number | null>(null);
+  const selectedEncoderIndex = ref<number>(0);
 
   return {
     encoderSetups,

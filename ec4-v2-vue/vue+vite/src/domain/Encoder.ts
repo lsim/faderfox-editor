@@ -48,8 +48,11 @@ export const pushbuttonTypes: EncoderType[] = [
   { text: 'Max', short: 'Max', value: 12 },
 ];
 
-export const typeByName = (name: (typeof encoderTypes)[number]['short']) =>
+export const encoderTypeByName = (name: (typeof encoderTypes)[number]['short']) =>
   encoderTypes.findIndex((t) => t.short === name);
+
+export const pushButtonTypeByName = (name: (typeof pushbuttonTypes)[number]['short']) =>
+  pushbuttonTypes.findIndex((t) => t.short === name);
 
 export type ScaleOption = {
   text: string;
@@ -100,8 +103,11 @@ export const encoderModes: ModeOption[] = [
   { text: 'LSp6', value: 9, long: 'Large step 6' },
 ];
 
-const modeByName = (name: (typeof encoderModes)[number]['text']) =>
+const encoderModeByName = (name: (typeof encoderModes)[number]['text']) =>
   encoderModes.findIndex((t) => t.text === name);
+
+const pushButtonModeByName = (name: (typeof pushButtonModes)[number]['text']) =>
+  pushButtonModes.findIndex((t) => t.text === name);
 
 export class EncoderGroup {
   id: number;
@@ -198,9 +204,9 @@ export class Encoder {
     this.number_h = 0;
     this.lower = 0;
     this.upper = 0;
-    this.mode = mode || encoderModes.findIndex((m) => m.text === 'Acc3');
+    this.mode = mode ?? encoderModeByName('Acc3');
     this.scale = 1;
-    this.type = type || typeByName('CCab');
+    this.type = type ?? encoderTypeByName('CCab');
     this.link = false;
   }
 
@@ -230,8 +236,9 @@ export class Encoder {
 
 export class PushButton extends Encoder {
   controlType: ControlType = 'push-button';
-  constructor(id: number, groupId: number) {
-    super(id, groupId, typeByName('Note'), modeByName('Key'));
+  constructor(id: number, groupId: number, setupId: number) {
+    super(id, groupId, setupId, pushButtonTypeByName('Note'), pushButtonModeByName('Key'));
+    console.log('pushButtonConstructor', this.mode, pushButtonModes);
   }
 
   static pushButtonFromBytes(
@@ -240,7 +247,7 @@ export class PushButton extends Encoder {
     groupId: number,
     encoderId: number,
   ): PushButton {
-    const res = new PushButton(encoderId, groupId);
+    const res = new PushButton(encoderId, groupId, setupId);
     res.channel = getMemField(bytes, setupId, groupId, encoderId, 'pb_channel');
     res.scale = getMemField(bytes, setupId, groupId, encoderId, 'pb_display');
     res.type = getMemField(bytes, setupId, groupId, encoderId, 'pb_type');

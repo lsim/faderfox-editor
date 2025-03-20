@@ -14,36 +14,16 @@ const ec4 = useEc4Store();
 
 const activeField = ref<FieldType>(null);
 
-// const selectedEncoderId = computed(() => {
-//   if (ec4.selectedEncoderIndex == null) return null;
-//   const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-//   const currentControls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
-//   return currentControls?.[ec4.selectedEncoderIndex]?.id || null;
-// });
-
 const oled = ref<InstanceType<typeof Oled> | null>(null);
 
 // IDEA: Shift + Ctrl + nav could select a range of encoders (eg for inserting incremental values
 
 function handleEncoderNav(e: KeyboardEvent) {
-  if (ec4.selectedEncoderIndex == null) return;
   const selectedRow = Math.floor(ec4.selectedEncoderIndex / 4);
   const selectedCol = ec4.selectedEncoderIndex % 4;
   let newSelectedRow = selectedRow;
   let newSelectedCol = selectedCol;
   switch (e.key) {
-    case 'o':
-      const focused = document.activeElement as HTMLInputElement | null;
-      const isInOled = focused?.closest('.oled');
-      if (isInOled) {
-        // Switch focus to active encoder
-        const idx = ec4.selectedEncoderIndex;
-        ec4.selectedEncoderIndex = null;
-        setTimeout(() => (ec4.selectedEncoderIndex = idx));
-      } else {
-        // Switch focus to active field in oled
-      }
-      return; // skip index change
     case 'e':
       newSelectedRow = Math.round((selectedRow - 1 + 4) % 4);
       break;
@@ -78,7 +58,6 @@ function handleKeyDown(e: KeyboardEvent) {
         if (isInOled) {
           // Switch focus to active encoder
           const idx = ec4.selectedEncoderIndex;
-          ec4.selectedEncoderIndex = null;
           setTimeout(() => (ec4.selectedEncoderIndex = idx));
         } else {
           // Switch focus to active field in oled

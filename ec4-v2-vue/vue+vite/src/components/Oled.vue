@@ -7,7 +7,7 @@ import {
   pushbuttonTypes,
   encoderModes,
   EncoderGroup,
-  typeByName,
+  encoderTypeByName,
   pushButtonModes,
 } from '@/domain/Encoder';
 import { computed, type ComputedRef, ref, watch } from 'vue';
@@ -35,7 +35,7 @@ const control: ComputedRef<Partial<Encoder>> = computed(() => {
 });
 
 function isInput(input: EventTarget | null): input is HTMLInputElement {
-  return (input as HTMLInputElement | null)?.type === 'INPUT';
+  return (input as HTMLElement | null)?.nodeName === 'INPUT';
 }
 
 function setActiveField(field: FieldType, input: EventTarget | null) {
@@ -198,7 +198,7 @@ defineExpose({ focusActiveField });
       @focus="setActiveField('scale', $event.target)"
       :class="{ hidden: isHidden('scale', control) }"
     />
-    <template v-if="control.type === typeByName('NRPN')">
+    <template v-if="control.type === encoderTypeByName('NRPN')">
       <!-- Encoder number - NRPN -->
       <label
         for="encoderNumber"
