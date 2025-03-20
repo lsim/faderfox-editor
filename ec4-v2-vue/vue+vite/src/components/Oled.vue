@@ -508,7 +508,7 @@ defineExpose({ focusActiveField });
   background: linear-gradient(8deg, #000, #222, #333);
 
   input {
-    width: calc(100% - 9px);
+    width: 100%;
     background-color: transparent;
     color: inherit;
     font: inherit;

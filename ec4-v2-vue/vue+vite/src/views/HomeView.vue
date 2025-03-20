@@ -52,7 +52,6 @@ function handleFocusOut(e: FocusEvent) {
   grid-template-columns: 1fr auto 1fr;
 
   .header {
-    justify-self: center;
     grid-area: header;
     margin-bottom: 3em;
   }
