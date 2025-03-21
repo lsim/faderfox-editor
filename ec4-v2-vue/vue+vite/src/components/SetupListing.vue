@@ -112,7 +112,7 @@ $picoColors: (
   ('yellow', $yellow-700),
   ('amber', $amber-700),
   ('pumpkin', $pumpkin-700),
-  //('orange', $orange-700),
+  ('orange', $orange-700),
   ('sand', $sand-700),
   ('grey', $grey-700),
   ('zinc', $zinc-700),
@@ -146,7 +146,6 @@ $picoColors: (
   grid-template-columns: 1fr 1fr;
   border: 3px solid #ccc;
   border-radius: 6px;
-  margin-top: 24px;
   text-align: center;
 
   input {
@@ -158,8 +157,7 @@ $picoColors: (
     $shadow: 30px;
 
     &.selected {
-      // pulse the box-shadow
-      animation: pulse 5s infinite;
+      animation: pulse 3s infinite;
       z-index: 10;
       box-shadow: 0 0 $shadow $white;
 

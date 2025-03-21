@@ -18,7 +18,6 @@ watch(
         newInputs.find((i) => i.device.name === 'Faderfox EC4') || newInputs[0];
     }
   },
-  { immediate: true },
 );
 
 watch(
@@ -29,7 +28,6 @@ watch(
         newOutputs.find((o) => o.device.name === 'Faderfox EC4') || newOutputs[0];
     }
   },
-  { immediate: true },
 );
 
 function loadSysexFromFile() {
@@ -75,7 +73,7 @@ function loadSysexFromFile() {
       id="midiInDeviceId"
       title="Please select the MIDI interface your EC4 is connected to for input."
       tabindex="-1"
-      v-model="midi.selectedInput"
+      v-model="midi.selectedInput.value"
     >
       <option v-if="midi.inputs.value.length === 0">(No devices)</option>
       <option v-for="(i, k) in midi.inputs.value" :key="k" :value="i">{{ i.device.name }}</option>
@@ -85,7 +83,7 @@ function loadSysexFromFile() {
       id="midiOutDeviceId"
       title="Please select the MIDI interface your EC4 is connected to for output."
       tabindex="-1"
-      v-model="midi.selectedOutput"
+      v-model="midi.selectedOutput.value"
     >
       <option v-if="midi.outputs.value.length === 0">(No devices)</option>
       <option v-for="(o, k) in midi.outputs.value" :key="k" :value="o">

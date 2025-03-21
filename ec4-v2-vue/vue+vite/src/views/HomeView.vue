@@ -47,9 +47,11 @@ function handleFocusOut(e: FocusEvent) {
   display: grid;
   grid-template-areas:
     'header header header'
+    'alignment alignment alignment'
     'group-selector front-panel midi-settings'
     'footer footer footer';
   grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: auto 25px auto auto;
 
   .header {
     grid-area: header;
@@ -58,18 +60,18 @@ function handleFocusOut(e: FocusEvent) {
 
   .midi-settings {
     grid-area: midi-settings;
-    align-self: baseline;
+    align-self: start;
   }
 
   .group-selector {
     grid-area: group-selector;
-    align-self: baseline;
+    align-self: start;
     justify-self: end;
   }
 
   .front-panel {
     grid-area: front-panel;
-    justify-self: start;
+    grid-row: span 2;
   }
 
   .credits {
