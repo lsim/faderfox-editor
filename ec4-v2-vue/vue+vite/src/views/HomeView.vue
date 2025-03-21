@@ -55,7 +55,8 @@ function handleFocusOut(e: FocusEvent) {
 
   .header {
     grid-area: header;
-    margin-bottom: 3em;
+    margin-bottom: 2em;
+    justify-self: center;
   }
 
   .midi-settings {
