@@ -131,7 +131,7 @@ function loadSysexFromFile() {
 #midisettings {
   max-width: 255px;
   border: 3px solid #ccc;
-  border-radius: 5px;
+  border-radius: 7px;
   padding: 15px;
 
   label {

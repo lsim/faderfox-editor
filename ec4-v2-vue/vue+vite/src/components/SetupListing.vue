@@ -145,7 +145,7 @@ $picoColors: (
   display: grid;
   grid-template-columns: 1fr 1fr;
   border: 3px solid #ccc;
-  border-radius: 6px;
+  border-radius: 7px;
   text-align: center;
 
   input {
