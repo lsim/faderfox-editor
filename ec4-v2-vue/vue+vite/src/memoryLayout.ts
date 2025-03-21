@@ -1,4 +1,5 @@
-import { EncoderSetup, type FieldType } from '@/domain/Encoder.ts';
+import { type FieldType } from '@/domain/Encoder.ts';
+import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { generateIds } from '@/stores/faderfox-ec4.ts';
 
 const STR = { sysex: {} as any };

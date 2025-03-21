@@ -2,8 +2,8 @@
 import EncoderPanel from '@/components/EncoderPanel.vue';
 import ModeSelector from '@/components/ModeSelector.vue';
 import Oled from '@/components/Oled.vue';
-import { EncoderGroup, type FieldType } from '@/domain/Encoder.ts';
-import { computed, ref } from 'vue';
+import { type FieldType } from '@/domain/Encoder.ts';
+import { ref } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const props = defineProps<{

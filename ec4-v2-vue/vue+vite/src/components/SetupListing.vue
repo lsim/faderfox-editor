@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { computed, toRefs } from 'vue';
-import { type EncoderGroup, EncoderSetup } from '@/domain/Encoder.ts';
+import { computed } from 'vue';
 
 const ec4 = useEc4Store();
 

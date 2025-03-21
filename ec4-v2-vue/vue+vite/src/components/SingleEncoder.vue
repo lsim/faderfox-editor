@@ -2,13 +2,13 @@
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import {
   type Encoder,
-  EncoderGroup,
   type FieldType,
   encoderTypes,
   pushbuttonTypes,
   encoderModes,
   encoderTypeByName,
 } from '@/domain/Encoder.ts';
+import { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import { computed, ref, type ComputedRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';

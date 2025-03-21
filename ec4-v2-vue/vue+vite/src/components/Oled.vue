@@ -6,10 +6,10 @@ import {
   encoderTypes,
   pushbuttonTypes,
   encoderModes,
-  EncoderGroup,
   encoderTypeByName,
   pushButtonModes,
 } from '@/domain/Encoder';
+import { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';

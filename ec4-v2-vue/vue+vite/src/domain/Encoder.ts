@@ -109,62 +109,6 @@ const encoderModeByName = (name: (typeof encoderModes)[number]['text']) =>
 const pushButtonModeByName = (name: (typeof pushButtonModes)[number]['text']) =>
   pushButtonModes.findIndex((t) => t.text === name);
 
-export class EncoderGroup {
-  id: number;
-  name: string;
-  encoders: Encoder[];
-  pushButtons: PushButton[];
-  setupId: number;
-
-  constructor(
-    id: number,
-    setupId: number,
-    name: string,
-    encoders: Encoder[],
-    pushButtons: PushButton[],
-  ) {
-    this.id = id;
-    this.name = name;
-    this.encoders = encoders;
-    this.pushButtons = pushButtons;
-    this.setupId = setupId;
-  }
-
-  static fromBytes(
-    bytes: Uint8Array<ArrayBufferLike>,
-    setupId: number,
-    groupId: number,
-  ): EncoderGroup {
-    const encoders = Array.from(generateIds()).map((encoderId) => {
-      return Encoder.encoderFromBytes(bytes, setupId, groupId, encoderId);
-    });
-    const pushButtons = Array.from(generateIds()).map((encoderId) => {
-      return PushButton.pushButtonFromBytes(bytes, setupId, groupId, encoderId);
-    });
-    const groupName = getGroupName(bytes, setupId, groupId);
-    return new EncoderGroup(groupId, setupId, groupName, encoders, pushButtons);
-  }
-}
-
-export class EncoderSetup {
-  id: number;
-  name: string;
-  groups: EncoderGroup[];
-
-  constructor(id: number, name: string, groups: EncoderGroup[]) {
-    this.id = id;
-    this.name = name;
-    this.groups = groups;
-  }
-
-  static fromBytes(bytes: Uint8Array<ArrayBufferLike>, setupId: number): EncoderSetup {
-    const groups = Array.from(generateIds()).map((groupId) => {
-      return EncoderGroup.fromBytes(bytes, setupId, groupId);
-    });
-    const setupName = getSetupName(bytes, setupId);
-    return new EncoderSetup(setupId, setupName, groups);
-  }
-}
 export type ControlType = 'encoder' | 'push-button';
 export class Encoder {
   id: number;
@@ -232,6 +176,8 @@ export class Encoder {
 
     return res;
   }
+
+  static encoderToBytes(buffer: Uint8Array) {}
 }
 
 export class PushButton extends Encoder {
@@ -259,4 +205,6 @@ export class PushButton extends Encoder {
     res.name = getEncoderName(bytes, setupId, groupId, encoderId);
     return res;
   }
+
+  static pushButtonToBytes(buffer: Uint8Array) {}
 }

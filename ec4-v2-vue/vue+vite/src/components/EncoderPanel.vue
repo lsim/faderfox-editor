@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SingleEncoder from '@/components/SingleEncoder.vue';
-import { type EncoderGroup, type FieldType } from '@/domain/Encoder';
+import { type FieldType } from '@/domain/Encoder';
+import { type EncoderGroup } from '@/domain/EncoderGroup';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { computed, watch, ref } from 'vue';
 
