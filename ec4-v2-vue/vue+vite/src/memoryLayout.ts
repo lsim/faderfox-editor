@@ -340,8 +340,8 @@ const P = {
     setupId: number,
     groupId: number,
     encoderId: number,
-    type: Exclude<FieldType, null>,
-    value: any,
+    type: MemField,
+    value: number,
   ) {
     const spec = this._dataFormat[type];
     if (!spec) {
@@ -349,31 +349,39 @@ const P = {
       return;
     }
     let addr = MEM.addrPresets + (setupId * 16 + groupId) * MEM.lengthGroup + spec.pos;
-    if (type === P.name) {
-      addr += encoderId * 4;
-      while (value.length < 4) {
-        value += ' ';
-      }
-      for (let i = 0; i < 4; i++) {
-        const oldValue = data[addr + i];
-        data[addr + i] = value.charCodeAt(i);
-        // isDirty = isDirty | (data[addr + i] != oldValue);
-      }
+
+    addr += encoderId;
+    // const oldValue = data[addr];
+    // value = parseInt(value);
+    if (type === P.channel) value--;
+    const shift = spec.lsb || 0;
+    if (spec.mask != 0xff) {
+      const invMask = 0xff ^ (spec.mask ?? 0);
+      value = (value & ((spec.mask ?? 0xff) >> shift)) << shift;
+      data[addr] = (data[addr] & invMask) | value;
     } else {
-      addr += encoderId;
-      const oldValue = data[addr];
-      value = parseInt(value);
-      if (type === P.channel) value--;
-      const shift = spec.lsb || 0;
-      if (spec.mask != 0xff) {
-        const invMask = 0xff ^ (spec.mask ?? 0);
-        value = (value & ((spec.mask ?? 0xff) >> shift)) << shift;
-        data[addr] = (data[addr] & invMask) | value;
-      } else {
-        value = value & 0xff; // ensure 8 bit
-        data[addr] = value;
-      }
-      // isDirty = isDirty | (data[addr] != oldValue); // TODO: what is this?
+      value = value & 0xff; // ensure 8 bit
+      data[addr] = value;
+    }
+    // isDirty = isDirty | (data[addr] != oldValue); // TODO: what is this?
+  },
+  setEncoderName: function (
+    data: Uint8Array<ArrayBufferLike>,
+    setupId: number,
+    groupId: number,
+    encoderId: number,
+    name: string,
+  ) {
+    const spec = this._dataFormat['name'];
+    let addr = MEM.addrPresets + (setupId * 16 + groupId) * MEM.lengthGroup + spec.pos;
+    addr += encoderId * 4;
+    while (name.length < 4) {
+      name += ' ';
+    }
+    for (let i = 0; i < 4; i++) {
+      // const oldValue = data[addr + i];
+      data[addr + i] = name.charCodeAt(i);
+      // isDirty = isDirty | (data[addr + i] != oldValue);
     }
   },
   setSetupName: function (data: Uint8Array<ArrayBufferLike>, setupId: number, name: string) {
@@ -471,6 +479,18 @@ export function getMemField(
   return value;
 }
 
+export function setMemField<TVal = number | string>(
+  data: Uint8Array<ArrayBufferLike>,
+  setupId: number,
+  groupId: number,
+  encoderId: number,
+  type: MemField,
+  value: TVal,
+) {
+  if (type === 'name') P.setEncoderName(data, setupId, groupId, encoderId, value as string);
+  else P.set(data, setupId, groupId, encoderId, type, value as number);
+}
+
 export function getEncoderName(
   data: Uint8Array<ArrayBufferLike>,
   setupId: number,
@@ -484,6 +504,19 @@ export function getSetupName(data: Uint8Array<ArrayBufferLike>, setupId: number)
   return P.getSetupName(data, setupId);
 }
 
+export function setSetupName(data: Uint8Array<ArrayBufferLike>, setupId: number, name: string) {
+  P.setSetupName(data, setupId, name);
+}
+
 export function getGroupName(data: Uint8Array<ArrayBufferLike>, setupId: number, groupId: number) {
   return P.getGroupName(data, setupId, groupId);
+}
+
+export function setGroupName(
+  data: Uint8Array<ArrayBufferLike>,
+  setupId: number,
+  groupId: number,
+  name: string,
+) {
+  P.setGroupName(data, setupId, groupId, name);
 }

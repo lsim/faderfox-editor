@@ -8,7 +8,9 @@ const midi = useMidi();
 
 const confirm = useConfirm();
 
-onBeforeUnmount(() => midi.dispose());
+onBeforeUnmount(() => {
+  midi.dispose();
+});
 
 watch(
   () => midi.inputs.value,

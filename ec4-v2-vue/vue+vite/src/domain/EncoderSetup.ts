@@ -1,5 +1,5 @@
 import { generateIds } from '@/stores/faderfox-ec4.ts';
-import { getSetupName } from '@/memoryLayout.ts';
+import { getSetupName, setSetupName } from '@/memoryLayout.ts';
 import { EncoderGroup } from '@/domain/EncoderGroup.ts';
 
 export class EncoderSetup {
@@ -19,5 +19,12 @@ export class EncoderSetup {
     });
     const setupName = getSetupName(bytes, setupId);
     return new EncoderSetup(setupId, setupName, groups);
+  }
+
+  toBytes(buffer: Uint8Array<ArrayBufferLike>) {
+    setSetupName(buffer, this.id, this.name);
+    for (const group of this.groups) {
+      group.toBytes(buffer);
+    }
   }
 }

@@ -319,7 +319,6 @@ export class MidiInput extends Midi<MIDIInput> {
     super(device);
     this.receivedMessages$ = new Subject<[MidiMessage, Uint8Array]>();
     device.onmidimessage = this.handleMidiMessage.bind(this);
-    console.log('MidiInput constructor', this.receivedMessages$);
   }
 
   handleMidiMessage(ev: MIDIMessageEvent) {
@@ -327,7 +326,7 @@ export class MidiInput extends Midi<MIDIInput> {
     if (!bytes) return;
     const msg = parseMidiMessage(bytes);
     if (!msg) return;
-    console.log(
+    console.debug(
       'MidiInput received message',
       this.receivedMessages$,
       msg,
@@ -482,7 +481,7 @@ export class EC4SysexProtocol {
 }
 
 export default function useMidi() {
-  console.debug('Initializing MIDI');
+  console.debug('Initializing MIDI', Error().stack);
 
   const midiSupport = ref<boolean>();
   const inputs = ref<Array<MidiInput>>([]);
@@ -519,6 +518,7 @@ export default function useMidi() {
   );
 
   function dispose() {
+    console.debug('Disposing MIDI', Error().stack);
     midi.then((_m) => {
       if (!m) return;
       m.onstatechange = null;
@@ -540,11 +540,7 @@ export default function useMidi() {
     () => [ec4.selectedSetupIndex, ec4.selectedGroupIndex],
     async ([newSetupId, newGroupId]) => {
       console.log('new setup/group', newSetupId, newGroupId);
-      // await protocol.value?.setSetupAndGroup(newVal[0], newVal[1]);
-      // await protocol.value?.setEncoderDisplay(newSetupId, newGroupId, 'fooo');
-      // await protocol.value?.showFullDisplay();
     },
-    { deep: true },
   );
 
   return {

@@ -1,5 +1,5 @@
 import { generateIds } from '@/stores/faderfox-ec4.ts';
-import { getGroupName } from '@/memoryLayout.ts';
+import { getGroupName, setGroupName } from '@/memoryLayout.ts';
 import { Encoder, PushButton } from '@/domain/Encoder.ts';
 
 export class EncoderGroup {
@@ -38,5 +38,13 @@ export class EncoderGroup {
     return new EncoderGroup(groupId, setupId, groupName, encoders, pushButtons);
   }
 
-  static toBytes(buffer: Uint8Array) {}
+  toBytes(buffer: Uint8Array<ArrayBufferLike>) {
+    setGroupName(buffer, this.setupId, this.id, this.name);
+    for (const encoder of this.encoders) {
+      encoder.encoderToBytes(buffer);
+    }
+    for (const pushButton of this.pushButtons) {
+      pushButton.pushButtonToBytes(buffer);
+    }
+  }
 }

@@ -1,5 +1,4 @@
-import { generateIds } from '@/stores/faderfox-ec4.ts';
-import { getMemField, getSetupName, getGroupName, getEncoderName } from '@/memoryLayout.ts';
+import { getMemField, getEncoderName, setMemField } from '@/memoryLayout.ts';
 
 export type FieldType =
   | 'channel'
@@ -177,14 +176,24 @@ export class Encoder {
     return res;
   }
 
-  static encoderToBytes(buffer: Uint8Array) {}
+  encoderToBytes(buffer: Uint8Array<ArrayBufferLike>) {
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'type', this.type);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'name', this.name);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'channel', this.channel);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'number', this.number);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'number_h', this.number_h);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'lower', this.lower);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'upper', this.upper);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'mode', this.mode);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'scale', this.scale);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'link', this.link);
+  }
 }
 
 export class PushButton extends Encoder {
   controlType: ControlType = 'push-button';
   constructor(id: number, groupId: number, setupId: number) {
     super(id, groupId, setupId, pushButtonTypeByName('Note'), pushButtonModeByName('Key'));
-    console.log('pushButtonConstructor', this.mode, pushButtonModes);
   }
 
   static pushButtonFromBytes(
@@ -206,5 +215,15 @@ export class PushButton extends Encoder {
     return res;
   }
 
-  static pushButtonToBytes(buffer: Uint8Array) {}
+  pushButtonToBytes(buffer: Uint8Array<ArrayBufferLike>) {
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_channel', this.channel);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_display', this.scale);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_type', this.type);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_mode', this.mode);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_number', this.number);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_lower', this.lower);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_upper', this.upper);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_link', this.link);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'name', this.name);
+  }
 }
