@@ -5,13 +5,23 @@ export type FieldType =
   | 'number'
   | 'number_h'
   | 'lower'
+  | 'lower_msb'
   | 'upper'
+  | 'upper_msb'
   | 'mode'
   | 'type'
   | 'scale' /* display */
   | 'name'
   | 'link'
-  | null;
+  | 'pb_channel'
+  | 'pb_display'
+  | 'pb_type'
+  | 'pb_scale'
+  | 'pb_mode'
+  | 'pb_number'
+  | 'pb_lower'
+  | 'pb_upper'
+  | 'pb_link';
 
 export type EncoderType = {
   text: string;
@@ -108,13 +118,14 @@ const encoderModeByName = (name: (typeof encoderModes)[number]['text']) =>
 const pushButtonModeByName = (name: (typeof pushButtonModes)[number]['text']) =>
   pushButtonModes.findIndex((t) => t.text === name);
 
-export type ControlType = 'encoder' | 'push-button';
-export class Encoder {
+export class Control {
+  name: string;
   id: number;
   groupId: number;
   setupId: number;
-  // The name of the encoder
-  name: string;
+
+  // The type (cc, nrpn, note, etc)
+  type: number;
   // The channel of the encoder
   channel: number;
   // The CC/NRPN address or note number of the encoder
@@ -123,107 +134,109 @@ export class Encoder {
   number_h: number;
   // The lower limit of the encoder
   lower: number;
+  lower_msb: number;
   // The upper limit of the encoder
   upper: number;
+  upper_msb: number;
   // The speed of the encoder
   mode: number;
   // The display/range of the encoder
   scale: number;
-  // The type (cc, nrpn, note, etc)
-  type: number;
   // Whether the encoder is linked to the next encoder
   link: boolean;
+  // Channel of the push button
+  pb_channel: number;
+  // The display/range of the push button
+  pb_display: number;
+  // The type (cc, nrpn, note, etc)
+  pb_type: number;
+  // The speed of the push button
+  pb_mode: number;
+  // The lower limit of the push button
+  pb_lower: number;
+  pb_upper: number;
+  // The upper limit of the push button
+  pb_number: number;
+  // Whether the push button is linked to the next push button
+  pb_link: boolean;
 
-  // Extra info
-  controlType: ControlType = 'encoder';
-
-  constructor(id: number, groupId: number, setupId: number, type?: number, mode?: number) {
+  constructor(name: string, id: number, groupId: number, setupId: number) {
+    this.name = name;
     this.id = id;
     this.groupId = groupId;
     this.setupId = setupId;
-    this.name = '----';
-    this.channel = 0;
+    this.channel = 1;
     this.number = 0;
     this.number_h = 0;
     this.lower = 0;
+    this.lower_msb = 0;
     this.upper = 0;
-    this.mode = mode ?? encoderModeByName('Acc3');
+    this.upper_msb = 0;
+    this.mode = encoderModeByName('Acc3');
     this.scale = 1;
-    this.type = type ?? encoderTypeByName('CCab');
+    this.type = encoderTypeByName('CCab');
     this.link = false;
+    this.pb_channel = 1;
+    this.pb_display = 0;
+    this.pb_type = pushButtonTypeByName('Note');
+    this.pb_mode = pushButtonModeByName('Key');
+    this.pb_number = 0;
+    this.pb_lower = 0;
+    this.pb_upper = 0;
+    this.pb_link = false;
   }
 
-  static encoderFromBytes(
+  fromBytes(
     bytes: Uint8Array<ArrayBufferLike>,
     setupId: number,
     groupId: number,
     encoderId: number,
-  ): Encoder {
-    const type = getMemField(bytes, setupId, groupId, encoderId, 'type') as any;
-
-    const res = new Encoder(encoderId, groupId, setupId, type);
-
-    res.channel = getMemField(bytes, setupId, groupId, encoderId, 'channel');
-    res.number = getMemField(bytes, setupId, groupId, encoderId, 'number');
-    res.number_h = getMemField(bytes, setupId, groupId, encoderId, 'number_h');
-    res.lower = getMemField(bytes, setupId, groupId, encoderId, 'lower');
-    res.upper = getMemField(bytes, setupId, groupId, encoderId, 'upper');
-    res.mode = getMemField(bytes, setupId, groupId, encoderId, 'mode');
-    res.scale = getMemField(bytes, setupId, groupId, encoderId, 'scale');
-    res.link = getMemField(bytes, setupId, groupId, encoderId, 'link') !== 0;
-    res.name = getEncoderName(bytes, setupId, groupId, encoderId);
-
-    return res;
+  ) {
+    this.id = encoderId;
+    this.groupId = groupId;
+    this.setupId = setupId;
+    this.name = getEncoderName(bytes, setupId, groupId, encoderId);
+    this.type = getMemField(bytes, setupId, groupId, encoderId, 'type') as any;
+    this.channel = getMemField(bytes, setupId, groupId, encoderId, 'channel');
+    this.number = getMemField(bytes, setupId, groupId, encoderId, 'number');
+    this.number_h = getMemField(bytes, setupId, groupId, encoderId, 'number_h');
+    this.lower = getMemField(bytes, setupId, groupId, encoderId, 'lower');
+    this.lower_msb = getMemField(bytes, setupId, groupId, encoderId, 'lower_msb');
+    this.upper = getMemField(bytes, setupId, groupId, encoderId, 'upper');
+    this.upper_msb = getMemField(bytes, setupId, groupId, encoderId, 'upper_msb');
+    this.mode = getMemField(bytes, setupId, groupId, encoderId, 'mode');
+    this.scale = getMemField(bytes, setupId, groupId, encoderId, 'scale');
+    this.link = getMemField(bytes, setupId, groupId, encoderId, 'link') !== 0;
+    this.pb_channel = getMemField(bytes, setupId, groupId, encoderId, 'pb_channel');
+    this.pb_display = getMemField(bytes, setupId, groupId, encoderId, 'pb_display');
+    this.pb_type = getMemField(bytes, setupId, groupId, encoderId, 'pb_type');
+    this.pb_mode = getMemField(bytes, setupId, groupId, encoderId, 'pb_mode');
+    this.pb_number = getMemField(bytes, setupId, groupId, encoderId, 'pb_number');
+    this.pb_lower = getMemField(bytes, setupId, groupId, encoderId, 'pb_lower');
+    this.pb_upper = getMemField(bytes, setupId, groupId, encoderId, 'pb_upper');
+    this.pb_link = getMemField(bytes, setupId, groupId, encoderId, 'pb_link') !== 0;
   }
 
-  encoderToBytes(buffer: Uint8Array<ArrayBufferLike>) {
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'type', this.type);
+  toBytes(buffer: Uint8Array<ArrayBufferLike>) {
     setMemField(buffer, this.setupId, this.groupId, this.id, 'name', this.name);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'type', this.type);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'channel', this.channel);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'number', this.number);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'number_h', this.number_h);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'lower', this.lower);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'lower_msb', this.lower_msb);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'upper', this.upper);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'upper_msb', this.upper_msb);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'mode', this.mode);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'scale', this.scale);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'link', this.link);
-  }
-}
-
-export class PushButton extends Encoder {
-  controlType: ControlType = 'push-button';
-  constructor(id: number, groupId: number, setupId: number) {
-    super(id, groupId, setupId, pushButtonTypeByName('Note'), pushButtonModeByName('Key'));
-  }
-
-  static pushButtonFromBytes(
-    bytes: Uint8Array<ArrayBufferLike>,
-    setupId: number,
-    groupId: number,
-    encoderId: number,
-  ): PushButton {
-    const res = new PushButton(encoderId, groupId, setupId);
-    res.channel = getMemField(bytes, setupId, groupId, encoderId, 'pb_channel');
-    res.scale = getMemField(bytes, setupId, groupId, encoderId, 'pb_display');
-    res.type = getMemField(bytes, setupId, groupId, encoderId, 'pb_type');
-    res.mode = getMemField(bytes, setupId, groupId, encoderId, 'pb_mode');
-    res.number = getMemField(bytes, setupId, groupId, encoderId, 'pb_number');
-    res.lower = getMemField(bytes, setupId, groupId, encoderId, 'pb_lower');
-    res.upper = getMemField(bytes, setupId, groupId, encoderId, 'pb_upper');
-    res.link = getMemField(bytes, setupId, groupId, encoderId, 'pb_link') !== 0;
-    res.name = getEncoderName(bytes, setupId, groupId, encoderId);
-    return res;
-  }
-
-  pushButtonToBytes(buffer: Uint8Array<ArrayBufferLike>) {
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_channel', this.channel);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_display', this.scale);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_type', this.type);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_mode', this.mode);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_number', this.number);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_lower', this.lower);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_upper', this.upper);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_link', this.link);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'name', this.name);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_channel', this.pb_channel);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_display', this.pb_display);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_type', this.pb_type);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_mode', this.pb_mode);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_number', this.pb_number);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_lower', this.pb_lower);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_upper', this.pb_upper);
+    setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_link', this.pb_link);
   }
 }

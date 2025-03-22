@@ -481,7 +481,7 @@ export class EC4SysexProtocol {
 }
 
 export default function useMidi() {
-  console.debug('Initializing MIDI', Error().stack);
+  console.debug('Initializing MIDI');
 
   const midiSupport = ref<boolean>();
   const inputs = ref<Array<MidiInput>>([]);
@@ -518,7 +518,7 @@ export default function useMidi() {
   );
 
   function dispose() {
-    console.debug('Disposing MIDI', Error().stack);
+    console.debug('Disposing MIDI');
     midi.then((_m) => {
       if (!m) return;
       m.onstatechange = null;

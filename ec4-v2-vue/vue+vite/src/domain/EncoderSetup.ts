@@ -7,18 +7,19 @@ export class EncoderSetup {
   name: string;
   groups: EncoderGroup[];
 
-  constructor(id: number, name: string, groups: EncoderGroup[]) {
+  constructor(id: number, name: string) {
     this.id = id;
     this.name = name;
-    this.groups = groups;
+    this.groups = Array.from(generateIds()).map((groupId) => {
+      return new EncoderGroup(groupId, this.id, name);
+    });
   }
 
-  static fromBytes(bytes: Uint8Array<ArrayBufferLike>, setupId: number): EncoderSetup {
-    const groups = Array.from(generateIds()).map((groupId) => {
-      return EncoderGroup.fromBytes(bytes, setupId, groupId);
-    });
-    const setupName = getSetupName(bytes, setupId);
-    return new EncoderSetup(setupId, setupName, groups);
+  fromBytes(bytes: Uint8Array<ArrayBufferLike>) {
+    this.name = getSetupName(bytes, this.id);
+    for (const group of this.groups) {
+      group.fromBytes(bytes, this.id);
+    }
   }
 
   toBytes(buffer: Uint8Array<ArrayBufferLike>) {

@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const ec4 = useEc4Store();
 
-const activeField = ref<FieldType>(null);
+const activeField = ref<FieldType>('name');
 
 const oled = ref<InstanceType<typeof Oled> | null>(null);
 

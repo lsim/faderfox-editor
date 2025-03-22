@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import SingleEncoder from '@/components/SingleEncoder.vue';
 import { type FieldType } from '@/domain/Encoder';
-import { type EncoderGroup } from '@/domain/EncoderGroup';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { computed, watch, ref } from 'vue';
 
 const props = defineProps<{
-  selectedEncoderId: number | null;
+  selectedEncoderId: number;
   activeField: FieldType;
 }>();
 
@@ -17,8 +16,7 @@ const emit = defineEmits<{
 const ec4 = useEc4Store();
 
 const controls = computed(() => {
-  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === ec4.selectedGroupIndex);
-  return ec4.editorMode === 'turn' ? group?.encoders || [] : group?.pushButtons || [];
+  return ec4.encoderGroups[ec4.selectedGroupIndex].controls;
 });
 
 const nameActive = ref<boolean>(false);
@@ -30,7 +28,7 @@ watch(
       'activeField changed to',
       newActiveField,
       ec4.editorMode,
-      controls.value.find((c) => c.id === props.selectedEncoderId)?.type,
+      controls.value[props.selectedEncoderId].type,
     );
   },
 );

@@ -1,8 +1,7 @@
-import { ref, computed, watch } from 'vue';
+import { ref, computed, type Ref } from 'vue';
 import { defineStore } from 'pinia';
-import { PushButton, Encoder } from '@/domain/Encoder.ts';
-import { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
+import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -18,22 +17,9 @@ function* generateDefaultNames(prefix: string) {
 const defaultGroupNames = Array.from(generateDefaultNames('GR'));
 const defaultSetupNames = Array.from(generateDefaultNames('SE'));
 
-function createEmptyEncoderGroup(groupId: number, setupId: number) {
-  const encoderIds = Array.from(generateIds());
-  const encoders = encoderIds.map((id) => new Encoder(id, groupId, setupId));
-  const pushButtons = encoderIds.map((id) => new PushButton(id, groupId, setupId));
-  return new EncoderGroup(groupId, setupId, defaultGroupNames[groupId], encoders, pushButtons);
-}
-
-function createEmptyEncoderSetups() {
-  const setupIds = Array.from(generateIds());
-
-  return setupIds.map((setupId) => {
-    const encoderGroups = Array.from(generateIds()).map((groupId) => {
-      return createEmptyEncoderGroup(groupId, setupId);
-    });
-    return new EncoderSetup(setupId, defaultSetupNames[setupId], encoderGroups);
-  });
+export function createEmptyEncoderSetups() {
+  const ids = Array.from(generateIds());
+  return ids.map((setupId) => new EncoderSetup(setupId, defaultSetupNames[setupId]));
 }
 
 const appFocused = ref(true);
@@ -45,22 +31,24 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
-// function getCachedSysexData(): number[] {
-//   return JSON.parse(localStorage.getItem('sysexDataArr') || '[]');
-// }
+function saveState(setups: EncoderSetup[]) {
+  const bytes = generateSysexData(setups);
+  localStorage.setItem('sysexDataArr', JSON.stringify(Array.from(bytes)));
+}
+
+function loadState(encoderSetups: Ref<EncoderSetup[]>) {
+  const bytes = JSON.parse(localStorage.getItem('sysexDataArr') || '[]');
+  if (bytes.length === 0) return;
+  const newSetups = createEmptyEncoderSetups();
+  parseSetupsFromSysex(new Uint8Array(bytes), newSetups);
+  encoderSetups.value = newSetups;
+}
 
 export const useEc4Store = defineStore('ec4', () => {
-  // const dataFromDevice = new Uint8Array(getCachedSysexData());
+  const encoderSetups = ref<EncoderSetup[]>([]);
+  loadState(encoderSetups);
+  if (encoderSetups.value.length === 0) encoderSetups.value = createEmptyEncoderSetups();
 
-  let initial: EncoderSetup[];
-  // try {
-  //   initial = parseSetupsFromSysex(dataFromDevice);
-  // } catch (e) {
-  //   console.error('Error parsing sysex data', e);
-  initial = createEmptyEncoderSetups();
-  // }
-
-  const encoderSetups = ref<EncoderSetup[]>(initial);
   const selectedSetupIndex = ref<number>(0);
 
   const encoderGroups = computed(() => encoderSetups.value[selectedSetupIndex.value].groups);
@@ -83,5 +71,7 @@ export const useEc4Store = defineStore('ec4', () => {
     setEditorMode,
     appFocused,
     selectedEncoderIndex,
+    saveState: () => saveState(encoderSetups.value),
+    loadState: () => loadState(encoderSetups),
   };
 });

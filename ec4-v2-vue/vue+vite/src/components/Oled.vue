@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import {
-  type Encoder,
   type FieldType,
   encoderTypes,
   pushbuttonTypes,
+  type Control,
   encoderModes,
   encoderTypeByName,
   pushButtonModes,
 } from '@/domain/Encoder';
-import { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
@@ -28,10 +27,9 @@ const emit = defineEmits<{
 
 const ec4 = useEc4Store();
 
-const control: ComputedRef<Partial<Encoder>> = computed(() => {
-  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === props.groupId);
-  const controls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
-  return controls?.find((e: Encoder) => e.id === props.encoderId) || {};
+const control: ComputedRef<Control> = computed(() => {
+  const group = ec4.encoderGroups[props.groupId];
+  return group.controls[props.encoderId];
 });
 
 function isInput(input: EventTarget | null): input is HTMLInputElement {
@@ -72,53 +70,47 @@ function focusActiveField() {
   }
 }
 
-function isHidden(field: FieldType, control: Partial<Encoder>): boolean {
+function isHidden(field: FieldType, control: Control): boolean {
   let excludingTypes: number[] = [];
-  if (control.controlType === 'encoder') {
-    switch (field) {
-      case 'lower':
-      case 'upper':
-        // Hidden for CCR1, CCR2, Note
-        excludingTypes = [0, 1, 7];
-        break;
-      case 'number':
-        // Hidden for PrgC, PBnd, AftT
-        excludingTypes = [3, 5, 6];
-        break;
-      case 'mode':
-        // Hidden for Note
-        excludingTypes = [7];
-        break;
-    }
-  } else if (control.controlType === 'push-button') {
-    switch (field) {
-      case 'scale':
-        // Hidden for Off
-        excludingTypes = [0];
-        break;
-      case 'channel':
-        // Hidden for Off, Acc0, Acc3, LSp6, Min, Max
-        excludingTypes = [0, 8, 9, 10, 11, 12];
-        break;
-      case 'mode':
-      case 'lower':
-      case 'upper':
-      case 'number':
-        // Like channel but also hidden for Grp, Set
-        excludingTypes = [0, 6, 7, 8, 9, 10, 11, 12];
-        break;
-    }
+  switch (field) {
+    case 'lower':
+    case 'upper':
+      // Hidden for CCR1, CCR2, Note
+      excludingTypes = [0, 1, 7];
+      break;
+    case 'number':
+      // Hidden for PrgC, PBnd, AftT
+      excludingTypes = [3, 5, 6];
+      break;
+    case 'mode':
+      // Hidden for Note
+      excludingTypes = [7];
+      break;
+    case 'pb_scale':
+      // Hidden for Off
+      excludingTypes = [0];
+      break;
+    case 'pb_channel':
+      // Hidden for Off, Acc0, Acc3, LSp6, Min, Max
+      excludingTypes = [0, 8, 9, 10, 11, 12];
+      break;
+    case 'pb_mode':
+    case 'pb_lower':
+    case 'pb_upper':
+    case 'pb_number':
+      // Like channel but also hidden for Grp, Set
+      excludingTypes = [0, 6, 7, 8, 9, 10, 11, 12];
+      break;
   }
   return excludingTypes.includes(control.type ?? -1);
 }
 
-// When control.type changes, we may need to clear the active field as it may no longer be valid
+// When control.type changes, we may need to change the active field as it may no longer be valid
 watch(
   () => control.value.type,
-  (newType) => {
-    const newFieldHidden = isHidden(props.activeField, control.value);
-    if (newFieldHidden) {
-      setActiveField(null, null);
+  () => {
+    if (isHidden(props.activeField, control.value)) {
+      setActiveField('name', nameInput.value);
     }
   },
 );

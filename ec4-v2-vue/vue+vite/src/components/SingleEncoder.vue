@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import {
-  type Encoder,
+  type Control,
   type FieldType,
   encoderTypes,
   pushbuttonTypes,
   encoderModes,
   encoderTypeByName,
 } from '@/domain/Encoder.ts';
-import { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import { computed, ref, type ComputedRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
@@ -28,10 +27,9 @@ const emit = defineEmits<{
 
 const ec4 = useEc4Store();
 
-const control: ComputedRef<Encoder | null> = computed(() => {
-  const group = ec4.encoderGroups.find((g: EncoderGroup) => g.id === ec4.selectedGroupIndex);
-  const controls = ec4.editorMode === 'turn' ? group?.encoders : group?.pushButtons;
-  return controls?.find((e: Encoder) => e.id === props.encoderId) || null;
+const control: ComputedRef<Control> = computed(() => {
+  const group = ec4.encoderGroups[ec4.selectedGroupIndex];
+  return group.controls[props.encoderId];
 });
 
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -237,6 +235,7 @@ function setNameActive(newVal: boolean, source: any) {
           ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"
         >
+          <!-- TODO: push button mode options -->
           <option v-for="n in encoderModes" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
       </template>

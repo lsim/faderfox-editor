@@ -1,50 +1,33 @@
 import { generateIds } from '@/stores/faderfox-ec4.ts';
 import { getGroupName, setGroupName } from '@/memoryLayout.ts';
-import { Encoder, PushButton } from '@/domain/Encoder.ts';
+import { Control } from '@/domain/Encoder.ts';
 
 export class EncoderGroup {
   id: number;
   name: string;
-  encoders: Encoder[];
-  pushButtons: PushButton[];
+  controls: Control[];
   setupId: number;
 
-  constructor(
-    id: number,
-    setupId: number,
-    name: string,
-    encoders: Encoder[],
-    pushButtons: PushButton[],
-  ) {
-    this.id = id;
+  constructor(id: number, setupId: number, name: string) {
     this.name = name;
-    this.encoders = encoders;
-    this.pushButtons = pushButtons;
+    this.id = id;
     this.setupId = setupId;
+    this.controls = Array.from(generateIds()).map(
+      (controlId) => new Control('----', controlId, this.id, this.setupId),
+    );
   }
 
-  static fromBytes(
-    bytes: Uint8Array<ArrayBufferLike>,
-    setupId: number,
-    groupId: number,
-  ): EncoderGroup {
-    const encoders = Array.from(generateIds()).map((encoderId) => {
-      return Encoder.encoderFromBytes(bytes, setupId, groupId, encoderId);
-    });
-    const pushButtons = Array.from(generateIds()).map((encoderId) => {
-      return PushButton.pushButtonFromBytes(bytes, setupId, groupId, encoderId);
-    });
-    const groupName = getGroupName(bytes, setupId, groupId);
-    return new EncoderGroup(groupId, setupId, groupName, encoders, pushButtons);
+  fromBytes(bytes: Uint8Array<ArrayBufferLike>, setupId: number) {
+    for (let i = 0; i < 16; i++) {
+      this.controls[i].fromBytes(bytes, setupId, this.id, i);
+    }
+    this.name = getGroupName(bytes, setupId, this.id);
   }
 
   toBytes(buffer: Uint8Array<ArrayBufferLike>) {
     setGroupName(buffer, this.setupId, this.id, this.name);
-    for (const encoder of this.encoders) {
-      encoder.encoderToBytes(buffer);
-    }
-    for (const pushButton of this.pushButtons) {
-      pushButton.pushButtonToBytes(buffer);
+    for (const control of this.controls) {
+      control.toBytes(buffer);
     }
   }
 }

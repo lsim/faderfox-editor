@@ -3,8 +3,11 @@ import useMidi from '@/composables/useMidi.ts';
 import { watch, onBeforeUnmount } from 'vue';
 import useConfirm from '@/composables/confirm.ts';
 import Confirm from '@/components/Confirm.vue';
+import { createEmptyEncoderSetups, useEc4Store } from '@/stores/faderfox-ec4.ts';
+import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
 
 const midi = useMidi();
+const ec4 = useEc4Store();
 
 const confirm = useConfirm();
 
@@ -32,37 +35,18 @@ watch(
   },
 );
 
-function loadSysexFromFile() {
-  midi.protocol.value
-    ?.setSetupAndGroup(0, 0)
-    .then(() => {
-      return midi.protocol.value?.getSetupAndGroup();
-    })
-    .then((setupAndGroup) => {
-      if (!setupAndGroup) return;
-      console.log(
-        'Setup and group response',
-        Array.from(setupAndGroup).map((x) => x.toString(16)),
-      );
-      return midi.protocol.value?.requestGroupSnapshot();
-    })
-    .then((response) => {
-      console.log('Snapshot response', response);
-    });
+function loadSysexData() {
   confirm
-    .showIt(
-      'Load Sysex File',
-      'Please select a Sysex file with EC4 settings to load.',
-      'Load file',
-      'Cancel',
-    )
+    .showIt('Load Sysex Data', 'This will overwrite all existing settings.', 'Load data', 'Cancel')
     .then(() => {
-      console.log('Load file');
+      ec4.loadState();
     })
-    .catch(() => {
-      console.log('Cancelled');
+    .catch((e) => {
+      console.log('Data not saved', e);
     });
 }
+
+function sysexRoundtrip() {}
 </script>
 
 <template>
@@ -95,19 +79,31 @@ function loadSysexFromFile() {
     <!--    <button type="button" id="btnreceive" title="Receive settings from your EC4" tabindex="-1">-->
     <!--      Receive from EC4-->
     <!--    </button>-->
-    <button type="button" title="Send editor data to your EC4" tabindex="-1">Send to EC4 ⮕</button>
     <button
-      @click="loadSysexFromFile"
+      @click="sysexRoundtrip"
+      type="button"
+      title="Send editor data to your EC4"
+      tabindex="-1"
+    >
+      Send to EC4 ⮕
+    </button>
+    <button
+      @click="loadSysexData"
       type="button"
       title="Load a Sysex file with EC4 settings"
       tabindex="-1"
     >
       Load file
     </button>
-    <button type="button" id="btnfilesave" title="Save editor data as Sysex file" tabindex="-1">
+    <button
+      @click="ec4.saveState"
+      type="button"
+      id="btnfilesave"
+      title="Save editor data as Sysex file"
+      tabindex="-1"
+    >
       Save file
     </button>
-    <a href="#" id="upgradeFirmware">Upgrade EC4 to firmware 2.0</a>
     <table>
       <thead>
         <tr>

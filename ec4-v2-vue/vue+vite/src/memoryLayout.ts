@@ -12,7 +12,7 @@ const MEMORY_SIZE = 0xf500;
 const MEMORY_OFFSET = 0x0b00;
 
 const MEM = {
-  data: new Uint8Array(MEMORY_SIZE),
+  // data: new Uint8Array(MEMORY_SIZE),
   lengthGroup: 192,
   lengthSetup: 192 * 16,
   dataOffset: 0x1bc0,
@@ -200,18 +200,6 @@ const P = {
   pb_upper: 'pb_upper',
   pb_link: 'pb_link',
 
-  // labels: {
-  //   type: 'Type',
-  //   channel: 'Channel',
-  //   number: 'Number',
-  //   number_h: 'MSB',
-  //   number_nrpn: '#MSB/LSB',
-  //   lower: 'Lower',
-  //   upper: 'Upper',
-  //   mode: 'Mode',
-  //   scale: 'Display',
-  // },
-  //
   _dataFormat: {
     type: { pos: 0, mask: 0xf0, lsb: 4, min: 0, max: 8, default: 2 },
     channel: { pos: 0, mask: 0x0f },
@@ -419,11 +407,70 @@ const P = {
   },
 };
 
-export function parseSetupsFromSysex(sysexData: Uint8Array<ArrayBufferLike>) {
+function hiloNibbles(v: number) {
+  let hi = ((v & 0xf0) >> 4) + 0x20;
+  let lo = (v & 0x0f) + 0x10;
+  return [hi, lo];
+}
+
+const PADDING = new Array(30).fill(0);
+
+export function generateSysexData(encoderSetups: EncoderSetup[]) {
+  const setupData = new Uint8Array(MEMORY_SIZE);
+  for (let s = 0; s < 16; s++) {
+    encoderSetups[s].toBytes(setupData);
+  }
+
+  const deviceparts = hiloNibbles(deviceId);
+  let dataout = [
+    0xf0,
+    0x00,
+    0x00,
+    0x00,
+    0x41,
+    deviceparts[0],
+    deviceparts[1],
+    0x42,
+    0x20,
+    0x13,
+    0x43, // CMD_APP_ID_H
+    0x20,
+    0x12,
+    0x44, // CMD_APP_ID_L
+    0x20,
+    0x14,
+  ];
+  const pages = setupData.length / 64;
+  for (let page = 0; page < pages; page++) {
+    const pos = page * 64;
+    const addr = pos + MEMORY_OFFSET;
+    dataout.push(0x49, ...hiloNibbles(addr >> 8));
+    dataout.push(0x4a, ...hiloNibbles(addr & 0xff));
+    let crc = 0;
+    for (let i = 0; i < 64; i++) {
+      dataout.push(0x4d, ...hiloNibbles(setupData[pos + i]));
+      crc += setupData[pos + i];
+    }
+    crc = crc & 0xffff;
+    // if (crc != 0) console.log('page', page, crc.toString(16));
+    dataout.push(0x4b, ...hiloNibbles((crc & 0xff00) >> 8)); // CRC high
+    dataout.push(0x4c, ...hiloNibbles(crc & 0x00ff)); // CRC low
+    dataout.push(...PADDING);
+  }
+  dataout.push(0x4f); // download stop
+  dataout.push(...deviceparts);
+  dataout.push(0xf7);
+  return new Uint8Array(dataout);
+}
+
+export function parseSetupsFromSysex(
+  sysexData: Uint8Array<ArrayBufferLike>,
+  setups: EncoderSetup[],
+) {
   const preparedBytes = prepareSysexBytes(sysexData);
-  return Array.from(generateIds()).map((setupId) => {
-    return EncoderSetup.fromBytes(preparedBytes, setupId);
-  });
+  for (const setup of setups) {
+    setup.fromBytes(preparedBytes);
+  }
 }
 
 export type MemField =
@@ -458,7 +505,7 @@ export function getMemField(
   setupId: number,
   groupId: number,
   encoderId: number,
-  type: Exclude<MemField, 'name'>,
+  type: MemField,
 ): number {
   let value = P.get<number>(data, setupId, groupId, encoderId, type);
   if (type === 'lower' || type === 'upper') {
