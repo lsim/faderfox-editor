@@ -31,6 +31,7 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
+// TODO: write unit tests to ensure each value survives a sysex round trip
 function saveState(setups: EncoderSetup[]) {
   const bytes = generateSysexData(setups);
   localStorage.setItem('sysexDataArr', JSON.stringify(Array.from(bytes)));
