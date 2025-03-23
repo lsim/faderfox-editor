@@ -336,7 +336,7 @@ const P = {
       console.log('Set unknown parameter type: ' + type);
       return;
     }
-    let addr = MEM.addrPresets + (setupId * 16 + groupId) * MEM.lengthGroup + spec.pos;
+    let addr = P._getMemAddr(spec, setupId, groupId);
 
     addr += encoderId;
     // const oldValue = data[addr];
@@ -413,7 +413,7 @@ function hiloNibbles(v: number) {
   return [hi, lo];
 }
 
-const PADDING = new Array(30).fill(0);
+const PADDING: number[] = new Array(30).fill(0);
 
 export function generateSysexData(encoderSetups: EncoderSetup[]) {
   const setupData = new Uint8Array(MEMORY_SIZE);
@@ -473,18 +473,7 @@ export function parseSetupsFromSysex(
   }
 }
 
-export type MemField =
-  | Exclude<FieldType, null>
-  | 'lower_msb'
-  | 'upper_msb'
-  | 'pb_channel'
-  | 'pb_display'
-  | 'pb_type'
-  | 'pb_mode'
-  | 'pb_number'
-  | 'pb_lower'
-  | 'pb_upper'
-  | 'pb_link';
+export type MemField = FieldType;
 
 function useHighres(
   data: Uint8Array<ArrayBufferLike>,

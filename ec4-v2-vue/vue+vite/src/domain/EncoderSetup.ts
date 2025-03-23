@@ -11,7 +11,7 @@ export class EncoderSetup {
     this.id = id;
     this.name = name;
     this.groups = Array.from(generateIds()).map((groupId) => {
-      return new EncoderGroup(groupId, this.id, name);
+      return new EncoderGroup(groupId, this.id, `GR${String(groupId + 1).padStart(2, '0')}`);
     });
   }
 

@@ -9,8 +9,7 @@ export function* generateIds() {
 
 function* generateDefaultNames(prefix: string) {
   for (let i = 0; i < 16; i++) {
-    const paddedNumber = i.toString().padStart(2, '0');
-    yield `${prefix}${paddedNumber}`;
+    yield `${prefix}${String(i + 1).padStart(2, '0')}`;
   }
 }
 
