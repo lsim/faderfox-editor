@@ -4,7 +4,7 @@ import {
   type Control,
   type FieldType,
   encoderTypes,
-  pushbuttonTypes,
+  pushButtonTypes,
   encoderModes,
   encoderTypeByName,
 } from '@/domain/Encoder.ts';
@@ -46,18 +46,6 @@ function noteToObject(n: number) {
 }
 
 const encoderInput = ref<HTMLInputElement | null>(null);
-
-// Encoders have one set of options, push buttons have another
-const typeOptions = computed(() => {
-  switch (ec4.editorMode) {
-    case 'turn':
-      return encoderTypes;
-    case 'push':
-      return pushbuttonTypes;
-    default:
-      throw Error('Unknown editor mode ' + ec4.editorMode);
-  }
-});
 
 function focusInput() {
   if (!props.selected) return;
@@ -164,11 +152,37 @@ function setNameActive(newVal: boolean, source: any) {
         </span>
       </template>
       <template v-else-if="props.activeField === 'number'"> </template>
+      <template v-else-if="props.activeField === 'pb_number'">
+        <label>{{ t('ENCODER_NUMBER') }}</label>
+        <input
+          class="width_3"
+          v-model="control.pb_number"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
       <template v-else-if="props.activeField === 'channel'">
         <label>{{ control.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
         <input
           class="width_3"
           :value="control.channel"
+          @input="
+            control.channel = ($event.target as HTMLInputElement).checkValidity()
+              ? parseInt(($event.target as HTMLInputElement).value, 10)
+              : control.channel
+          "
+          type="number"
+          min="1"
+          max="16"
+          ref="encoderInput"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'pb_channel'">
+        <label>{{ t('ENCODER_CHANNEL') }}</label>
+        <input
+          class="width_3"
           @input="
             control.channel = ($event.target as HTMLInputElement).checkValidity()
               ? parseInt(($event.target as HTMLInputElement).value, 10)
@@ -193,6 +207,15 @@ function setNameActive(newVal: boolean, source: any) {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
+      <template v-else-if="props.activeField === 'pb_lower'">
+        <label>{{ t('ENCODER_LOWER') }}</label>
+        <input
+          class="width_4"
+          v-model="control.pb_lower"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
       <template v-else-if="props.activeField === 'upper'">
         <label>{{ t('ENCODER_UPPER') }}</label>
         <input
@@ -204,11 +227,28 @@ function setNameActive(newVal: boolean, source: any) {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
+      <template v-else-if="props.activeField === 'pb_upper'">
+        <label>{{ t('ENCODER_UPPER') }}</label>
+        <input
+          class="width_4"
+          v-model="control.pb_upper"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
       <template v-else-if="props.activeField === 'scale'">
         <label>{{ t('ENCODER_SCALE') }}</label>
         <ScaleSelector
-          :model-value="control.scale || 0"
-          @update:modelValue="control.scale = $event"
+          v-model="control.scale"
+          ref="encoderInput"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'pb_display'">
+        <label>{{ t('ENCODER_SCALE') }}</label>
+        <ScaleSelector
+          v-model="control.pb_display"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
@@ -222,7 +262,20 @@ function setNameActive(newVal: boolean, source: any) {
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         >
-          <option v-for="n in typeOptions" :key="n.value" :value="n.value" :title="n.text">
+          <option v-for="n in encoderTypes" :key="n.value" :value="n.value" :title="n.text">
+            {{ n.short }}
+          </option>
+        </select>
+      </template>
+      <template v-else-if="props.activeField === 'pb_type'">
+        <label>{{ t('ENCODER_TYPE') }}</label>
+        <select
+          v-model="control.pb_type"
+          ref="encoderInput"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        >
+          <option v-for="n in pushButtonTypes" :key="n.value" :value="n.value" :title="n.text">
             {{ n.short }}
           </option>
         </select>
@@ -235,8 +288,18 @@ function setNameActive(newVal: boolean, source: any) {
           ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"
         >
-          <!-- TODO: push button mode options -->
           <option v-for="n in encoderModes" :key="n.value" :value="n.value">{{ n.text }}</option>
+        </select>
+      </template>
+      <template v-else-if="props.activeField === 'pb_mode'">
+        <label>{{ t('ENCODER_MODE') }}</label>
+        <select
+          v-model="control.pb_mode"
+          @focus="setNameActive(false, $event.target)"
+          ref="encoderInput"
+          :tabindex="props.nameActive ? -1 : 0"
+        >
+          <option v-for="n in pushButtonModes" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
       </template>
       <template v-else>

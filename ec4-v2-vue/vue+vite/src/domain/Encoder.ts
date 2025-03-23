@@ -40,7 +40,7 @@ export const encoderTypes: EncoderType[] = [
   { text: 'NRPN', short: 'NRPN', value: 8 },
 ];
 
-export const pushbuttonTypes: EncoderType[] = [
+export const pushButtonTypes: EncoderType[] = [
   { text: 'Off', short: 'Off', value: 0 },
   { text: 'Note', short: 'Note', value: 1 },
   { text: 'CC', short: 'CC', value: 2 },
@@ -59,8 +59,8 @@ export const pushbuttonTypes: EncoderType[] = [
 export const encoderTypeByName = (name: (typeof encoderTypes)[number]['short']) =>
   encoderTypes.findIndex((t) => t.short === name);
 
-export const pushButtonTypeByName = (name: (typeof pushbuttonTypes)[number]['short']) =>
-  pushbuttonTypes.findIndex((t) => t.short === name);
+export const pushButtonTypeByName = (name: (typeof pushButtonTypes)[number]['short']) =>
+  pushButtonTypes.findIndex((t) => t.short === name);
 
 export type ScaleOption = {
   text: string;
