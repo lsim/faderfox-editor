@@ -316,7 +316,7 @@ const P = {
             val = spec.default ?? 0;
           }
         }
-        if (type === P.channel || type === 'pb_channel') val++;
+        if (type === P.channel || type === P.pb_channel) val++;
         return val as TRes;
       } else {
         return data[addr] as TRes;
@@ -341,7 +341,7 @@ const P = {
     addr += encoderId;
     // const oldValue = data[addr];
     // value = parseInt(value);
-    if (type === P.channel) value--;
+    if (type === P.channel || type === P.pb_channel) value--;
     const shift = spec.lsb || 0;
     if (spec.mask != 0xff) {
       const invMask = 0xff ^ (spec.mask ?? 0);

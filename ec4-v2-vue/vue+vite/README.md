@@ -43,3 +43,7 @@ yarn test:unit
 ```sh
 yarn lint
 ```
+
+## TODO
+
+- Auto saving to local storage

@@ -16,7 +16,6 @@ export type FieldType =
   | 'pb_channel'
   | 'pb_display'
   | 'pb_type'
-  | 'pb_scale'
   | 'pb_mode'
   | 'pb_number'
   | 'pb_lower'
