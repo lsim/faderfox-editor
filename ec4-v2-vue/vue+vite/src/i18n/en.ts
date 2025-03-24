@@ -22,6 +22,7 @@ export default {
   OLED_ENCODER_NAME: 'ctrl',
   OLED_CHANNEL: 'chan',
   OLED_GROUP: 'group',
+  OLED_SET: 'set',
   OLED_DISPLAY: 'disp',
   OLED_NUMBER: 'numb',
   OLED_TYPE: 'type',

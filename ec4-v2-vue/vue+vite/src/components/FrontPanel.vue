@@ -57,8 +57,7 @@ function handleKeyDown(e: KeyboardEvent) {
         const isInOled = focused?.closest('.oled');
         if (isInOled) {
           // Switch focus to active encoder
-          const idx = ec4.selectedEncoderIndex;
-          setTimeout(() => (ec4.selectedEncoderIndex = idx));
+          ec4.controlFocusRequests++;
         } else {
           // Switch focus to active field in oled
           oled.value?.focusActiveField();

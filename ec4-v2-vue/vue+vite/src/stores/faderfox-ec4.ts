@@ -50,6 +50,7 @@ export const useEc4Store = defineStore('ec4', () => {
   if (encoderSetups.value.length === 0) encoderSetups.value = createEmptyEncoderSetups();
 
   const selectedSetupIndex = ref<number>(0);
+  const controlFocusRequests = ref(0);
 
   const encoderGroups = computed(() => encoderSetups.value[selectedSetupIndex.value].groups);
   const selectedGroupIndex = ref<number>(0);
@@ -73,5 +74,6 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedEncoderIndex,
     saveState: () => saveState(encoderSetups.value),
     loadState: () => loadState(encoderSetups),
+    controlFocusRequests,
   };
 });

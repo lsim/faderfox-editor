@@ -21,24 +21,24 @@ const controls = computed(() => {
 
 const nameActive = ref<boolean>(false);
 
-watch(
-  () => props.activeField,
-  (newActiveField) => {
-    console.debug(
-      'activeField changed to',
-      newActiveField,
-      ec4.editorMode,
-      controls.value[props.selectedEncoderId].type,
-    );
-  },
-);
-
-watch(
-  () => nameActive,
-  (newVal) => {
-    console.debug('Name active changed', newVal);
-  },
-);
+// watch(
+//   () => props.activeField,
+//   (newActiveField) => {
+//     console.debug(
+//       'activeField changed to',
+//       newActiveField,
+//       ec4.editorMode,
+//       controls.value[props.selectedEncoderId].type,
+//     );
+//   },
+// );
+//
+// watch(
+//   () => nameActive,
+//   (newVal) => {
+//     console.debug('Name active changed', newVal);
+//   },
+// );
 </script>
 
 <template>

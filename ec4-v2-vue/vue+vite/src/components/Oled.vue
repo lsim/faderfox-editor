@@ -7,6 +7,7 @@ import {
   type Control,
   encoderModes,
   encoderTypeByName,
+  pushButtonTypeByName,
   pushButtonModes,
 } from '@/domain/Encoder';
 import { computed, type ComputedRef, ref, watch } from 'vue';
@@ -68,6 +69,7 @@ function focusActiveField() {
   } else if (props.activeField === 'mode') {
     modeSelect.value?.focus();
   }
+  // TODO: push button fields
 }
 
 function isHidden(field: FieldType, control: Control): boolean {
@@ -86,7 +88,7 @@ function isHidden(field: FieldType, control: Control): boolean {
       // Hidden for Note
       excludingTypes = [7];
       break;
-    case 'pb_scale':
+    case 'pb_display':
       // Hidden for Off
       excludingTypes = [0];
       break;
@@ -102,8 +104,22 @@ function isHidden(field: FieldType, control: Control): boolean {
       excludingTypes = [0, 6, 7, 8, 9, 10, 11, 12];
       break;
   }
-  return excludingTypes.includes(control.type ?? -1);
+  // if (field === 'pb_number') console.log('isHidden', field, control.pb_type, excludingTypes);
+  return ec4.editorMode === 'push'
+    ? excludingTypes.includes(control.pb_type ?? -1)
+    : excludingTypes.includes(control.type ?? -1);
 }
+
+const pbChannelLabel = computed(() => {
+  switch (control.value.pb_type) {
+    case pushButtonTypeByName('Grp'):
+      return t('OLED_GROUP');
+    case pushButtonTypeByName('Set'):
+      return t('OLED_SET');
+    default:
+      return t('OLED_CHANNEL');
+  }
+});
 
 // When control.type changes, we may need to change the active field as it may no longer be valid
 watch(
@@ -131,54 +147,64 @@ defineExpose({ focusActiveField });
       @focus="setActiveField('name', $event.target)"
     />
     <!-- Encoder channel -->
-    <label
-      for="encoderChannel"
-      :class="{
-        'active-field': activeField.includes('channel'),
-        hidden: isHidden('channel', control),
-      }"
-      >{{ control.type === 6 ? t('OLED_GROUP') : t('OLED_CHANNEL') }}:</label
-    >
-    <input
-      v-if="ec4.editorMode === 'turn'"
-      id="encoderChannel"
-      ref="channelInput"
-      autocomplete="off"
-      type="number"
-      min="1"
-      max="16"
-      :value="control.channel"
-      @input="
-        control.channel = ($event.target as HTMLInputElement | null)?.checkValidity()
-          ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
-          : control.channel
-      "
-      @focus="setActiveField('channel', $event.target)"
-      :class="{ hidden: isHidden('channel', control) }"
-    />
-    <input
-      v-else
-      id="encoderChannel"
-      ref="channelInput"
-      autocomplete="off"
-      type="number"
-      min="1"
-      max="16"
-      :value="control.pb_channel"
-      @input="
-        control.pb_channel = ($event.target as HTMLInputElement | null)?.checkValidity()
-          ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
-          : control.pb_channel
-      "
-      @focus="setActiveField('pb_channel', $event.target)"
-      :class="{ hidden: isHidden('pb_channel', control) }"
-    />
+    <template v-if="ec4.editorMode === 'turn'">
+      <label
+        for="encoderChannel"
+        :class="{
+          'active-field': activeField.includes('channel'),
+          hidden: isHidden('channel', control),
+        }"
+        >{{ t('OLED_CHANNEL') }}:</label
+      >
+      <input
+        id="encoderChannel"
+        ref="channelInput"
+        autocomplete="off"
+        type="number"
+        min="1"
+        max="16"
+        :value="control.channel"
+        @input="
+          control.channel = ($event.target as HTMLInputElement | null)?.checkValidity()
+            ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
+            : control.channel
+        "
+        @focus="setActiveField('channel', $event.target)"
+        :class="{ hidden: isHidden('channel', control) }"
+      />
+    </template>
+    <template v-else>
+      <label
+        for="encoderChannel"
+        :class="{
+          'active-field': activeField.includes('channel'),
+          hidden: isHidden('pb_channel', control),
+        }"
+        >{{ pbChannelLabel }}:</label
+      >
+      <input
+        id="encoderChannel"
+        ref="channelInput"
+        autocomplete="off"
+        type="number"
+        min="1"
+        max="16"
+        :value="control.pb_channel"
+        @input="
+          control.pb_channel = ($event.target as HTMLInputElement | null)?.checkValidity()
+            ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
+            : control.pb_channel
+        "
+        @focus="setActiveField('pb_channel', $event.target)"
+        :class="{ hidden: isHidden('pb_channel', control) }"
+      />
+    </template>
     <!-- Encoder display -->
     <label
       for="encoderScale"
       :class="{
         'active-field': activeField === 'scale' || activeField === 'pb_display',
-        hidden: isHidden('scale', control),
+        hidden: isHidden('scale', control) || isHidden('pb_display', control),
       }"
       >{{ t('OLED_DISPLAY') }}:</label
     >
@@ -203,15 +229,16 @@ defineExpose({ focusActiveField });
       :class="{ hidden: isHidden('pb_display', control) }"
     />
     <!-- Encoder number - NRPN/other/push button -->
-    <label
-      for="encoderNumber"
-      :class="{
-        'active-field': activeField === 'number' || activeField === 'pb_number',
-        hidden: isHidden('number', control),
-      }"
-      >{{ t('OLED_NUMBER') }}:</label
-    >
     <template v-if="ec4.editorMode === 'turn'">
+      <label
+        for="encoderNumber"
+        :class="{
+          'active-field': activeField === 'number',
+          hidden: isHidden('number', control),
+        }"
+        >{{ t('OLED_NUMBER') }}:</label
+      >
+
       <template v-if="control.type === encoderTypeByName('NRPN')">
         <span class="two-inputs" :class="{ hidden: isHidden('number', control) }">
           <input
@@ -240,6 +267,14 @@ defineExpose({ focusActiveField });
       </template>
     </template>
     <template v-else>
+      <label
+        for="encoderNumber"
+        :class="{
+          'active-field': activeField === 'pb_number',
+          hidden: isHidden('pb_number', control),
+        }"
+        >{{ t('OLED_NUMBER') }}:</label
+      >
       <input
         id="encoderNumber"
         ref="numberInput"
@@ -280,42 +315,52 @@ defineExpose({ focusActiveField });
       </select>
     </template>
     <!-- Lower limit -->
-    <label
-      for="encoderLowerLimit"
-      :class="{
-        'active-field': activeField === 'lower' || activeField === 'pb_lower',
-        hidden: isHidden('lower', control),
-      }"
-      >{{ t('OLED_LOWER') }}:</label
-    >
-    <input
-      v-if="ec4.editorMode === 'turn'"
-      id="encoderLowerLimit"
-      ref="lowerLimitInput"
-      v-model="control.lower"
-      @focus="setActiveField('lower', $event.target)"
-      :class="{ hidden: isHidden('lower', control) }"
-      type="number"
-    />
-    <input
-      v-else
-      id="encoderLowerLimit"
-      ref="lowerLimitInput"
-      v-model="control.pb_lower"
-      @focus="setActiveField('pb_lower', $event.target)"
-      :class="{ hidden: isHidden('pb_lower', control) }"
-      type="number"
-    />
-    <!-- Encoder mode -->
-    <label
-      for="encoderMode"
-      :class="{
-        'active-field': activeField === 'mode' || activeField === 'pb_mode',
-        hidden: isHidden('mode', control),
-      }"
-      >{{ t('OLED_MODE') }}:</label
-    >
     <template v-if="ec4.editorMode === 'turn'">
+      <label
+        for="encoderLowerLimit"
+        :class="{
+          'active-field': activeField === 'lower',
+          hidden: isHidden('lower', control),
+        }"
+        >{{ t('OLED_LOWER') }}:</label
+      >
+      <input
+        id="encoderLowerLimit"
+        ref="lowerLimitInput"
+        v-model="control.lower"
+        @focus="setActiveField('lower', $event.target)"
+        :class="{ hidden: isHidden('lower', control) }"
+        type="number"
+      />
+    </template>
+    <template v-else>
+      <label
+        for="encoderLowerLimit"
+        :class="{
+          'active-field': activeField === 'pb_lower',
+          hidden: isHidden('pb_lower', control),
+        }"
+        >{{ t('OLED_LOWER') }}:</label
+      >
+      <input
+        id="encoderLowerLimit"
+        ref="lowerLimitInput"
+        v-model="control.pb_lower"
+        @focus="setActiveField('pb_lower', $event.target)"
+        :class="{ hidden: isHidden('pb_lower', control) }"
+        type="number"
+      />
+    </template>
+    <!-- Encoder mode -->
+    <template v-if="ec4.editorMode === 'turn'">
+      <label
+        for="encoderMode"
+        :class="{
+          'active-field': activeField === 'mode',
+          hidden: isHidden('mode', control),
+        }"
+        >{{ t('OLED_MODE') }}:</label
+      >
       <select
         id="encoderMode"
         v-model="control.mode"
@@ -329,6 +374,14 @@ defineExpose({ focusActiveField });
       </select>
     </template>
     <template v-else>
+      <label
+        for="encoderMode"
+        :class="{
+          'active-field': activeField === 'pb_mode',
+          hidden: isHidden('pb_mode', control),
+        }"
+        >{{ t('OLED_MODE') }}:</label
+      >
       <select
         id="encoderMode"
         v-model="control.pb_mode"
@@ -342,32 +395,42 @@ defineExpose({ focusActiveField });
       </select>
     </template>
     <!-- Upper limit -->
-    <label
-      for="encoderUpperLimit"
-      :class="{
-        'active-field': activeField === 'upper' || activeField === 'pb_upper',
-        hidden: isHidden('upper', control),
-      }"
-      >{{ t('OLED_UPPER') }}:</label
-    >
-    <input
-      v-if="ec4.editorMode === 'turn'"
-      id="encoderUpperLimit"
-      ref="upperLimitInput"
-      v-model="control.upper"
-      @focus="setActiveField('upper', $event.target)"
-      :class="{ hidden: isHidden('upper', control) }"
-      type="number"
-    />
-    <input
-      v-else
-      id="encoderUpperLimit"
-      ref="upperLimitInput"
-      v-model="control.pb_upper"
-      @focus="setActiveField('pb_upper', $event.target)"
-      :class="{ hidden: isHidden('pb_upper', control) }"
-      type="number"
-    />
+    <template v-if="ec4.editorMode === 'turn'">
+      <label
+        for="encoderUpperLimit"
+        :class="{
+          'active-field': activeField === 'upper',
+          hidden: isHidden('upper', control),
+        }"
+        >{{ t('OLED_UPPER') }}:</label
+      >
+      <input
+        id="encoderUpperLimit"
+        ref="upperLimitInput"
+        v-model="control.upper"
+        @focus="setActiveField('upper', $event.target)"
+        :class="{ hidden: isHidden('upper', control) }"
+        type="number"
+      />
+    </template>
+    <template v-else>
+      <label
+        for="encoderUpperLimit"
+        :class="{
+          'active-field': activeField === 'pb_upper',
+          hidden: isHidden('pb_upper', control),
+        }"
+        >{{ t('OLED_UPPER') }}:</label
+      >
+      <input
+        id="encoderUpperLimit"
+        ref="upperLimitInput"
+        v-model="control.pb_upper"
+        @focus="setActiveField('pb_upper', $event.target)"
+        :class="{ hidden: isHidden('pb_upper', control) }"
+        type="number"
+      />
+    </template>
 
     <!--    <div id="turn" class="modecontainer">-->
     <!--      <span >Ctrl:</span-->

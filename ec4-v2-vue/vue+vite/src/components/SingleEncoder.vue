@@ -6,11 +6,14 @@ import {
   encoderTypes,
   pushButtonTypes,
   encoderModes,
+  pushButtonModes,
   encoderTypeByName,
+  pushButtonTypeByName,
 } from '@/domain/Encoder.ts';
-import { computed, ref, type ComputedRef, watch } from 'vue';
+import { computed, ref, type ComputedRef, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import NoteInput from '@/components/NoteInput.vue';
 
 const { t } = useI18n();
 
@@ -32,18 +35,7 @@ const control: ComputedRef<Control> = computed(() => {
   return group.controls[props.encoderId];
 });
 
-const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
 const nameInput = ref<HTMLInputElement | null>(null);
-
-function noteToObject(n: number) {
-  const name = noteNames[n % 12];
-  const octave = Math.round(n / 12) - 2;
-  return {
-    text: `${name} ${octave || ''}`,
-    value: n,
-  };
-}
 
 const encoderInput = ref<HTMLInputElement | null>(null);
 
@@ -72,8 +64,16 @@ watch(
   },
 );
 
-// From C-2 to G-8
-const noteOptions = ref([...Array(128).keys()].map((n) => noteToObject(n)));
+watch(
+  () => ec4.controlFocusRequests,
+  (newCount) => {
+    if (newCount <= 0 || props.encoderId !== ec4.selectedEncoderIndex) return;
+    nextTick(() => {
+      ec4.controlFocusRequests = 0;
+      focusInput();
+    });
+  },
+);
 
 // This governs tab order behavior
 function setNameActive(newVal: boolean, source: any) {
@@ -134,29 +134,34 @@ function setNameActive(newVal: boolean, source: any) {
         v-else-if="props.activeField === 'number' && control.type === encoderTypeByName('Note')"
       >
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
-        <span class="note-inputs"
-          ><input
-            class="width_3"
-            v-model="control.number"
-            ref="encoderInput"
-            maxlength="3"
-            @focus="setNameActive(false, $event.target)"
-          /><select
-            class="width_3"
-            v-model="control.number"
-            @focus="setNameActive(false, $event.target)"
-            :tabindex="props.nameActive ? -1 : 0"
-          >
-            <option v-for="n in noteOptions" :key="n.value" :value="n.value">{{ n.text }}</option>
-          </select>
-        </span>
+        <note-input
+          class="note-input"
+          v-model="control.number"
+          ref="encoderInput"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
       </template>
       <template v-else-if="props.activeField === 'number'"> </template>
-      <template v-else-if="props.activeField === 'pb_number'">
+      <template
+        v-else-if="
+          props.activeField === 'pb_number' && control.pb_type !== pushButtonTypeByName('Note')
+        "
+      >
         <label>{{ t('ENCODER_NUMBER') }}</label>
         <input
           class="width_3"
           v-model="control.pb_number"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template v-else-if="props.activeField === 'pb_number'">
+        <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
+        <note-input
+          class="note-input"
+          v-model="control.pb_number"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -325,112 +330,7 @@ function setNameActive(newVal: boolean, source: any) {
         alt="Turn mode (click to toggle)"
         @click.capture="ec4.setEditorMode('push')"
       />
-
-      <!--      <div class="pb_channel">-->
-      <!--        <label>{{ t('ENCODER_PB_CHANNEL') }}</label>-->
-      <!--        <input-->
-      <!--          data-watch="pb_channel"-->
-      <!--          maxlength="2"-->
-      <!--          type="text"-->
-      <!--          value="0"-->
-      <!--          tabindex="{{ 216 + index }}"-->
-      <!--        />-->
-      <!--      </div>-->
-      <!--      <div class="pb_display">-->
-      <!--        <label>{{ t('ENCODER_PB_DISPLAY') }}</label>-->
-      <!--        <select data-watch="pb_display" tabindex="{{ 216 + index }}">-->
-      <!--          <option>Off</option>-->
-      <!--          <option>On</option>-->
-      <!--        </select>-->
-      <!--      </div>-->
-      <!--      <div class="pb_number">-->
-      <!--        <div class="pb_standard">-->
-      <!--          <label>{{ t('ENCODER_PB_NUMBER') }}</label>-->
-      <!--          <div class="inputs">-->
-      <!--            <input-->
-      <!--              data-watch="pb_number"-->
-      <!--              maxlength="3"-->
-      <!--              type="text"-->
-      <!--              value="0"-->
-      <!--            />-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--        <div class="pb_note">-->
-      <!--          <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>-->
-      <!--          <div class="inputs">-->
-      <!--            <input-->
-      <!--              data-watch="pb_number"-->
-      <!--              maxlength="3"-->
-      <!--              type="text"-->
-      <!--              value="0"-->
-      <!--            />-->
-      <!--            <select-->
-      <!--              data-watch="pb_number"-->
-      <!--            >-->
-      <!--              &lt;!&ndash; TODO: bind this &ndash;&gt;-->
-      <!--            </select>-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--      </div>-->
-      <!--      <div class="pb_type">-->
-      <!--        <label>{{ t('ENCODER_PB_TYPE') }}</label>-->
-      <!--        <select data-watch="pb_type" class="b">-->
-      <!--          <option>Off</option>-->
-      <!--          <option>Note</option>-->
-      <!--          <option>CC</option>-->
-      <!--          <option>PrgC</option>-->
-      <!--          <option>PBnd</option>-->
-      <!--          <option>AftT</option>-->
-      <!--          <option>Grp</option>-->
-      <!--          <option>Set</option>-->
-      <!--          <option>Acc0</option>-->
-      <!--          <option>Acc3</option>-->
-      <!--          <option>LSp6</option>-->
-      <!--          <option>Min</option>-->
-      <!--          <option>Max</option>-->
-      <!--        </select>-->
-      <!--      </div>-->
-      <!--      <div class="pb_mode">-->
-      <!--        <label>{{ t('ENCODER_PB_MODE') }}</label>-->
-      <!--        <select data-watch="pb_mode">-->
-      <!--          <option>Key</option>-->
-      <!--          <option>Togl</option>-->
-      <!--        </select>-->
-      <!--      </div>-->
-      <!--      <div class="pb_lower">-->
-      <!--        <label>{{ t('ENCODER_PB_LOWER') }}</label>-->
-      <!--        <input-->
-      <!--          data-watch="pb_lower"-->
-      <!--          maxlength="3"-->
-      <!--          type="text"-->
-      <!--          value="0"-->
-      <!--          tabindex="{{ 216 + index }}"-->
-      <!--        />-->
-      <!--      </div>-->
-      <!--      <div class="pb_upper">-->
-      <!--        <label>{{ t('ENCODER_PB_UPPER') }}</label>-->
-      <!--        <input-->
-      <!--          data-watch="pb_upper"-->
-      <!--          maxlength="3"-->
-      <!--          type="text"-->
-      <!--          value="0"-->
-      <!--          tabindex="{{ 216 + index }}"-->
-      <!--        />-->
-      <!--      </div>-->
     </div>
-    <!--    <div class="link turn matrixfont" title="Link this encoder to next">-->
-    <!--      <input type="checkbox" id="linkenc{{ index }}" data-watch="link" data-action="edit-link" />-->
-    <!--      <label for="linkenc{{ index }}"><span>Link</span>&gt;</label>-->
-    <!--    </div>-->
-    <!--    <div class="link push matrixfont" title="Link this push button to next">-->
-    <!--      <input-->
-    <!--        type="checkbox"-->
-    <!--        id="linkpb{{ index }}"-->
-    <!--        data-watch="pb_link"-->
-    <!--        data-action="edit-pb_link"-->
-    <!--      />-->
-    <!--      <label for="linkpb{{ index }}"><span>Link</span>&gt;</label>-->
-    <!--    </div>-->
   </div>
 </template>
 
@@ -443,15 +343,11 @@ function setNameActive(newVal: boolean, source: any) {
   position: relative;
 
   .inputs {
-    z-index: 10;
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
+    z-index: 1;
 
     display: grid;
     grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-columns: calc(100% - 6px);
     align-items: center;
     justify-items: center;
     justify-content: center;
@@ -459,11 +355,6 @@ function setNameActive(newVal: boolean, source: any) {
     label {
       text-transform: capitalize;
       color: $textColor;
-    }
-
-    .note-inputs {
-      display: flex;
-      flex-direction: row;
     }
 
     input {
@@ -515,6 +406,11 @@ function setNameActive(newVal: boolean, source: any) {
   $knob-size: 64px;
   .knob {
     z-index: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     width: $knob-size;
     height: $knob-size;
 
