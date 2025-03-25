@@ -11,6 +11,7 @@ jobs:
         with:
           node-version: 22
       - run: cd ec4-v2-vue/vue+vite
+      - run: pwd
       - name: Install dependencies
         run: yarn
       - name: Test
