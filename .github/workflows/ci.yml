@@ -2,14 +2,14 @@ name: Build & Test
 on: [push]
 jobs:
   Build-Job:
-    runs-on: node-22
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-#      - name: Use Node.js 22
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 22
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - run: cd ec4-v2-vue/vue+vite
       - name: Install dependencies
         run: yarn
