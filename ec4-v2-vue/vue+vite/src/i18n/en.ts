@@ -19,7 +19,7 @@ export default {
   // ENCODER_PB_UPPER: 'upper',
 
   // Abbreviated labels for oled
-  OLED_ENCODER_NAME: 'ctrl',
+  OLED_ENCODER_ID: 'ctrl',
   OLED_CHANNEL: 'chan',
   OLED_GROUP: 'group',
   OLED_SET: 'set',

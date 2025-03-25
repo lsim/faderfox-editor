@@ -217,6 +217,7 @@ function setNameActive(newVal: boolean, source: any) {
         <input
           class="width_4"
           v-model="control.pb_lower"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -237,6 +238,7 @@ function setNameActive(newVal: boolean, source: any) {
         <input
           class="width_4"
           v-model="control.pb_upper"
+          ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />

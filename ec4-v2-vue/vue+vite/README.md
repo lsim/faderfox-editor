@@ -49,4 +49,4 @@ yarn lint
 - Auto saving to local storage
 - Set up CI
 - Receive sysex dumps from device and store in indexeddb or local storage - show in table
-- Oled ctrl: show same as reference app
+- Progressive web app possible? Vite PWA plugin looks good

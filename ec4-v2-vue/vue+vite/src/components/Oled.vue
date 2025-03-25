@@ -42,7 +42,7 @@ function setActiveField(field: FieldType, input: EventTarget | null) {
   // Select all the text in the input field for easier editing
   if (!isInput(input)) input = (input as Element | null)?.querySelector('input') || null;
   if (!isInput(input)) return;
-  setTimeout(() => input.select(), 100);
+  input?.select?.();
 }
 
 const nameInput = ref<HTMLInputElement | null>(null);
@@ -53,10 +53,16 @@ const lowerLimitInput = ref<HTMLInputElement | null>(null);
 const upperLimitInput = ref<HTMLInputElement | null>(null);
 const modeSelect = ref<HTMLSelectElement | null>(null);
 
+const pbChannelInput = ref<HTMLInputElement | null>(null);
+const pbDisplayInput = ref<HTMLInputElement | null>(null);
+const pbLowerLimitInput = ref<HTMLInputElement | null>(null);
+const pbUpperLimitInput = ref<HTMLInputElement | null>(null);
+const pbModeSelect = ref<HTMLSelectElement | null>(null);
+const pbTypeSelect = ref<HTMLSelectElement | null>(null);
+const pbNumberInput = ref<HTMLInputElement | null>(null);
+
 function focusActiveField() {
-  if (props.activeField === 'name') {
-    nameInput.value?.focus();
-  } else if (props.activeField === 'channel') {
+  if (props.activeField === 'channel' || props.activeField === 'name') {
     channelInput.value?.focus();
   } else if (props.activeField === 'scale') {
     scaleInput.value?.focus();
@@ -68,8 +74,21 @@ function focusActiveField() {
     upperLimitInput.value?.focus();
   } else if (props.activeField === 'mode') {
     modeSelect.value?.focus();
+  } else if (props.activeField === 'pb_channel') {
+    pbChannelInput.value?.focus();
+  } else if (props.activeField === 'pb_display') {
+    pbDisplayInput.value?.focus();
+  } else if (props.activeField === 'pb_lower') {
+    pbLowerLimitInput.value?.focus();
+  } else if (props.activeField === 'pb_upper') {
+    pbUpperLimitInput.value?.focus();
+  } else if (props.activeField === 'pb_mode') {
+    pbModeSelect.value?.focus();
+  } else if (props.activeField === 'pb_type') {
+    pbTypeSelect.value?.focus();
+  } else if (props.activeField === 'pb_number') {
+    pbNumberInput.value?.focus();
   }
-  // TODO: push button fields
 }
 
 function isHidden(field: FieldType, control: Control): boolean {
@@ -121,6 +140,11 @@ const pbChannelLabel = computed(() => {
   }
 });
 
+const ctrlIds = computed(() => {
+  const prefix = ec4.editorMode === 'turn' ? 'EC' : 'PB';
+  return Array.from(Array(16).keys()).map((i) => `${prefix}${(i + 1).toString().padStart(2, '0')}`);
+});
+
 // When control.type changes, we may need to change the active field as it may no longer be valid
 watch(
   () => control.value.type,
@@ -135,17 +159,16 @@ defineExpose({ focusActiveField });
 </script>
 
 <template>
-  <div id="oled" class="oled typed matrix_font" v-if="control">
-    <!-- Encoder name -->
-    <label for="encoderName" :class="{ 'active-field': activeField === 'name' }"
-      >{{ t('OLED_ENCODER_NAME') }}:</label
+  <div id="oled" class="oled typed matrix_font">
+    <!-- Selected control id -->
+    <label for="encoderId" :class="{ 'active-field': activeField === 'name' }"
+      >{{ t('OLED_ENCODER_ID') }}:</label
     >
-    <input
-      id="encoderName"
-      ref="nameInput"
-      v-model="control.name"
-      @focus="setActiveField('name', $event.target)"
-    />
+    <select v-model="ec4.selectedEncoderIndex" id="encoderId">
+      <option v-for="(id, idx) in ctrlIds" :key="id" :value="idx">
+        {{ id }}
+      </option>
+    </select>
     <!-- Encoder channel -->
     <template v-if="ec4.editorMode === 'turn'">
       <label
@@ -175,16 +198,16 @@ defineExpose({ focusActiveField });
     </template>
     <template v-else>
       <label
-        for="encoderChannel"
+        for="pbChannel"
         :class="{
-          'active-field': activeField.includes('channel'),
+          'active-field': activeField === 'pb_channel',
           hidden: isHidden('pb_channel', control),
         }"
         >{{ pbChannelLabel }}:</label
       >
       <input
-        id="encoderChannel"
-        ref="channelInput"
+        id="pbChannel"
+        ref="pbChannelInput"
         autocomplete="off"
         type="number"
         min="1"
@@ -224,7 +247,7 @@ defineExpose({ focusActiveField });
       @update:modelValue="control.pb_display = $event"
       :abbreviated="true"
       id="encoderScale"
-      ref="scaleInput"
+      ref="pbDisplayInput"
       @focus="setActiveField('pb_display', $event.target)"
       :class="{ hidden: isHidden('pb_display', control) }"
     />
@@ -277,7 +300,7 @@ defineExpose({ focusActiveField });
       >
       <input
         id="encoderNumber"
-        ref="numberInput"
+        ref="pbNumberInput"
         v-model="control.pb_number"
         :class="{ hidden: isHidden('pb_number', control) }"
         @focus="setActiveField('pb_number', $event.target)"
@@ -307,7 +330,7 @@ defineExpose({ focusActiveField });
         id="encoderType"
         v-model="control.pb_type"
         @focus="setActiveField('pb_type', $event.target)"
-        ref="typeSelect"
+        ref="pbTypeSelect"
       >
         <option v-for="n in pushButtonTypes" :key="n.value" :value="n.value" :title="n.text">
           {{ n.short }}
@@ -344,7 +367,7 @@ defineExpose({ focusActiveField });
       >
       <input
         id="encoderLowerLimit"
-        ref="lowerLimitInput"
+        ref="pbLowerLimitInput"
         v-model="control.pb_lower"
         @focus="setActiveField('pb_lower', $event.target)"
         :class="{ hidden: isHidden('pb_lower', control) }"
@@ -386,7 +409,7 @@ defineExpose({ focusActiveField });
         id="encoderMode"
         v-model="control.pb_mode"
         @focus="setActiveField('pb_mode', $event.target)"
-        ref="modeSelect"
+        ref="pbModeSelect"
         :class="{ hidden: isHidden('pb_mode', control) }"
       >
         <option v-for="n in pushButtonModes" :key="n.value" :value="n.value" :title="n.long">
@@ -424,207 +447,13 @@ defineExpose({ focusActiveField });
       >
       <input
         id="encoderUpperLimit"
-        ref="upperLimitInput"
+        ref="pbUpperLimitInput"
         v-model="control.pb_upper"
         @focus="setActiveField('pb_upper', $event.target)"
         :class="{ hidden: isHidden('pb_upper', control) }"
         type="number"
       />
     </template>
-
-    <!--    <div id="turn" class="modecontainer">-->
-    <!--      <span >Ctrl:</span-->
-    <!--      ><select  data-watch="select-encoder"></select-->
-    <!--    ><span class="c channel" data-action="edit-channel">Chan :</span-->
-    <!--    ><input-->
-    <!--      data-watch="channel"-->
-    <!--      data-action="edit-channel"-->
-
-    <!--      type="text"-->
-    <!--      maxlength="2"-->
-    <!--      value=""-->
-    <!--    /><span class="a scale" data-action="edit-scale">Disp:</span-->
-    <!--    ><select data-watch="scale" data-action="edit-scale" >-->
-    <!--      <option>off</option>-->
-    <!--      <option>127</option>-->
-    <!--      <option>100</option>-->
-    <!--      <option>1000</option>-->
-    <!--      <option> ±63</option>-->
-    <!--      <option> ±50</option>-->
-    <!--      <option>±500</option>-->
-    <!--      <option>ONOF</option>-->
-    <!--      <option>9999</option>-->
-    <!--    </select-->
-    <!--    ><span class="c number number_l" data-action="edit-number"-->
-    <!--    >Numb :</span-->
-    <!--    ><input-->
-    <!--      data-watch="number"-->
-    <!--      data-action="edit-number"-->
-    <!--      class="d number number_l"-->
-    <!--      type="text"-->
-    <!--      maxlength="3"-->
-    <!--      value=""-->
-    <!--    /><span class="c number number_h">N:</span-->
-    <!--    ><input-->
-    <!--      data-watch="number_h"-->
-    <!--      data-action="edit-number"-->
-    <!--      class="d number number_h"-->
-    <!--      type="text"-->
-    <!--      maxlength="3"-->
-    <!--      value=""-->
-    <!--      title="NPRM MSB"-->
-    <!--    /><input-->
-    <!--      data-watch="number"-->
-    <!--      data-action="edit-number"-->
-    <!--      class="d number number_h"-->
-    <!--      type="text"-->
-    <!--      maxlength="3"-->
-    <!--      value=""-->
-    <!--      title="NPRM LSB"-->
-    <!--    /><span class="a type" data-action="edit-type">Type:</span-->
-    <!--    ><select data-watch="type" data-action="edit-type" >-->
-    <!--      <option>CCR1</option>-->
-    <!--      <option>CCR2</option>-->
-    <!--      <option>CCab</option>-->
-    <!--      <option>PrgC</option>-->
-    <!--      <option>CCAh</option>-->
-    <!--      <option>PBnd</option>-->
-    <!--      <option>AftT</option>-->
-    <!--      <option>Note</option>-->
-    <!--      <option>NRPN</option>-->
-    <!--    </select-->
-    <!--    ><span class="c lower" data-action="edit-lower">Lower:</span-->
-    <!--    ><input-->
-    <!--      data-watch="lower"-->
-    <!--      data-action="edit-lower"-->
-    <!--      class="d lower"-->
-    <!--      type="text"-->
-    <!--      maxlength="5"-->
-    <!--      value=""-->
-    <!--    /><span class="a mode" data-action="edit-mode">Mode:</span-->
-    <!--    ><select data-watch="mode" data-action="edit-mode" class="b mode">-->
-    <!--      <option>Div8</option>-->
-    <!--      <option>Div4</option>-->
-    <!--      <option>Div2</option>-->
-    <!--      <option>Acc0</option>-->
-    <!--      <option>Acc1</option>-->
-    <!--      <option>Acc2</option>-->
-    <!--      <option>Acc3</option>-->
-    <!--      <option>LSp2</option>-->
-    <!--      <option>LSp4</option>-->
-    <!--      <option>LSp6</option>-->
-    <!--    </select-->
-    <!--    ><span class="c upper" data-action="edit-upper">Upper:</span-->
-    <!--    ><input-->
-    <!--      data-watch="upper"-->
-    <!--      data-action="edit-upper"-->
-    <!--      class="d upper"-->
-    <!--      type="text"-->
-    <!--      maxlength="5"-->
-    <!--      value=""-->
-    <!--    />-->
-    <!--    </div>-->
-    <!--    <div id="push" class="modecontainer">-->
-    <!--            <span >Ctrl:</span-->
-    <!--            ><select  data-watch="select-encoder">-->
-    <!--      <option>PB01-->
-    <!--      </option>-->
-    <!--      <option>PB02-->
-    <!--      </option>-->
-    <!--      <option>PB03-->
-    <!--      </option>-->
-    <!--      <option>PB04</option>-->
-    <!--      <option>PB05-->
-    <!--      </option>-->
-    <!--      <option>PB06-->
-    <!--      </option>-->
-    <!--      <option>PB07-->
-    <!--      </option>-->
-    <!--      <option>PB08</option>-->
-    <!--      <option>PB09-->
-    <!--      </option>-->
-    <!--      <option>PB10-->
-    <!--      </option>-->
-    <!--      <option>PB11-->
-    <!--      </option>-->
-    <!--      <option>PB12</option>-->
-    <!--      <option>PB13-->
-    <!--      </option>-->
-    <!--      <option>PB14-->
-    <!--      </option>-->
-    <!--      <option>PB15-->
-    <!--      </option>-->
-    <!--      <option>PB16</option>-->
-    <!--    </select-->
-    <!--    ><span class="c pb_channel" data-action="edit-pb_channel">Chan :</span-->
-    <!--    ><span class="c pb_channel pb_group" data-action="edit-pb_channel"-->
-    <!--    >Group:</span-->
-    <!--    ><span class="c pb_channel pb_set" data-action="edit-pb_channel"-->
-    <!--    >Set&nbsp; :</span-->
-    <!--    ><input-->
-    <!--      data-watch="pb_channel"-->
-    <!--      data-action="edit-pb_channel"-->
-    <!--      class="d pb_channel"-->
-    <!--      type="text"-->
-    <!--      maxlength="2"-->
-    <!--      value=""-->
-    <!--    /><span class="a pb_display" data-action="edit-pb_display">Disp:</span-->
-    <!--    ><select data-watch="pb_display" data-action="edit-pb_display" class="b pb_display">-->
-    <!--      <option>Off</option>-->
-    <!--      <option>On</option>-->
-    <!--    </select-->
-    <!--    ><span class="c pb_number" data-action="edit-pb_number"-->
-    <!--    >Numb :</span-->
-    <!--    ><input-->
-    <!--      data-watch="pb_number"-->
-    <!--      data-action="edit-pb_number"-->
-    <!--      class="d pb_number"-->
-    <!--      type="text"-->
-    <!--      maxlength="3"-->
-    <!--      value=""-->
-    <!--    /><span class="a pb_type" data-action="edit-pb_type">Type:</span-->
-    <!--    ><select data-watch="pb_type" data-action="edit-pb_type" >-->
-    <!--      <option>Off</option>-->
-    <!--      <option>Note</option>-->
-    <!--      <option>CC</option>-->
-    <!--      <option>PrgC</option>-->
-    <!--      <option>PBnd</option>-->
-    <!--      <option>AftT</option>-->
-    <!--      <option>Grp</option>-->
-    <!--      <option>Set</option>-->
-    <!--      <option>Acc0</option>-->
-    <!--      <option>Acc3</option>-->
-    <!--      <option>LSp6</option>-->
-    <!--      <option>Min</option>-->
-    <!--      <option>Max</option>-->
-    <!--    </select-->
-    <!--    ><span class="c pb_lower" data-action="edit-pb_lower">Lower:</span-->
-    <!--    ><input-->
-    <!--      data-watch="pb_lower"-->
-    <!--      data-action="edit-pb_lower"-->
-    <!--      class="d pb_lower"-->
-    <!--      type="text"-->
-    <!--      maxlength="3"-->
-    <!--      value=""-->
-    <!--    /><span class="a pb_mode" data-action="edit-pb_mode">Mode:</span-->
-    <!--    ><select data-watch="pb_mode" data-action="edit-pb_mode" class="b pb_mode">-->
-    <!--      <option>Key</option>-->
-    <!--      <option>Togl</option>-->
-    <!--    </select-->
-    <!--    ><span class="c pb_upper" data-action="edit-pb_upper">Upper:</span-->
-    <!--    ><input-->
-    <!--      data-watch="pb_upper"-->
-    <!--      data-action="edit-pb_upper"-->
-    <!--      class="d pb_upper"-->
-    <!--      type="text"-->
-    <!--      maxlength="3"-->
-    <!--      value=""-->
-    <!--    />-->
-    <!--    </div>-->
-    <!--    <div id="toallenc" class="asbutton" data-action="copy2all">-->
-    <!--      Copy &quot;<span>XXXX</span>&quot; to all encoders in group-->
-    <!--    </div>-->
-    <!--    <div class="centerline"></div>-->
   </div>
 </template>
 
