@@ -15,5 +15,5 @@ export default defineConfig({
   server: {
     port: 4242,
   },
-  base: './',
+  base: '/faderfox-editor/',
 });
