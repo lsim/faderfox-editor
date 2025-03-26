@@ -122,7 +122,7 @@ main {
   height: 818px;
   background: url('../assets/ec4.jpg') no-repeat;
   // The picture has a few too many pixels on the right, so make it a bit too big on that axis
-  background-size: 101% 100%;
+  background-size: 101.3% 100%;
 
   .mode-selector {
     grid-area: mode-selector;
