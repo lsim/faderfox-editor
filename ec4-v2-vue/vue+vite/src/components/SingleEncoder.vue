@@ -405,11 +405,11 @@ function setNameActive(newVal: boolean, source: any) {
     width: 2.6em;
   }
 
-  $knob-size: 64px;
+  $knob-size: 55px;
   .knob {
     z-index: 0;
     position: absolute;
-    top: 0;
+    top: 10px;
     left: 0;
     bottom: 0;
     right: 0;
