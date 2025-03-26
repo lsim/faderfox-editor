@@ -3,7 +3,7 @@ import EncoderPanel from '@/components/EncoderPanel.vue';
 import ModeSelector from '@/components/ModeSelector.vue';
 import Oled from '@/components/Oled.vue';
 import { type FieldType } from '@/domain/Encoder.ts';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
 const props = defineProps<{
@@ -70,10 +70,23 @@ function handleKeyDown(e: KeyboardEvent) {
     }
   }
 }
+
+const showSaveIndicator = ref(false);
+
+watch(
+  () => ec4.lastStateSaved,
+  () => {
+    showSaveIndicator.value = true;
+    setTimeout(() => {
+      showSaveIndicator.value = false;
+    }, 2000);
+  },
+);
 </script>
 
 <template>
   <main @keydown.capture="handleKeyDown">
+    <div id="save-indicator" v-if="showSaveIndicator">💾</div>
     <ModeSelector class="mode-selector" />
     <Oled
       v-if="ec4.selectedEncoderIndex != null"
@@ -102,11 +115,13 @@ function handleKeyDown(e: KeyboardEvent) {
 </template>
 
 <style scoped lang="scss">
+@use '@picocss/pico/scss/colors/index.scss' as *;
 $oled-height: 130px;
 $oled-width: 300px;
 
 main {
   // This grid was tweaked to fit the outlines of the EC4 controller
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   grid-template-rows: 73px 30px $oled-height 30px 480px 20px;
@@ -146,6 +161,39 @@ main {
   .fillnumbers {
     grid-area: fillnumbers;
     display: none;
+  }
+
+  $diameter: 39px;
+  #save-indicator {
+    text-align: center;
+    line-height: $diameter;
+    position: absolute;
+    top: 181px;
+    left: 37px;
+    width: $diameter;
+    height: $diameter;
+    border-radius: 50%;
+    color: $white;
+    background-color: rgba($green-800, 0.5);
+    opacity: 0;
+
+    animation: pulse 1s;
+    @keyframes pulse {
+      0% {
+        opacity: 1;
+        rotate: 0deg;
+        box-shadow: 0 0 0 0 rgba($green-300, 0.8);
+      }
+      70% {
+        rotate: 360deg;
+        opacity: 1;
+        box-shadow: 0 0 0 $diameter rgba($green-800, 0);
+      }
+      100% {
+        rotate: 360deg;
+        opacity: 0;
+      }
+    }
   }
 }
 </style>

@@ -85,7 +85,7 @@ function setNameActive(newVal: boolean, source: any) {
 <template>
   <div class="enc typed encoder-container">
     <div class="knob"></div>
-    <div class="inputs" v-if="control">
+    <div class="inputs">
       <div class="name">
         <input
           ref="nameInput"
@@ -310,8 +310,8 @@ function setNameActive(newVal: boolean, source: any) {
         </select>
       </template>
       <template v-else>
-        <div></div>
-        <div></div>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
       </template>
 
       <img

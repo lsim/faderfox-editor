@@ -1,4 +1,4 @@
-import { ref, computed, type Ref } from 'vue';
+import { ref, computed, type Ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
@@ -30,17 +30,20 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
-// TODO: write unit tests to ensure each value survives a sysex round trip
 function saveState(setups: EncoderSetup[]) {
-  const bytes = generateSysexData(setups);
-  localStorage.setItem('sysexDataArr', JSON.stringify(Array.from(bytes)));
+  const saveObj = {
+    bytes: Array.from(generateSysexData(setups)),
+    timestamp: Date.now(),
+  };
+  localStorage.setItem('sysexSave', JSON.stringify(saveObj));
 }
 
 function loadState(encoderSetups: Ref<EncoderSetup[]>) {
-  const bytes = JSON.parse(localStorage.getItem('sysexDataArr') || '[]');
-  if (bytes.length === 0) return;
+  const saveObj = JSON.parse(localStorage.getItem('sysexSave') || 'null');
+  if (saveObj === null) return;
+  console.log('Loading state from', new Date(saveObj.timestamp).toLocaleString());
   const newSetups = createEmptyEncoderSetups();
-  parseSetupsFromSysex(new Uint8Array(bytes), newSetups);
+  parseSetupsFromSysex(new Uint8Array(saveObj.bytes), newSetups);
   encoderSetups.value = newSetups;
 }
 
@@ -62,6 +65,20 @@ export const useEc4Store = defineStore('ec4', () => {
   }
 
   const selectedEncoderIndex = ref<number>(0);
+  const lastStateSaved = ref(0);
+
+  let timeout: number = 0;
+  watch(
+    encoderSetups,
+    () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        saveState(encoderSetups.value);
+        lastStateSaved.value = Date.now();
+      }, 3000);
+    },
+    { deep: true },
+  );
 
   return {
     encoderSetups,
@@ -75,5 +92,6 @@ export const useEc4Store = defineStore('ec4', () => {
     saveState: () => saveState(encoderSetups.value),
     loadState: () => loadState(encoderSetups),
     controlFocusRequests,
+    lastStateSaved,
   };
 });

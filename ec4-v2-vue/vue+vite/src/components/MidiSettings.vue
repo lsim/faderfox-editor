@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useMidi from '@/composables/useMidi.ts';
-import { watch, onBeforeUnmount } from 'vue';
+import { watch, onBeforeUnmount, ref, nextTick } from 'vue';
 import useConfirm from '@/composables/confirm.ts';
 import Confirm from '@/components/Confirm.vue';
 import { createEmptyEncoderSetups, useEc4Store } from '@/stores/faderfox-ec4.ts';
@@ -46,11 +46,27 @@ function loadSysexData() {
     });
 }
 
+const blobUrl = ref('');
+const downloadLink = ref<HTMLAnchorElement | null>(null);
+
+function saveSysexDataToFile() {
+  const blob = new Blob([generateSysexData(ec4.encoderSetups)], {
+    type: 'application/octet-stream',
+  });
+  blobUrl.value = URL.createObjectURL(blob);
+  nextTick(() => {
+    downloadLink.value?.click();
+    URL.revokeObjectURL(blobUrl.value);
+    blobUrl.value = '';
+  });
+}
+
 function sysexRoundtrip() {}
 </script>
 
 <template>
   <form id="midisettings" class="pico" v-if="midi.midiSupport.value">
+    <a :href="blobUrl" ref="downloadLink" download="ec4-sysex.syx" style="display: none"></a>
     <Confirm>
       <!--      <template v-slot:message>Foobar</template>-->
     </Confirm>
@@ -96,7 +112,7 @@ function sysexRoundtrip() {}
       Load file
     </button>
     <button
-      @click="ec4.saveState"
+      @click="saveSysexDataToFile"
       type="button"
       id="btnfilesave"
       title="Save editor data as Sysex file"

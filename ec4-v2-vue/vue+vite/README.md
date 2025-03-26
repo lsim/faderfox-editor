@@ -46,7 +46,6 @@ yarn lint
 
 ## TODO
 
-- Auto saving to local storage
-- Set up CI
 - Receive sysex dumps from device and store in indexeddb or local storage - show in table
+- Load sysex from file
 - Progressive web app possible? Vite PWA plugin looks good
