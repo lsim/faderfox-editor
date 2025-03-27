@@ -155,7 +155,6 @@ main {
   .encoders {
     grid-area: encoders;
     padding-left: 5px;
-    padding-top: 10px;
   }
 
   .fillnumbers {

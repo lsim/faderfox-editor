@@ -51,12 +51,12 @@ const nameActive = ref<boolean>(false);
     // A 4 x 4 grid of encoders
     display: grid;
     grid-template-columns: repeat(4, 110px);
-    grid-template-rows: repeat(4, 25%);
+    grid-template-rows: repeat(4, 118px);
     border: 1px solid transparent;
 
     .selected {
       // Mark the selected encoder
-      border: 1px solid rgba($active-field-color, 0.6);
+      border: 2px dashed rgba($active-field-color, 0.6);
       border-radius: 10px;
 
       // Gently pulse the selected encoder
@@ -64,13 +64,13 @@ const nameActive = ref<boolean>(false);
 
       @keyframes pulse {
         0% {
-          box-shadow: 0 0 0 14px inset rgba($active-field-color, 0.6);
+          box-shadow: 0 0 0 0 rgba($active-field-color, 0.8);
         }
         40% {
-          box-shadow: 0 0 0 5px inset rgba($active-field-color, 0.3);
+          box-shadow: 0 0 0 20px rgba($active-field-color, 0);
         }
         100% {
-          box-shadow: 0 0 0 0 inset rgba($active-field-color, 0.5);
+          box-shadow: 0 0 0 20px rgba($active-field-color, 0);
         }
       }
     }
