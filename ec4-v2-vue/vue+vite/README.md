@@ -46,6 +46,7 @@ yarn lint
 
 ## TODO
 
-- Receive sysex dumps from device and store in indexeddb or local storage - show in table
-- Load sysex from file
+- Track bundle being edited (in URL hash?). Highlight bundle in table. Show name above editor?
+  - Then auto save can go to dexie in stead of localStorage
+- Load sysex from file (Drag to bundle list? vueuse dropzone)
 - Progressive web app possible? Vite PWA plugin looks good

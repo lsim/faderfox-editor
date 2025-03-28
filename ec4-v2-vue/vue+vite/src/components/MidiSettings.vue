@@ -2,9 +2,10 @@
 import useMidi from '@/composables/useMidi.ts';
 import { watch, onBeforeUnmount, ref, nextTick } from 'vue';
 import useConfirm from '@/composables/confirm.ts';
-import Confirm from '@/components/Confirm.vue';
-import { createEmptyEncoderSetups, useEc4Store } from '@/stores/faderfox-ec4.ts';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
+import useFileStorage from '@/composables/fileStorage.ts';
+import { useStorage } from '@/composables/storage.ts';
 
 const midi = useMidi();
 const ec4 = useEc4Store();
@@ -35,38 +36,34 @@ watch(
   },
 );
 
-function loadSysexData() {
-  confirm
-    .showIt('Load Sysex Data', 'This will overwrite all existing settings.', 'Load data', 'Cancel')
-    .then(() => {
-      ec4.loadState();
-    })
-    .catch((e) => {
-      console.log('Data not saved', e);
-    });
+// function loadSysexData() {
+//   confirm
+//     .showIt('Load Sysex Data', 'This will overwrite all existing settings.', 'Load data', 'Cancel')
+//     .then(() => {
+//       ec4.loadState();
+//     })
+//     .catch((e) => {
+//       console.log('Data not saved', e);
+//     });
+// }
+//
+const fileStorage = useFileStorage();
+
+function saveSetupsToDisk() {
+  const bytes = generateSysexData(ec4.encoderSetups);
+  fileStorage.saveSysexDataToDisk(bytes);
 }
 
-const blobUrl = ref('');
-const downloadLink = ref<HTMLAnchorElement | null>(null);
+const storage = useStorage();
 
-function saveSysexDataToFile() {
-  const blob = new Blob([generateSysexData(ec4.encoderSetups)], {
-    type: 'application/octet-stream',
-  });
-  blobUrl.value = URL.createObjectURL(blob);
-  nextTick(() => {
-    downloadLink.value?.click();
-    URL.revokeObjectURL(blobUrl.value);
-    blobUrl.value = '';
-  });
+function saveSetupsToDb() {
+  const bytes = generateSysexData(ec4.encoderSetups);
+  storage.addBundle(bytes);
 }
-
-function sysexRoundtrip() {}
 </script>
 
 <template>
   <form id="midisettings" class="pico" v-if="midi.midiSupport.value">
-    <a :href="blobUrl" ref="downloadLink" download="ec4-sysex.syx" style="display: none"></a>
     <Confirm>
       <!--      <template v-slot:message>Foobar</template>-->
     </Confirm>
@@ -95,49 +92,38 @@ function sysexRoundtrip() {}
     <!--    <button type="button" id="btnreceive" title="Receive settings from your EC4" tabindex="-1">-->
     <!--      Receive from EC4-->
     <!--    </button>-->
+    <!--    <button-->
+    <!--      type="button"-->
+    <!--      title="Send editor data to your EC4"-->
+    <!--      tabindex="-1"-->
+    <!--    >-->
+    <!--      Send to EC4 ⮕-->
+    <!--    </button>-->
     <button
-      @click="sysexRoundtrip"
+      @click="saveSetupsToDb"
       type="button"
-      title="Send editor data to your EC4"
+      title="Save editor data to database"
       tabindex="-1"
     >
-      Send to EC4 ⮕
+      Save to DB
     </button>
+    <!--    <button-->
+    <!--      @click="loadSysexData"-->
+    <!--      type="button"-->
+    <!--      title="Load a Sysex file with EC4 settings"-->
+    <!--      tabindex="-1"-->
+    <!--    >-->
+    <!--      Load file-->
+    <!--    </button>-->
     <button
-      @click="loadSysexData"
-      type="button"
-      title="Load a Sysex file with EC4 settings"
-      tabindex="-1"
-    >
-      Load file
-    </button>
-    <button
-      @click="saveSysexDataToFile"
+      @click="saveSetupsToDisk"
       type="button"
       id="btnfilesave"
       title="Save editor data as Sysex file"
       tabindex="-1"
     >
-      Save file
+      Save to disk
     </button>
-    <table>
-      <thead>
-        <tr>
-          <th>Received</th>
-          <th># Setups</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>23:30:10</td>
-          <td>16</td>
-        </tr>
-        <tr>
-          <td>14:20:50</td>
-          <td>1</td>
-        </tr>
-      </tbody>
-    </table>
   </form>
 </template>
 

@@ -2,12 +2,15 @@
 import FrontPanel from '@/components/FrontPanel.vue';
 import MidiSettings from '@/components/MidiSettings.vue';
 import SetupListing from '@/components/SetupListing.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import useFileStorage from '@/composables/fileStorage.ts';
+import StoredConfs from '@/components/StoredConfs.vue';
 
 const groupId = ref<number>(0);
 
 const ec4 = useEc4Store();
+const fileStorage = useFileStorage();
 
 // Insist that focus doesn't leave the editor
 function handleFocusOut(e: FocusEvent) {
@@ -15,32 +18,57 @@ function handleFocusOut(e: FocusEvent) {
     (e.target as HTMLElement | undefined)?.focus?.();
   }
 }
+
+// Make download link available to fileStorage composable
+const downloadLink = ref<HTMLAnchorElement | null>(null);
+watch(
+  () => downloadLink.value,
+  (link) => {
+    fileStorage.setDownloadLink(link);
+  },
+);
 </script>
 
 <template>
   <main @focusout="handleFocusOut" id="home">
-    <h1 class="header">Web-MIDI Editor for the Faderfox EC4-MIDI controller</h1>
+    <a
+      :href="fileStorage.blobUrl.value"
+      ref="downloadLink"
+      download="ec4-sysex.syx"
+      style="display: none"
+    ></a>
+    <h1 class="header">Web-MIDI Editor for the Faderfox EC4</h1>
     <MidiSettings class="midi-settings" />
     <SetupListing class="group-selector" />
     <FrontPanel :group-id="groupId" class="front-panel" />
 
-    <!--    <div class="credits">-->
-    <!--      Web-MIDI Editor for the-->
-    <!--      <a href="http://faderfox.de/ec4.html" tabindex="-1">faderfox EC4-MIDI controller</a>.-->
-    <!--      Developed by Peter Witzel (<a href="https://www.privatepublic.de" tabindex="-1"-->
-    <!--        >privatepublic.de</a-->
-    <!--      >) in co-operation with Faderfox. Source code available on-->
-    <!--      <a href="https://github.com/privatepublic-de/faderfox-editor" tabindex="-1">github</a>.-->
-    <!--      <p class="privacydeclaration">-->
-    <!--        <b>Complete Privacy:</b> This web application (page) does not track, store or dispatch any-->
-    <!--        data entered here. Visits, appliance or any other interactions with this page are not-->
-    <!--        tracked. If in doubt, feel free to check the source code.-->
-    <!--      </p>-->
-    <!--    </div>-->
+    <StoredConfs class="stored-confs" />
+    <div class="credits">
+      <h3>Credits</h3>
+      <p>
+        This version of the EC4 Web-MIDI editor for the Faderfox EC4 was built by Lars Ole Simonsen
+        (<a href="https://github.com/lsim" tabindex="-1">lsim</a>). It is heavily inspired by the
+        awesome original
+        <a href="https://github.com/privatepublic-de/faderfox-editor" tabindex="-1">editor</a>
+        developed by Peter Witzel in co-operation with Faderfox.
+      </p>
+      <p>
+        <a href="https://github.com/lsim/faderfox-editor" tabindex="-1">Source code</a>
+        on github.
+      </p>
+      <h3>Complete Privacy:</h3>
+      <p class="privacydeclaration">
+        This web application (page) does not track or transmit any data entered here. Visits,
+        appliance or any other interactions with this page are not tracked. If in doubt, feel free
+        to check the source code.
+      </p>
+    </div>
   </main>
 </template>
 
 <style scoped lang="scss">
+@use '@picocss/pico/scss/colors/index.scss' as *;
+
 #home {
   margin: 0 10%;
   width: auto;
@@ -49,7 +77,8 @@ function handleFocusOut(e: FocusEvent) {
     'header header header'
     'alignment alignment alignment'
     'group-selector front-panel midi-settings'
-    'footer footer footer';
+    'bundles bundles bundles'
+    'credits credits credits';
   grid-template-columns: 1fr auto 1fr;
   grid-template-rows: auto 25px auto auto;
 
@@ -75,11 +104,16 @@ function handleFocusOut(e: FocusEvent) {
     grid-row: span 2;
   }
 
+  .stored-confs {
+    grid-area: bundles;
+    margin-right: 1em;
+  }
+
   .credits {
-    margin-left: 30%;
-    margin-right: 30%;
-    justify-self: end;
-    grid-area: footer;
+    grid-area: credits;
+    padding: 1em;
+    //border: 2px solid $white;
+    //border-radius: 4px;
   }
 }
 </style>

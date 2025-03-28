@@ -1,202 +1,7 @@
-import { computed, type ComputedRef, ref, watch } from 'vue';
-import { filter, lastValueFrom, map, Subject, take, timeout } from 'rxjs';
+import { computed, type ComputedRef, ref, watch, type WatchHandle } from 'vue';
+import { filter, lastValueFrom, map, Subject, Subscription, take, timeout } from 'rxjs';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-
-/**
- * Web MIDI interface handler
- * @param {string} deviceName
- * @param {function} sysexMessageHandler
- */
-// function MIDI(deviceName, sysexMessageHandler, completeHandler) {
-//   console.log('MIDI: Initializing...');
-//   const self = this;
-//   self.midiAccess = null;
-//   self.deviceIdIn = null;
-//   self.deviceIdOut = null;
-//   self.knownInputIds = {};
-//   self.knownOutputIds = {};
-//   let select_in = DOM.element('#midiInDeviceId');
-//   let select_out = DOM.element('#midiOutDeviceId');
-//   const optionNoDevice = '<option value="">(No devices)</option>';
-//   const knownPorts = {};
-//
-//   let trueReported = false;
-//
-//   const reportStatus = function (available, msg) {
-//     if (completeHandler) {
-//       if ((available && !trueReported) || !available) {
-//         trueReported = available;
-//         completeHandler(available, msg);
-//       }
-//     } else {
-//       if (available) {
-//         MBox.hide();
-//       } else {
-//         MBox.show(STR.midictrl.title_error, msg, { type: 'error' });
-//       }
-//     }
-//   };
-//
-//   const onMIDISuccess = function (midiAccess) {
-//     console.log('MIDI ready!');
-//     self.midiAccess = midiAccess;
-//     listInputsAndOutputs();
-//     selectDevices();
-//     self.midiAccess.onstatechange = onStateChange;
-//   };
-//   const onMIDIFailure = function (msg) {
-//     console.log('MIDI: Failed to get MIDI access - ' + msg);
-//     reportStatus(false, STR.midictrl.nomidi);
-//   };
-//   const onStateChange = function (e) {
-//     const port = e.port;
-//     const state = e.port.state;
-//     if (state === 'disconnected') {
-//       knownPorts[port.id] = false;
-//       listInputsAndOutputs();
-//       selectDevices();
-//     } else if (state === 'connected') {
-//       if (!knownPorts[port.id]) {
-//         listInputsAndOutputs();
-//         selectDevices();
-//       }
-//     }
-//   };
-//   const listInputsAndOutputs = function () {
-//     let selectedIn = null;
-//     let selectedOut = null;
-//     let countIn = 0;
-//     let countOut = 0;
-//     DOM.empty(select_in);
-//     for (let entry of self.midiAccess.inputs) {
-//       let input = entry[1];
-//       if (!knownPorts[input.id]) {
-//         console.log('MIDI: Input device', input.name, input.manufacturer, input.state);
-//       }
-//       knownPorts[input.id] = true;
-//       if (input.name === deviceName) {
-//         selectedIn = input.id;
-//         console.log('MIDI: Selected input:', input.name, input.manufacturer, input.state);
-//       }
-//       DOM.addHTML(select_in, 'beforeend', `<option value="${input.id}">${input.name}</option>`);
-//       countIn++;
-//     }
-//     DOM.empty(select_out);
-//     for (let entry of self.midiAccess.outputs) {
-//       let output = entry[1];
-//       if (!knownPorts[output.id]) {
-//         console.log('MIDI: Output device', output.name, output.manufacturer, output.state);
-//       }
-//       knownPorts[output.id] = true;
-//       if (output.name === deviceName) {
-//         selectedOut = output.id;
-//         console.log('MIDI: Selected output', output.name, output.manufacturer, output.state);
-//       }
-//       DOM.addHTML(select_out, 'beforeend', `<option value="${output.id}">${output.name}</option>`);
-//       countOut++;
-//     }
-//     if (selectedIn) {
-//       select_in.value = selectedIn;
-//     }
-//     if (selectedOut) {
-//       select_out.value = selectedOut;
-//     }
-//     console.log('MIDI: ', countIn, 'inputs,', countOut, 'outputs');
-//     if (countIn == 0 || countOut == 0) {
-//       let message;
-//       if (countIn > 0 && countOut == 0) {
-//         message = STR.midictrl.nooutputs;
-//         DOM.addHTML(select_out, 'beforeend', optionNoDevice);
-//       } else if (countIn == 0 && countOut > 0) {
-//         message = STR.midictrl.noinputs;
-//         DOM.addHTML(select_in, 'beforeend', optionNoDevice);
-//       } else {
-//         message = STR.midictrl.nodevices;
-//         DOM.addHTML(select_out, 'beforeend', optionNoDevice);
-//         DOM.addHTML(select_in, 'beforeend', optionNoDevice);
-//       }
-//       reportStatus(false, STR.apply(STR.midictrl.$error_hint, message, deviceName));
-//     } else {
-//       reportStatus(true);
-//     }
-//   };
-//   function onMIDIMessage(event) {
-//     if (event.data && event.data.length > 4) {
-//       if (event.data[0] == 0xf0 && event.data[event.data.length - 1] == 0xf7) {
-//         console.log('MIDI: Sysex received', event);
-//         if (sysexMessageHandler) {
-//           sysexMessageHandler(event.data);
-//         }
-//       }
-//     }
-//   }
-//   function selectDevices() {
-//     self.deviceIdIn = DOM.find(select_in, 'option:checked')[0].value;
-//     self.deviceIdOut = DOM.find(select_out, 'option:checked')[0].value;
-//     self.deviceIn = self.midiAccess.inputs.get(self.deviceIdIn);
-//     self.deviceOut = self.midiAccess.outputs.get(self.deviceIdOut);
-//     if (self.deviceIn) {
-//       self.midiAccess.inputs.forEach(function (entry) {
-//         entry.onmidimessage = undefined;
-//       });
-//       self.deviceIn.onmidimessage = onMIDIMessage;
-//     } else {
-//       console.log('MIDI: No input device selected!');
-//     }
-//   }
-//   // go ahead, start midi
-//   let list = [select_in, select_out];
-//   list.forEach(function (el) {
-//     el.addEventListener('change', selectDevices);
-//   });
-//   if ('function' === typeof window.navigator.requestMIDIAccess) {
-//     console.log('MIDI: System has MIDI support.');
-//     if (navigator.userAgent.includes('Firefox/')) {
-//       console.log('MIDI: Detected Firefox, MIDI unreliable - not initializing');
-//       reportStatus(false, STR.midictrl.nomidisupport);
-//     } else {
-//       navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
-//     }
-//   } else {
-//     console.log('MIDI: System has *no* MIDI support.');
-//     reportStatus(false, STR.midictrl.nomidisupport);
-//     DOM.addClass('#midisettings', 'unsupported');
-//     DOM.all('#midisettings select', function (el) {
-//       el.disabled = 'disabled';
-//     });
-//   }
-// }
-//
-// MIDI.prototype.sendSysex = function (data, timeoutms) {
-//   if (this.deviceOut) {
-//     console.log('MIDI: Sending as sysex...');
-//     MBox.show(STR.midictrl.title_send, STR.midictrl.msg_sending, {
-//       hideAfter: timeoutms || 10000,
-//       type: 'processing',
-//     });
-//     this.deviceOut.send(data);
-//   } else {
-//     console.log("MIDI: Can't send sysex. No output device.");
-//     MBox.show(STR.midictrl.title_send, STR.midictrl.nooutputs, {
-//       hideAfter: 6000,
-//     });
-//   }
-// };
-//
-// MIDI.prototype.hasOutput = function () {
-//   return typeof this.deviceOut !== 'undefined';
-// };
-//
-// MIDI.prototype.hasInput = function () {
-//   return typeof this.deviceIn !== 'undefined';
-// };
-//
-// function toHex(d, pad) {
-//   return ('0000' + Number(d).toString(16)).slice(pad ? -pad : -2).toUpperCase();
-// }
-// function toBinary(d, pad) {
-//   return ('0000000000000000' + Number(d).toString(2)).slice(pad ? -pad : -2).toUpperCase();
-// }
+import { useStorage } from '@/composables/storage.ts';
 
 const midi: Promise<MIDIAccess> = navigator.requestMIDIAccess({ sysex: true });
 
@@ -535,6 +340,22 @@ export default function useMidi() {
     if (!selectedInput.value || !selectedOutput.value) return null;
     return new EC4SysexProtocol(selectedInput.value as MidiInput, selectedOutput.value);
   });
+
+  let inboundBundlesSubscription: Subscription | undefined = undefined;
+
+  const storage = useStorage();
+
+  watch(
+    () => protocol.value,
+    (newLink) => {
+      inboundBundlesSubscription?.unsubscribe();
+      inboundBundlesSubscription = newLink?.input.receivedMessages$
+        .pipe(filter(([msg, bytes]) => msg.type === 'sysex' && bytes.length > 1000))
+        .subscribe(async ([msg, bytes]) => {
+          await storage.addBundle(bytes, 'Sysex from EC4');
+        });
+    },
+  );
 
   watch(
     () => [ec4.selectedSetupIndex, ec4.selectedGroupIndex],

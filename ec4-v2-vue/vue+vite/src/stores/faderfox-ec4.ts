@@ -89,7 +89,7 @@ export const useEc4Store = defineStore('ec4', () => {
     setEditorMode,
     appFocused,
     selectedEncoderIndex,
-    saveState: () => saveState(encoderSetups.value),
+    // saveState: () => saveState(encoderSetups.value),
     loadState: () => loadState(encoderSetups),
     controlFocusRequests,
     lastStateSaved,
