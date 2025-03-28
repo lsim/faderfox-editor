@@ -50,3 +50,4 @@ yarn lint
   - Then auto save can go to dexie in stead of localStorage
 - Load sysex from file (Drag to bundle list? vueuse dropzone)
 - Progressive web app possible? Vite PWA plugin looks good
+- Add legend for keyboard shortcuts
