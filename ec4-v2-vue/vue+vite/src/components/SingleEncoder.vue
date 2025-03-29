@@ -24,9 +24,7 @@ const props = defineProps<{
   selected: boolean;
 }>();
 
-const emit = defineEmits<{
-  (event: 'update:name-active', nameActive: boolean): void;
-}>();
+const emit = defineEmits<(event: 'update:name-active', nameActive: boolean) => void>();
 
 const ec4 = useEc4Store();
 
@@ -77,13 +75,16 @@ watch(
 
 // This governs tab order behavior
 function setNameActive(newVal: boolean, source: any) {
-  if (newVal != props.nameActive) emit('update:name-active', newVal);
+  if (newVal !== props.nameActive) emit('update:name-active', newVal);
   if (typeof source?.select === 'function') source.select();
 }
 </script>
 
 <template>
-  <div class="enc typed encoder-container">
+  <div
+    class="encoder-container"
+    :class="{ push: ec4.editorMode === 'push', turn: ec4.editorMode === 'turn', active: selected }"
+  >
     <div class="knob"></div>
     <div class="inputs">
       <div class="name">
@@ -313,25 +314,6 @@ function setNameActive(newVal: boolean, source: any) {
         <div>&nbsp;</div>
         <div>&nbsp;</div>
       </template>
-
-      <img
-        v-if="ec4.editorMode === 'push'"
-        src="../assets/tap-svgrepo-com.svg"
-        width="24px"
-        class="tapicon clickable"
-        title="Push button mode (click to toggle)"
-        alt="Push button mode (click to toggle)"
-        @click.capture="ec4.setEditorMode('turn')"
-      />
-      <img
-        v-if="ec4.editorMode === 'turn'"
-        src="../assets/rotate-svgrepo-com.svg"
-        width="24px"
-        class="rotateicon clickable"
-        title="Turn mode (click to toggle)"
-        alt="Turn mode (click to toggle)"
-        @click.capture="ec4.setEditorMode('push')"
-      />
     </div>
   </div>
 </template>
@@ -422,6 +404,59 @@ function setNameActive(newVal: boolean, source: any) {
     background-color: #222;
     box-shadow: 0 0 15px #777;
     border: 2px solid #000;
+  }
+
+  &.active {
+    &::before {
+      position: absolute;
+      z-index: 0;
+      bottom: 0;
+      left: 0;
+      line-height: 100%;
+      font-size: 2em;
+    }
+    &.push::before {
+      content: '\00a0';
+      left: 0;
+      bottom: 0;
+      width: 35px;
+      background-image: url(../assets/tap-svgrepo-com.svg);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      rotate: 45deg;
+
+      animation: click 0.5s;
+
+      @keyframes click {
+        0% {
+          transform: translateY(0);
+        }
+        20% {
+          transform: translateY(3px);
+        }
+        60% {
+          transform: translateY(-3px);
+        }
+        100% {
+          transform: translate(0, 0);
+        }
+      }
+    }
+    &.turn::before {
+      color: rgba(255, 255, 255, 0.5);
+      content: '↻';
+
+      animation: turn 0.5s;
+
+      @keyframes turn {
+        0% {
+          rotate: 0deg;
+        }
+        100% {
+          rotate: 360deg;
+        }
+      }
+    }
   }
 }
 </style>
