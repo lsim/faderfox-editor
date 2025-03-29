@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import useMidi from '@/composables/useMidi.ts';
-import { watch, onBeforeUnmount, ref, nextTick } from 'vue';
-import useConfirm from '@/composables/confirm.ts';
-import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
-import useFileStorage from '@/composables/fileStorage.ts';
-import { useStorage } from '@/composables/storage.ts';
+import { watch, onBeforeUnmount } from 'vue';
 
 const midi = useMidi();
-const ec4 = useEc4Store();
-
-const confirm = useConfirm();
 
 onBeforeUnmount(() => {
   midi.dispose();
@@ -35,38 +27,10 @@ watch(
     }
   },
 );
-
-// function loadSysexData() {
-//   confirm
-//     .showIt('Load Sysex Data', 'This will overwrite all existing settings.', 'Load data', 'Cancel')
-//     .then(() => {
-//       ec4.loadState();
-//     })
-//     .catch((e) => {
-//       console.log('Data not saved', e);
-//     });
-// }
-//
-const fileStorage = useFileStorage();
-
-function saveSetupsToDisk() {
-  const bytes = generateSysexData(ec4.encoderSetups);
-  fileStorage.saveSysexDataToDisk(bytes);
-}
-
-const storage = useStorage();
-
-function saveSetupsToDb() {
-  const bytes = generateSysexData(ec4.encoderSetups);
-  storage.addBundle(bytes);
-}
 </script>
 
 <template>
   <form id="midisettings" class="pico" v-if="midi.midiSupport.value">
-    <Confirm>
-      <!--      <template v-slot:message>Foobar</template>-->
-    </Confirm>
     <label for="midiInDeviceId">MIDI Input:</label>
     <select
       id="midiInDeviceId"
@@ -89,41 +53,15 @@ function saveSetupsToDb() {
         {{ o.device.name }}
       </option>
     </select>
-    <!--    <button type="button" id="btnreceive" title="Receive settings from your EC4" tabindex="-1">-->
-    <!--      Receive from EC4-->
-    <!--    </button>-->
     <!--    <button-->
+    <!--      @click="saveSetupsToDisk"-->
     <!--      type="button"-->
-    <!--      title="Send editor data to your EC4"-->
+    <!--      id="btnfilesave"-->
+    <!--      title="Save editor data as Sysex file"-->
     <!--      tabindex="-1"-->
     <!--    >-->
-    <!--      Send to EC4 ⮕-->
+    <!--      Save to disk-->
     <!--    </button>-->
-    <button
-      @click="saveSetupsToDb"
-      type="button"
-      title="Save editor data to database"
-      tabindex="-1"
-    >
-      Save to DB
-    </button>
-    <!--    <button-->
-    <!--      @click="loadSysexData"-->
-    <!--      type="button"-->
-    <!--      title="Load a Sysex file with EC4 settings"-->
-    <!--      tabindex="-1"-->
-    <!--    >-->
-    <!--      Load file-->
-    <!--    </button>-->
-    <button
-      @click="saveSetupsToDisk"
-      type="button"
-      id="btnfilesave"
-      title="Save editor data as Sysex file"
-      tabindex="-1"
-    >
-      Save to disk
-    </button>
   </form>
 </template>
 

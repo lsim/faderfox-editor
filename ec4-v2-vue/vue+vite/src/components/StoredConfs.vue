@@ -2,11 +2,10 @@
 import { type BundleMeta, useStorage } from '@/composables/storage.ts';
 import { formatDate } from '@vueuse/core';
 import useConfirm from '@/composables/confirm.ts';
-
-import { computed, ref } from 'vue';
-import { createEmptyEncoderSetups, useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { parseSetupsFromSysex } from '@/memoryLayout.ts';
+import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
+import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
+import router from '@/router';
 
 const confirm = useConfirm();
 
@@ -31,20 +30,14 @@ function deleteBundle(meta: BundleMeta) {
 const ec4 = useEc4Store();
 
 async function editBundle(meta: BundleMeta) {
-  const bundle = await storage.getBundle(meta);
-  if (!bundle) return;
-  const setups = createEmptyEncoderSetups();
-  parseSetupsFromSysex(bundle.bytes, setups);
-  ec4.encoderSetups = setups;
-  ec4.selectedSetupIndex = 0;
-  ec4.selectedGroupIndex = 0;
+  await router.push({ name: 'bundle', params: { bundleId: meta.id } });
 }
 
-function newBundle() {
-  ec4.encoderSetups = createEmptyEncoderSetups();
+async function newBundle() {
   ec4.selectedSetupIndex = 0;
   ec4.selectedGroupIndex = 0;
   ec4.selectedEncoderIndex = 0;
+  await storage.saveBundle(Ec4Bundle.createEmpty());
 }
 
 const fileStorage = useFileStorage();
@@ -71,24 +64,28 @@ async function downloadBundle(meta: BundleMeta) {
       <thead>
         <tr>
           <th>Name</th>
-          <th>Last edited</th>
+          <th>Last saved</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr
+          :class="{ active: meta.id === ec4.activeBundle.id }"
+          @click="editBundle(meta)"
           v-for="meta in (storage.bundleMetas.value || []).filter(
             (m: BundleMeta | undefined) => !!m,
           )"
           :key="meta.id"
         >
-          <td><input v-model="meta.name" type="text" /></td>
+          <td>
+            <span v-if="meta.id !== ec4.activeBundle.id">{{ meta.name }}</span>
+            <span v-else>{{ ec4.activeBundle.name }}</span>
+          </td>
           <td>{{ dateString(meta.timestamp) }}</td>
           <td class="actions">
             <aside>
               <nav>
                 <ul>
-                  <li><a href="#" @click.prevent="editBundle(meta)">Edit</a></li>
                   <li><a href="#" @click.prevent="deleteBundle(meta)">Delete</a></li>
                   <li><a href="#" @click.prevent="downloadBundle(meta)">Download</a></li>
                 </ul>
@@ -102,19 +99,42 @@ async function downloadBundle(meta: BundleMeta) {
 </template>
 
 <style scoped lang="scss">
-.actions {
-  display: flex;
-  flex-direction: column;
-}
+@use '@picocss/pico/scss/colors/index.scss' as *;
+@use '@/assets/main.scss' as *;
 
-aside nav li {
-  margin-bottom: 0;
-  margin-top: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+tbody tr {
+  cursor: pointer;
+  &:hover {
+    filter: brightness(1.2);
+  }
+  &.active {
+    filter: drop-shadow(0 0 3px $active-field-color);
+    border-radius: 0.5rem;
+  }
 
-  a {
-    padding: 5px;
+  input {
+    margin: 0 !important;
+  }
+
+  td.actions {
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    font-size: 80%;
+    ul {
+      flex: 1 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+
+      li {
+        flex: 1 0 auto;
+        a {
+        }
+      }
+    }
   }
 }
 </style>

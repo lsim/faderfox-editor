@@ -6,6 +6,11 @@ import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
+import Confirm from '@/components/Confirm.vue';
+
+const props = defineProps<{
+  bundleId?: string;
+}>();
 
 const groupId = ref<number>(0);
 
@@ -27,10 +32,22 @@ watch(
     fileStorage.setDownloadLink(link);
   },
 );
+
+watch(
+  () => props.bundleId,
+  (newId) => {
+    console.log('bundleId changed', newId);
+    if (newId) {
+      ec4.loadBundle(Number.parseInt(newId, 10));
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
   <main @focusout="handleFocusOut" id="home">
+    <Confirm />
     <a
       :href="fileStorage.blobUrl.value"
       ref="downloadLink"

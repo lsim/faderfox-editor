@@ -25,3 +25,21 @@ html {
 .clickable {
   cursor: pointer;
 }
+
+.dymo-label {
+  border-top:1px solid #6c5c5d;
+  rotate:-.5deg;
+  line-height:24px;
+  font-size:20px;
+  background: linear-gradient(to bottom, #31221f, #030000);
+  color:#c3bcb6;
+  text-shadow:
+          -1px -1px 0 #030000,
+          1px -1px 0 #030000,
+          -1px 1px 0 #030000,
+          1px 1px 0 #030000,
+          0 0 4px #fff;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  font-family:courier;
+}

@@ -47,7 +47,10 @@ yarn lint
 ## TODO
 
 - Track bundle being edited (in URL hash?). Highlight bundle in table. Show name above editor?
-  - Then auto save can go to dexie in stead of localStorage
+  - Then auto save can go to dexie instead of localStorage
 - Load sysex from file (Drag to bundle list? vueuse dropzone)
 - Progressive web app possible? Vite PWA plugin looks good
 - Add legend for keyboard shortcuts
+- Add 'copy to all' feature
+- Add UI for link editing
+- Rework the push/turn indication to be more intuitive (eg circular icon around the selected encoder)

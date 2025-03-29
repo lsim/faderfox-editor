@@ -5,7 +5,7 @@ import { computed } from 'vue';
 const ec4 = useEc4Store();
 
 const gridRows = computed(() => {
-  return ec4.encoderSetups.map((s, i) => [s, ec4.encoderGroups[i]]);
+  return ec4.activeBundle.setups.map((s, i) => [s, ec4.encoderGroups[i]]);
 });
 
 function handleFocus(e: Event, setupId: number, groupId: number) {
@@ -143,7 +143,7 @@ $picoColors: (
 #setupsandgroups {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border: 3px solid #ccc;
+  border: 3px solid #c0c0c0;
   border-radius: 7px;
   text-align: center;
 

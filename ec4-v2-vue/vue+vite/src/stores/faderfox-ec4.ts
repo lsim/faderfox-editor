@@ -1,7 +1,8 @@
 import { ref, computed, type Ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
-import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
+import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
+import { useStorage } from '@/composables/storage.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -12,8 +13,9 @@ function* generateDefaultNames(prefix: string) {
     yield `${prefix}${String(i + 1).padStart(2, '0')}`;
   }
 }
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-const defaultGroupNames = Array.from(generateDefaultNames('GR'));
+// const defaultGroupNames = Array.from(generateDefaultNames('GR'));
 const defaultSetupNames = Array.from(generateDefaultNames('SE'));
 
 export function createEmptyEncoderSetups() {
@@ -30,32 +32,14 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
-function saveState(setups: EncoderSetup[]) {
-  const saveObj = {
-    bytes: Array.from(generateSysexData(setups)),
-    timestamp: Date.now(),
-  };
-  localStorage.setItem('sysexSave', JSON.stringify(saveObj));
-}
-
-function loadState(encoderSetups: Ref<EncoderSetup[]>) {
-  const saveObj = JSON.parse(localStorage.getItem('sysexSave') || 'null');
-  if (saveObj === null) return;
-  console.log('Loading state from', new Date(saveObj.timestamp).toLocaleString());
-  const newSetups = createEmptyEncoderSetups();
-  parseSetupsFromSysex(new Uint8Array(saveObj.bytes), newSetups);
-  encoderSetups.value = newSetups;
-}
-
 export const useEc4Store = defineStore('ec4', () => {
-  const encoderSetups = ref<EncoderSetup[]>([]);
-  loadState(encoderSetups);
-  if (encoderSetups.value.length === 0) encoderSetups.value = createEmptyEncoderSetups();
+  const storage = useStorage();
+  const activeBundle: Ref<Ec4Bundle> = ref(Ec4Bundle.createEmpty());
 
   const selectedSetupIndex = ref<number>(0);
   const controlFocusRequests = ref(0);
 
-  const encoderGroups = computed(() => encoderSetups.value[selectedSetupIndex.value].groups);
+  const encoderGroups = computed(() => activeBundle.value.setups[selectedSetupIndex.value].groups);
   const selectedGroupIndex = ref<number>(0);
 
   const editorMode = ref<'push' | 'turn'>('turn');
@@ -67,21 +51,23 @@ export const useEc4Store = defineStore('ec4', () => {
   const selectedEncoderIndex = ref<number>(0);
   const lastStateSaved = ref(0);
 
-  let timeout: number = 0;
+  // Auto save after a bit of inactivity
+  let timeout = 0;
   watch(
-    encoderSetups,
-    () => {
+    activeBundle,
+    (newBundle, oldBundle) => {
       clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        saveState(encoderSetups.value);
+      // No auto save if we are loading a new bundle
+      if (!oldBundle || newBundle.id !== oldBundle.id) return;
+      timeout = setTimeout(async () => {
+        await storage.saveBundle(activeBundle.value);
         lastStateSaved.value = Date.now();
-      }, 3000);
+      }, 1000);
     },
     { deep: true },
   );
 
   return {
-    encoderSetups,
     selectedSetupIndex,
     encoderGroups,
     selectedGroupIndex,
@@ -89,9 +75,11 @@ export const useEc4Store = defineStore('ec4', () => {
     setEditorMode,
     appFocused,
     selectedEncoderIndex,
-    // saveState: () => saveState(encoderSetups.value),
-    loadState: () => loadState(encoderSetups),
+    loadBundle: async (id: number) => {
+      activeBundle.value = await storage.loadBundle(id);
+    },
     controlFocusRequests,
     lastStateSaved,
+    activeBundle,
   };
 });

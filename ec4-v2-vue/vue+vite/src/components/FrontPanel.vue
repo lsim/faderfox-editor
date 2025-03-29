@@ -111,6 +111,13 @@ watch(
       <a href="" class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
       <a href="" class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
     </div>
+
+    <input
+      type="text"
+      class="bundle-name dymo-label"
+      placeholder="Bundle name"
+      v-model="ec4.activeBundle.name"
+    />
   </main>
 </template>
 
@@ -131,7 +138,8 @@ main {
     'margin-left oled margin-right'
     'margin-left spacer margin-right'
     'margin-left encoders margin-right'
-    'margin-left fillnumbers margin-right';
+    'margin-left fillnumbers margin-right'
+    'margin-left bundle-name margin-right';
   justify-items: center;
   width: 500px;
   height: 818px;
@@ -160,6 +168,15 @@ main {
   .fillnumbers {
     grid-area: fillnumbers;
     display: none;
+  }
+
+  .bundle-name {
+    grid-area: bundle-name;
+    grid-row: span 2;
+    padding-right: 20px;
+    text-align: center;
+    margin-top: 5px;
+    height: 30px;
   }
 
   $diameter: 39px;
