@@ -80,8 +80,7 @@ async function downloadBundle(meta: BundleMeta) {
           :key="meta.id"
         >
           <td>
-            <span v-if="meta.id !== ec4.activeBundle.id">{{ meta.name }}</span>
-            <span v-else>{{ ec4.activeBundle.name }}</span>
+            <span>{{ meta.name }}</span>
           </td>
           <td>{{ dateString(meta.timestamp) }}</td>
           <td class="actions">
@@ -111,7 +110,21 @@ tbody tr {
   }
   &.active {
     filter: drop-shadow(0 0 3px $active-field-color);
+    scale: 1.01;
     border-radius: 0.5rem;
+
+    animation: grow ease 0.2s;
+    @keyframes grow {
+      0% {
+        scale: 1;
+      }
+      30% {
+        scale: 1.05;
+      }
+      100% {
+        scale: 1.02;
+      }
+    }
   }
 
   input {

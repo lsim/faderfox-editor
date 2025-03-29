@@ -51,3 +51,4 @@ yarn lint
 - Add legend for keyboard shortcuts
 - Add 'copy to all' features
 - Add UI for link editing
+- Put sysex work on a service worker (vueuse useWebWorkerFn). Might help keep the UI responsive

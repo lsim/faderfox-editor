@@ -23,7 +23,6 @@ export class Ec4Bundle {
     b.name = meta.name;
     b.id = meta.id;
     parseSetupsFromSysex(bundle.bytes, b.setups);
-    console.log('Loading from db', b.id, b);
     return b;
   }
 

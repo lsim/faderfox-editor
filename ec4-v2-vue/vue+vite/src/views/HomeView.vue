@@ -37,7 +37,6 @@ watch(
 watch(
   () => props.bundleId,
   (newId, oldId) => {
-    console.log('bundleId changed', newId);
     if (newId) {
       ec4.loadBundle(Number.parseInt(newId, 10));
     } else if (oldId) {
@@ -66,15 +65,15 @@ watch(
     <div class="credits">
       <h3>Credits</h3>
       <p>
-        This version of the EC4 Web-MIDI editor for the Faderfox EC4 was built by Lars Ole Simonsen
-        (<a href="https://github.com/lsim" tabindex="-1">lsim</a>). It is heavily inspired by the
-        awesome original
+        This version of the EC4 Web-MIDI editor for the Faderfox EC4 was (re)built by Lars Ole Avery
+        Simonsen (<a href="https://github.com/lsim" tabindex="-1">lsim</a>). It borrows lots of code
+        from the awesome original
         <a href="https://github.com/privatepublic-de/faderfox-editor" tabindex="-1">editor</a>
         developed by Peter Witzel in co-operation with Faderfox.
       </p>
       <p>
-        <a href="https://github.com/lsim/faderfox-editor" tabindex="-1">Source code</a>
-        on github.
+        Source code available on
+        <a href="https://github.com/lsim/faderfox-editor" tabindex="-1">github</a>.
       </p>
       <h3>Complete Privacy:</h3>
       <p class="privacydeclaration">
