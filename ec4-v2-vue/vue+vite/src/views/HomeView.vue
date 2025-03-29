@@ -7,6 +7,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
 import Confirm from '@/components/Confirm.vue';
+import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 
 const props = defineProps<{
   bundleId?: string;
@@ -35,10 +36,12 @@ watch(
 
 watch(
   () => props.bundleId,
-  (newId) => {
+  (newId, oldId) => {
     console.log('bundleId changed', newId);
     if (newId) {
       ec4.loadBundle(Number.parseInt(newId, 10));
+    } else if (oldId) {
+      ec4.activeBundle = Ec4Bundle.createEmpty();
     }
   },
   { immediate: true },

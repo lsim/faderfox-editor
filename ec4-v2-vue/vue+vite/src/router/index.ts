@@ -11,8 +11,9 @@ const router = createRouter({
       props: true,
       children: [
         {
-          path: ':bundleId',
+          path: 'bundle/:bundleId',
           name: 'bundle',
+          props: true,
           component: HomeView,
         },
       ],

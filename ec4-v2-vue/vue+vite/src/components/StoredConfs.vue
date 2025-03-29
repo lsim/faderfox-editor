@@ -15,8 +15,9 @@ function dateString(date: number) {
   return formatDate(new Date(date), 'DD/MM/YYYY HH:mm');
 }
 
-function deleteBundle(meta: BundleMeta) {
-  confirm
+async function deleteBundle(meta: BundleMeta) {
+  const shouldNavigate = meta.id === ec4.activeBundle.id;
+  await confirm
     .showIt(
       'Delete stored configuration',
       `Delete configuration "${meta.name} from ${dateString(meta.timestamp)}"?`,
@@ -25,6 +26,7 @@ function deleteBundle(meta: BundleMeta) {
     )
     .then(() => storage.deleteBundle(meta))
     .catch(() => {});
+  if (shouldNavigate) await router.push({ name: 'home' });
 }
 
 const ec4 = useEc4Store();
@@ -37,7 +39,7 @@ async function newBundle() {
   ec4.selectedSetupIndex = 0;
   ec4.selectedGroupIndex = 0;
   ec4.selectedEncoderIndex = 0;
-  await storage.saveBundle(Ec4Bundle.createEmpty());
+  await router.push({ name: 'home' });
 }
 
 const fileStorage = useFileStorage();
@@ -71,7 +73,7 @@ async function downloadBundle(meta: BundleMeta) {
       <tbody>
         <tr
           :class="{ active: meta.id === ec4.activeBundle.id }"
-          @click="editBundle(meta)"
+          @click.capture="editBundle(meta)"
           v-for="meta in (storage.bundleMetas.value || []).filter(
             (m: BundleMeta | undefined) => !!m,
           )"

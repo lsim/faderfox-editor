@@ -55,8 +55,8 @@ export function useStorage() {
     if (existingMeta) {
       await updateBundle({ ...meta, id: existingMeta.id }, { ...bundle, id: existingMeta.id });
     } else {
-      await addBundle(bundle.bytes, meta.name);
-      await router.push({ name: 'bundle', params: { bundleId: meta.id } });
+      const newId = await addBundle(bundle.bytes, meta.name);
+      await router.push({ name: 'bundle', params: { bundleId: newId } });
     }
   }
 
@@ -69,6 +69,7 @@ export function useStorage() {
   }
 
   async function addBundle(bytes: Uint8Array, name = '') {
+    let newId = 0;
     await db.transaction('rw', db.bundles, db.summaries, async () => {
       const meta: BundleMeta = {
         name,
@@ -76,8 +77,9 @@ export function useStorage() {
         id: await db.bundles.add({ bytes }),
       };
       console.log('addBundle', meta);
-      await db.summaries.add(meta);
+      newId = await db.summaries.add(meta);
     });
+    return newId;
   }
 
   return {

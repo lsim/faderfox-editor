@@ -1,5 +1,5 @@
 import { computed, type ComputedRef, ref, watch, type WatchHandle } from 'vue';
-import { filter, lastValueFrom, map, Subject, Subscription, take, timeout } from 'rxjs';
+import { filter, lastValueFrom, map, Subject, type Subscription, take, timeout } from 'rxjs';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { useStorage } from '@/composables/storage.ts';
 
@@ -42,16 +42,16 @@ type MidiMessage = {
 function getMessageType(bytes: Uint8Array<ArrayBufferLike> | null) {
   if (!bytes || bytes.length < 2) return null;
   const statusByte = bytes[0];
-  if (statusByte == 0xf0) return 'sysex';
-  if ((statusByte & 0xf0) == 0x80) return 'noteOff';
-  if ((statusByte & 0xf0) == 0x90) return 'noteOn';
-  if ((statusByte & 0xf0) == 0xa0) return 'polyKeyPressure';
-  if ((statusByte & 0xf0) == 0xb0) return 'controllerChange';
-  if ((statusByte & 0xf0) == 0xc0) return 'programChange';
-  if ((statusByte & 0xf0) == 0xd0) return 'channelPressure';
-  if ((statusByte & 0xf0) == 0xe0) return 'pitchBend';
+  if (statusByte === 0xf0) return 'sysex';
+  if ((statusByte & 0xf0) === 0x80) return 'noteOff';
+  if ((statusByte & 0xf0) === 0x90) return 'noteOn';
+  if ((statusByte & 0xf0) === 0xa0) return 'polyKeyPressure';
+  if ((statusByte & 0xf0) === 0xb0) return 'controllerChange';
+  if ((statusByte & 0xf0) === 0xc0) return 'programChange';
+  if ((statusByte & 0xf0) === 0xd0) return 'channelPressure';
+  if ((statusByte & 0xf0) === 0xe0) return 'pitchBend';
 
-  if (statusByte == 0xf7) return 'sysex';
+  if (statusByte === 0xf7) return 'sysex';
   return null;
 }
 
@@ -142,10 +142,6 @@ export class MidiInput extends Midi<MIDIInput> {
 }
 
 export class MidiOutput extends Midi<MIDIOutput> {
-  constructor(device: MIDIOutput) {
-    super(device);
-  }
-
   send(data: Uint8Array) {
     if (!this.device) throw Error('MIDI device not found');
     this.device.send(Array.from(data));
@@ -165,7 +161,7 @@ export class EC4SysexProtocol {
     this.output.send(data);
   }
 
-  private async roundtrip(data: number[], timeoutMs: number = 1000) {
+  private async roundtrip(data: number[], timeoutMs = 1000) {
     console.log(
       'sending request',
       data.map((x) => x.toString(16)),

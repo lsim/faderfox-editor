@@ -2,7 +2,7 @@
 import EncoderPanel from '@/components/EncoderPanel.vue';
 import ModeSelector from '@/components/ModeSelector.vue';
 import Oled from '@/components/Oled.vue';
-import { type FieldType } from '@/domain/Encoder.ts';
+import type { FieldType } from '@/domain/Encoder.ts';
 import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 
@@ -177,6 +177,7 @@ main {
     text-align: center;
     margin-top: 5px;
     height: 30px;
+    outline: none;
   }
 
   $diameter: 39px;
