@@ -45,12 +45,12 @@ onKeyStroke('Escape', handleCancel);
             <p>{{ confirm.message }}</p>
           </slot>
           <footer>
-            <button @click="handleCancel">
+            <button @click="handleCancel" v-show="confirm?.negativeText">
               <slot name="cancel-bn">
                 {{ confirm.negativeText }}
               </slot>
             </button>
-            <button @click="handleConfirm">
+            <button @click="handleConfirm" v-show="confirm?.positiveText">
               <slot name="confirm-bn">
                 {{ confirm.positiveText }}
               </slot>

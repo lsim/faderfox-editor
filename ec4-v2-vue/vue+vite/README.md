@@ -46,9 +46,9 @@ yarn lint
 
 ## TODO
 
-- Load sysex from file (Drag to bundle list? vueuse dropzone)
 - Progressive web app possible? Vite PWA plugin looks good
 - Add legend for keyboard shortcuts
 - Add 'copy to all' features
 - Add UI for link editing
 - Put sysex work on a service worker (vueuse useWebWorkerFn). Might help keep the UI responsive
+- Fix router bug where bundleId stops being reactive

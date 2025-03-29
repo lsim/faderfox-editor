@@ -13,8 +13,8 @@ export default defineStore('confirm', () => {
   function showIt(
     _header: string,
     _message: string,
-    _positiveText: string = 'OK',
-    _negativeText: string = 'Cancel',
+    _positiveText = 'OK',
+    _negativeText = 'Cancel',
   ) {
     return new Promise<void>((_resolve, _reject) => {
       header.value = _header;

@@ -1,5 +1,8 @@
 import { nextTick, ref } from 'vue';
 import { useStorage } from '@/composables/storage.ts';
+import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
+import { parseSetupsFromSysex } from '@/memoryLayout.ts';
+import useConfirm from '@/composables/confirm.ts';
 
 const downloadLink = ref<HTMLAnchorElement | null>(null);
 
@@ -19,12 +22,34 @@ export default function useFileStorage() {
     });
   }
 
+  const confirm = useConfirm();
   const storage = useStorage();
 
   async function loadBlobFromDisk(file: File) {
-    const blob = await file.arrayBuffer();
-    const bytes = new Uint8Array(blob);
-    await storage.addBundle(bytes, file.name);
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    try {
+      const bundle = Ec4Bundle.createEmpty();
+      parseSetupsFromSysex(bytes, bundle.setups);
+      // Create bundle
+      await storage.addBundle(bytes, file.name);
+    } catch (e) {
+      // Not a sysex file
+      await confirm.showIt(
+        'Invalid file',
+        `The file "${file.name}" is not a valid sysex file`,
+        'Ok',
+        '',
+      );
+    }
+  }
+
+  async function onDrop(files: File[] | null, e: DragEvent) {
+    e.preventDefault();
+    console.log('onDrop', files, e);
+    for (const file of files || []) {
+      await loadBlobFromDisk(file);
+    }
   }
 
   return {
@@ -33,5 +58,6 @@ export default function useFileStorage() {
       downloadLink.value = link;
     },
     saveSysexDataToDisk,
+    onDrop,
   };
 }

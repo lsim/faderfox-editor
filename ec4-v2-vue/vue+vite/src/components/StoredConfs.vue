@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import { type BundleMeta, useStorage } from '@/composables/storage.ts';
-import { formatDate } from '@vueuse/core';
+import { formatDate, useDropZone } from '@vueuse/core';
 import useConfirm from '@/composables/confirm.ts';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
-import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import router from '@/router';
+import { ref } from 'vue';
 
 const confirm = useConfirm();
+const fileStorage = useFileStorage();
+
+const dropZone = ref<HTMLElement | null>(null);
+const { isOverDropZone } = useDropZone(dropZone, {
+  onDrop: fileStorage.onDrop,
+  preventDefaultForUnhandled: true,
+  multiple: false,
+});
 
 const storage = useStorage();
 
@@ -24,14 +32,17 @@ async function deleteBundle(meta: BundleMeta) {
       'Delete',
       'Cancel',
     )
-    .then(() => storage.deleteBundle(meta))
+    .then(async () => {
+      await storage.deleteBundle(meta);
+      if (shouldNavigate) await router.push({ name: 'home' });
+    })
     .catch(() => {});
-  if (shouldNavigate) await router.push({ name: 'home' });
 }
 
 const ec4 = useEc4Store();
 
 async function editBundle(meta: BundleMeta) {
+  if (meta.id === ec4.activeBundle.id) return;
   await router.push({ name: 'bundle', params: { bundleId: meta.id } });
 }
 
@@ -42,8 +53,6 @@ async function newBundle() {
   await router.push({ name: 'home' });
 }
 
-const fileStorage = useFileStorage();
-
 async function downloadBundle(meta: BundleMeta) {
   const bundle = await storage.getBundle(meta);
   if (!bundle?.bytes) return;
@@ -53,7 +62,7 @@ async function downloadBundle(meta: BundleMeta) {
 </script>
 
 <template>
-  <div class="pico">
+  <div class="pico stored-confs" ref="dropZone" :class="{ dragover: isOverDropZone }">
     <nav>
       <ul>
         <li><h2>Bundles stored locally</h2></li>
@@ -73,14 +82,21 @@ async function downloadBundle(meta: BundleMeta) {
       <tbody>
         <tr
           :class="{ active: meta.id === ec4.activeBundle.id }"
-          @click.capture="editBundle(meta)"
+          @click.capture.prevent="editBundle(meta)"
           v-for="meta in (storage.bundleMetas.value || []).filter(
             (m: BundleMeta | undefined) => !!m,
           )"
           :key="meta.id"
         >
           <td>
-            <span>{{ meta.name }}</span>
+            <span
+              class="dymo-label bundle-name"
+              :style="{
+                rotate: (meta.id % 3) - 1.5 + 'deg',
+                padding: `0 ${(meta.id + 33) % 20}px`,
+              }"
+              >{{ meta.name }}
+            </span>
           </td>
           <td>{{ dateString(meta.timestamp) }}</td>
           <td class="actions">
@@ -103,27 +119,61 @@ async function downloadBundle(meta: BundleMeta) {
 @use '@picocss/pico/scss/colors/index.scss' as *;
 @use '@/assets/main.scss' as *;
 
-tbody tr {
-  cursor: pointer;
-  &:hover {
-    filter: brightness(1.2);
-  }
-  &.active {
-    filter: drop-shadow(0 0 3px $active-field-color);
-    scale: 1.01;
-    border-radius: 0.5rem;
-
-    animation: grow ease 0.2s;
-    @keyframes grow {
+.stored-confs {
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    opacity: 0;
+    scale: 0;
+    z-index: 1;
+    top: -5%;
+    left: -5%;
+    height: 110%;
+    width: 110%;
+    background-color: transparent;
+    border: 5px dashed $green;
+    border-radius: 40px;
+    animation: out 200ms ease-in-out;
+    @keyframes out {
       0% {
         scale: 1;
-      }
-      30% {
-        scale: 1.05;
+        opacity: 0.8;
       }
       100% {
-        scale: 1.02;
+        scale: 0.5;
+        opacity: 0;
       }
+    }
+  }
+  &.dragover::before {
+    opacity: 0.8;
+    scale: 1;
+    animation: in 200ms ease-in-out;
+    @keyframes in {
+      0% {
+        scale: 0.5;
+        opacity: 0;
+      }
+      100% {
+        scale: 1;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+.bundle-name {
+  display: inline-block;
+}
+
+tbody tr {
+  cursor: pointer;
+  &.active {
+    cursor: default;
+    box-shadow: 0 0 20px inset $active-field-color;
+    * {
+      background-color: transparent;
     }
   }
 

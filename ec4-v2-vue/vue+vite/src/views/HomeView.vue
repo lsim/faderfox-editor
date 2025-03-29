@@ -37,6 +37,7 @@ watch(
 watch(
   () => props.bundleId,
   (newId, oldId) => {
+    console.log('new bundleId', newId, oldId);
     if (newId) {
       ec4.loadBundle(Number.parseInt(newId, 10));
     } else if (oldId) {
@@ -81,6 +82,7 @@ watch(
         appliance or any other interactions with this page are not tracked. If in doubt, feel free
         to check the source code.
       </p>
+      Showing bundle #{{ props.bundleId || 'undefined' }}
     </div>
   </main>
 </template>
