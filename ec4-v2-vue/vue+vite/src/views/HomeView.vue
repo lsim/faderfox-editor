@@ -50,10 +50,19 @@ watch(
   },
   { immediate: true },
 );
+
+// Shift + space to toggle editor mode
+function handleKeyDown(e: KeyboardEvent) {
+  if (e.key === ' ' && e.shiftKey) {
+    e.preventDefault();
+    e.stopPropagation();
+    ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
+  }
+}
 </script>
 
 <template>
-  <main @focusout="handleFocusOut" id="home">
+  <main @focusout="handleFocusOut" id="home" @keydown="handleKeyDown">
     <Confirm />
     <a
       :href="fileStorage.blobUrl.value"

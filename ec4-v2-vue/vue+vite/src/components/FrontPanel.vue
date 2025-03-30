@@ -81,6 +81,13 @@ watch(
     }, 2000);
   },
 );
+watch(
+  () => ec4.editorMode,
+  (newMode) => {
+    if (newMode === 'push') activeField.value = 'pb_channel';
+    else activeField.value = 'channel';
+  },
+);
 </script>
 
 <template>

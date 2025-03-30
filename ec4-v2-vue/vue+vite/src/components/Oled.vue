@@ -22,9 +22,7 @@ const props = defineProps<{
   activeField: FieldType;
 }>();
 
-const emit = defineEmits<{
-  (event: 'update:active-field', field: FieldType): void;
-}>();
+const emit = defineEmits<(event: 'update:active-field', field: FieldType) => void>();
 
 const ec4 = useEc4Store();
 
@@ -40,9 +38,11 @@ function isInput(input: EventTarget | null): input is HTMLInputElement {
 function setActiveField(field: FieldType, input: EventTarget | null) {
   emit('update:active-field', field);
   // Select all the text in the input field for easier editing
-  if (!isInput(input)) input = (input as Element | null)?.querySelector('input') || null;
-  if (!isInput(input)) return;
-  input?.select?.();
+  let inputToSelect = input;
+  if (!isInput(inputToSelect))
+    inputToSelect = (input as Element | null)?.querySelector('input') || null;
+  if (!isInput(inputToSelect)) return;
+  inputToSelect?.select?.();
 }
 
 const nameInput = ref<HTMLInputElement | null>(null);

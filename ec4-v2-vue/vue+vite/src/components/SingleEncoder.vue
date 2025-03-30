@@ -202,9 +202,9 @@ function setNameActive(newVal: boolean, source: any) {
         <input
           class="width_3"
           @input="
-            control.channel = ($event.target as HTMLInputElement).checkValidity()
+            control.pb_channel = ($event.target as HTMLInputElement).checkValidity()
               ? parseInt(($event.target as HTMLInputElement).value, 10)
-              : control.channel
+              : control.pb_channel
           "
           type="number"
           min="1"
