@@ -12,8 +12,12 @@ watch(
   () => midi.inputs.value,
   (newInputs) => {
     if (newInputs.length > 0) {
-      midi.selectedInput.value =
-        newInputs.find((i) => i.device.name === 'Faderfox EC4') || newInputs[0];
+      const ffInput = newInputs.find((i) => i.device.name === 'Faderfox EC4');
+      if (ffInput) {
+        midi.selectedInput.value = ffInput;
+      } else if (!midi.selectedInput.value) {
+        midi.selectedInput.value = newInputs[0];
+      }
     }
   },
 );
@@ -22,8 +26,12 @@ watch(
   () => midi.outputs.value,
   (newOutputs) => {
     if (newOutputs.length > 0) {
-      midi.selectedOutput.value =
-        newOutputs.find((o) => o.device.name === 'Faderfox EC4') || newOutputs[0];
+      const ffOutput = newOutputs.find((o) => o.device.name === 'Faderfox EC4');
+      if (ffOutput) {
+        midi.selectedOutput.value = ffOutput;
+      } else if (!midi.selectedOutput.value) {
+        midi.selectedOutput.value = newOutputs[0];
+      }
     }
   },
 );

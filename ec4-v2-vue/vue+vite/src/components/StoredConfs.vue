@@ -6,6 +6,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import router from '@/router';
 import { ref } from 'vue';
+import useMidi from '@/composables/useMidi.ts';
 
 const confirm = useConfirm();
 const fileStorage = useFileStorage();
@@ -41,6 +42,8 @@ async function deleteBundle(meta: BundleMeta) {
 
 const ec4 = useEc4Store();
 
+const midi = useMidi();
+
 async function editBundle(meta: BundleMeta) {
   if (meta.id === ec4.activeBundle.id) return;
   await router.push({ name: 'bundle', params: { bundleId: meta.id } });
@@ -58,6 +61,12 @@ async function downloadBundle(meta: BundleMeta) {
   if (!bundle?.bytes) return;
   console.log('Saving bytes to disk', bundle.bytes.length);
   await fileStorage.saveSysexDataToDisk(bundle.bytes);
+}
+
+async function sendBundle(meta: BundleMeta) {
+  const bundle = await storage.getBundle(meta);
+  if (!bundle?.bytes) return;
+  midi.sendBundle(bundle);
 }
 </script>
 
@@ -106,6 +115,7 @@ async function downloadBundle(meta: BundleMeta) {
                 <ul>
                   <li><a href="#" @click.prevent="deleteBundle(meta)">Delete</a></li>
                   <li><a href="#" @click.prevent="downloadBundle(meta)">Download</a></li>
+                  <li><a href="#" @click.prevent="sendBundle(meta)">Send</a></li>
                 </ul>
               </nav>
             </aside>

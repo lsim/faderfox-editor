@@ -29,8 +29,7 @@ const emit = defineEmits<(event: 'update:name-active', nameActive: boolean) => v
 const ec4 = useEc4Store();
 
 const control: ComputedRef<Control> = computed(() => {
-  const group = ec4.encoderGroups[ec4.selectedGroupIndex];
-  return group.controls[props.encoderId];
+  return ec4.selectedGroup.controls[props.encoderId];
 });
 
 const nameInput = ref<HTMLInputElement | null>(null);
@@ -95,6 +94,7 @@ function setNameActive(newVal: boolean, source: any) {
 <template>
   <div
     class="encoder-container"
+    v-if="control"
     :class="{ push: ec4.editorMode === 'push', turn: ec4.editorMode === 'turn', active: selected }"
   >
     <div class="knob"></div>
@@ -201,6 +201,7 @@ function setNameActive(newVal: boolean, source: any) {
         <label>{{ t('ENCODER_CHANNEL') }}</label>
         <input
           class="width_3"
+          :value="control.pb_channel"
           @input="
             control.pb_channel = ($event.target as HTMLInputElement).checkValidity()
               ? parseInt(($event.target as HTMLInputElement).value, 10)

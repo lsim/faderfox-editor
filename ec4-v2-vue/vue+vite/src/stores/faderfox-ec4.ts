@@ -41,6 +41,7 @@ export const useEc4Store = defineStore('ec4', () => {
 
   const encoderGroups = computed(() => activeBundle.value.setups[selectedSetupIndex.value].groups);
   const selectedGroupIndex = ref<number>(0);
+  const selectedGroup = computed(() => encoderGroups.value[selectedGroupIndex.value]);
 
   const editorMode = ref<'push' | 'turn'>('turn');
 
@@ -49,6 +50,7 @@ export const useEc4Store = defineStore('ec4', () => {
   }
 
   const selectedEncoderIndex = ref<number>(0);
+  const selectedControl = computed(() => selectedGroup.value.controls[selectedEncoderIndex.value]);
   const lastStateSaved = ref(0);
 
   // Auto save after a bit of inactivity
@@ -71,10 +73,12 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedSetupIndex,
     encoderGroups,
     selectedGroupIndex,
+    selectedGroup,
     editorMode,
     setEditorMode,
     appFocused,
     selectedEncoderIndex,
+    selectedControl,
     loadBundle: async (id: number) => {
       activeBundle.value = await storage.loadBundle(id);
     },

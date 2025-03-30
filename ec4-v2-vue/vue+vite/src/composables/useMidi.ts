@@ -1,7 +1,7 @@
 import { computed, type ComputedRef, ref, watch, type WatchHandle } from 'vue';
 import { filter, lastValueFrom, map, Subject, type Subscription, take, timeout } from 'rxjs';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { useStorage } from '@/composables/storage.ts';
+import { type Bundle, useStorage } from '@/composables/storage.ts';
 
 const midi: Promise<MIDIAccess | null> =
   typeof navigator.requestMIDIAccess === 'function'
@@ -284,9 +284,8 @@ export class EC4SysexProtocol {
   }
 }
 
-export default function useMidi() {
+function initMidi() {
   console.debug('Initializing MIDI');
-
   const midiSupport = ref<boolean>();
   const inputs = ref<Array<MidiInput>>([]);
   const outputs = ref<Array<MidiOutput>>([]);
@@ -365,6 +364,10 @@ export default function useMidi() {
     },
   );
 
+  function sendBundle(bundle: Bundle) {
+    if (!m) return;
+    selectedOutput.value?.send(bundle.bytes);
+  }
   return {
     midiSupport,
     inputs,
@@ -372,6 +375,16 @@ export default function useMidi() {
     protocol,
     selectedInput,
     selectedOutput,
+    sendBundle,
     dispose,
   };
+}
+
+let midiExports: ReturnType<typeof initMidi> | null = null;
+
+export default function useMidi() {
+  if (!midiExports) {
+    midiExports = initMidi();
+  }
+  return midiExports;
 }
