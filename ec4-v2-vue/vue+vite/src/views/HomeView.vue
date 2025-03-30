@@ -20,8 +20,12 @@ const fileStorage = useFileStorage();
 
 // Insist that focus doesn't leave the editor
 function handleFocusOut(e: FocusEvent) {
-  if (!e.relatedTarget) {
-    (e.target as HTMLElement | undefined)?.focus?.();
+  if (!e.relatedTarget && e.target) {
+    const x = window.scrollX;
+    const y = window.scrollY;
+    console.log('focus out', x, y);
+    (e.target as HTMLElement).focus?.();
+    window.scrollTo(x, y);
   }
 }
 

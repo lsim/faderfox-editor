@@ -12,11 +12,9 @@ const props = defineProps<{
 
 const ec4 = useEc4Store();
 
-const activeField = ref<FieldType>('name');
+const activeField = ref<FieldType>('channel');
 
 const oled = ref<InstanceType<typeof Oled> | null>(null);
-
-// IDEA: Shift + Ctrl + nav could select a range of encoders (eg for inserting incremental values
 
 function handleEncoderNav(e: KeyboardEvent) {
   const selectedRow = Math.floor(ec4.selectedEncoderIndex / 4);
@@ -52,7 +50,7 @@ function handleKeyDown(e: KeyboardEvent) {
       return;
     }
     switch (e.key) {
-      case 'o':
+      case 'o': {
         const focused = document.activeElement as HTMLInputElement | null;
         const isInOled = focused?.closest('.oled');
         if (isInOled) {
@@ -65,6 +63,7 @@ function handleKeyDown(e: KeyboardEvent) {
         e.preventDefault();
         e.stopPropagation();
         break;
+      }
       default:
         break;
     }

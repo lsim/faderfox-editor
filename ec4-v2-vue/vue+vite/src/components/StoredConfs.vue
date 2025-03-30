@@ -81,6 +81,7 @@ async function downloadBundle(meta: BundleMeta) {
       </thead>
       <tbody>
         <tr
+          tabIndex="-1"
           :class="{ active: meta.id === ec4.activeBundle.id }"
           @click.capture.prevent="editBundle(meta)"
           v-for="meta in (storage.bundleMetas.value || []).filter(

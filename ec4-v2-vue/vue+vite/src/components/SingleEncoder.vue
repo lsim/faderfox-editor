@@ -39,11 +39,14 @@ const encoderInput = ref<HTMLInputElement | null>(null);
 
 function focusInput() {
   if (!props.selected) return;
+  const x = window.scrollX;
+  const y = window.scrollY;
   if (props.nameActive) {
     nameInput.value?.focus();
   } else {
     encoderInput.value?.focus();
   }
+  window.scrollTo(x, y);
 }
 
 watch(
@@ -70,6 +73,15 @@ watch(
       ec4.controlFocusRequests = 0;
       focusInput();
     });
+  },
+);
+
+watch(
+  () => ec4.activeBundle.id,
+  () => {
+    if (props.encoderId === ec4.selectedEncoderIndex) {
+      focusInput();
+    }
   },
 );
 

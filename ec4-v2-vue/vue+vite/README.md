@@ -51,4 +51,6 @@ yarn lint
 - Add 'copy to all' features
 - Add UI for link editing
 - Put sysex work on a service worker (vueuse useWebWorkerFn). Might help keep the UI responsive
-- Fix router bug where bundleId stops being reactive
+- IDEA: Shift + Ctrl + nav or Shift + Tab could select a range of encoders (eg for inserting incremental values)
+- Send to EC4 link
+
