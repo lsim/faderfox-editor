@@ -3,7 +3,10 @@ import { filter, lastValueFrom, map, Subject, type Subscription, take, timeout }
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { useStorage } from '@/composables/storage.ts';
 
-const midi: Promise<MIDIAccess> = navigator.requestMIDIAccess({ sysex: true });
+const midi: Promise<MIDIAccess | null> =
+  typeof navigator.requestMIDIAccess === 'function'
+    ? navigator.requestMIDIAccess({ sysex: true })
+    : Promise.resolve(null);
 
 // Single setup bytes: 14294
 // All setups bytes: 14294 * 16 = 22112? No it's 229340 bytes
@@ -310,8 +313,10 @@ export default function useMidi() {
     (_m) => {
       midiSupport.value = true;
       m = _m;
-      m.onstatechange = updateDevices;
-      updateDevices();
+      if (m) {
+        m.onstatechange = updateDevices;
+        updateDevices();
+      }
     },
     () => {
       midiSupport.value = false;

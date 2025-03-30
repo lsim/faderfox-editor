@@ -1,7 +1,4 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
-vi.mock('../src/composables/usemidi.ts', () => ({
-  useMidi: () => ({}),
-}));
 
 // import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
 import { generateSysexData, parseSetupsFromSysex } from '../src/memoryLayout';
