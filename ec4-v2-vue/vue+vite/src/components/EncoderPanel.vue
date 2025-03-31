@@ -56,21 +56,20 @@ const nameActive = ref<boolean>(false);
 
     .selected {
       // Mark the selected encoder
-      border: 2px dashed rgba($active-field-color, 0.6);
       border-radius: 10px;
 
       // Gently pulse the selected encoder
-      animation: pulse 3s infinite;
+      animation: pulse 5s linear infinite;
 
       @keyframes pulse {
         0% {
-          box-shadow: 0 0 0 0 rgba($active-field-color, 0.8);
+          filter: drop-shadow(0px 3px 20px rgba($blue, 1));
         }
-        40% {
-          box-shadow: 0 0 0 20px rgba($active-field-color, 0);
+        50% {
+          filter: drop-shadow(0px -3px 10px rgba($blue, 0.5));
         }
         100% {
-          box-shadow: 0 0 0 20px rgba($active-field-color, 0);
+          filter: drop-shadow(0 3px 20px rgba($blue, 1));
         }
       }
     }
