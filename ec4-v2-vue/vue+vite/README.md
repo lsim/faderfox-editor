@@ -51,6 +51,6 @@ yarn lint
 - Add 'copy to all' features
 - Add UI for link editing
 - Put sysex work on a service worker (vueuse useWebWorkerFn). Might help keep the UI responsive
-- IDEA: Shift + Ctrl + nav or Shift + Tab could select a range of encoders (eg for inserting incremental values)
-- Send to EC4 link
+- IDEA: Shift + Ctrl + nav or eg Alt + Tab could select a range of encoders (eg for inserting incremental values)
+- Send to EC4 activity indicator? Or a modal you can't dismiss?
 

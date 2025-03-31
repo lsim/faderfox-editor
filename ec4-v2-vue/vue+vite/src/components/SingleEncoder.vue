@@ -89,6 +89,14 @@ function setNameActive(newVal: boolean, source: any) {
   if (newVal !== props.nameActive) emit('update:name-active', newVal);
   if (typeof source?.select === 'function') source.select();
 }
+
+function toggleLink() {
+  if (ec4.editorMode === 'turn') {
+    control.value.link = !control.value.link;
+  } else {
+    control.value.pb_link = !control.value.pb_link;
+  }
+}
 </script>
 
 <template>
@@ -327,6 +335,16 @@ function setNameActive(newVal: boolean, source: any) {
         <div>&nbsp;</div>
         <div>&nbsp;</div>
       </template>
+      <div
+        class="link-next"
+        :class="{
+          active:
+            (ec4.editorMode === 'turn' && control.link) ||
+            (ec4.editorMode === 'push' && control.pb_link),
+        }"
+      >
+        <a href @click.prevent="toggleLink">Link</a>
+      </div>
     </div>
   </div>
 </template>
@@ -390,6 +408,57 @@ function setNameActive(newVal: boolean, source: any) {
       text-align: center;
       background-color: transparent;
       color: $textColor;
+    }
+
+    .link-next {
+      text-transform: uppercase;
+      ::before {
+        content: '';
+        position: absolute;
+        border-right: 2px solid $yellow-600;
+        height: 100%;
+        right: -0.8em;
+        bottom: 0.8em;
+      }
+      ::after {
+        content: '→';
+        position: absolute;
+        font-size: 2em;
+        right: -0.5em;
+        bottom: 0;
+      }
+      margin-right: 1em;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      font-size: 0.6em;
+      color: $yellow-600;
+      &.active {
+        color: $yellow-100;
+        ::before {
+          border: none;
+        }
+        ::after {
+          animation: pulse 3s infinite;
+          @keyframes pulse {
+            0% {
+              transform: scale(1);
+            }
+            50% {
+              transform: scale(0.9);
+            }
+            100% {
+              transform: scale(1);
+            }
+          }
+        }
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      cursor: pointer;
     }
   }
 

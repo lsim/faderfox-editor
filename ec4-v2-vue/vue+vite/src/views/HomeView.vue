@@ -18,9 +18,11 @@ const groupId = ref<number>(0);
 const ec4 = useEc4Store();
 const fileStorage = useFileStorage();
 
-// Insist that focus doesn't leave the editor
+// Insist that focus doesn't leave the editor inputs
 function handleFocusOut(e: FocusEvent) {
-  if (!e.relatedTarget && e.target) {
+  const fromTag = (e.relatedTarget as HTMLElement | undefined)?.tagName;
+  // const toTag = (e.target as HTMLElement | undefined)?.tagName;
+  if ((!fromTag || fromTag === 'A') && e.target) {
     const x = window.scrollX;
     const y = window.scrollY;
     console.log('focus out', x, y);
