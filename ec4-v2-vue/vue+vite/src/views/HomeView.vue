@@ -25,7 +25,7 @@ function handleFocusOut(e: FocusEvent) {
   if ((!fromTag || fromTag === 'A') && e.target) {
     const x = window.scrollX;
     const y = window.scrollY;
-    console.log('focus out', x, y);
+    // console.log('focus out', x, y, e.target, e.relatedTarget);
     (e.target as HTMLElement).focus?.();
     window.scrollTo(x, y);
   }

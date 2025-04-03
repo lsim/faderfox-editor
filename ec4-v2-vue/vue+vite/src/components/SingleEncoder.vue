@@ -343,7 +343,7 @@ function toggleLink() {
             (ec4.editorMode === 'push' && control.pb_link),
         }"
       >
-        <a href="#" @click.prevent="toggleLink">Link</a>
+        <a href="#" @click.prevent="toggleLink" tabindex="-1">Link</a>
       </div>
     </div>
   </div>
