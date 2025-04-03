@@ -92,6 +92,7 @@ watch(
 
 <template>
   <main @keydown.capture="handleKeyDown">
+    <div class="beta-notice dymo-label">BETA</div>
     <div id="save-indicator" v-if="showSaveIndicator">💾</div>
     <ModeSelector class="mode-selector" />
     <Oled
@@ -217,6 +218,16 @@ main {
         opacity: 0;
       }
     }
+  }
+
+  .beta-notice {
+    position: absolute;
+    padding-right: 0.2em;
+    padding-left: 0.5em;
+    font-size: 150%;
+    left: 3.5em;
+    top: 1.7em;
+    rotate: -10deg;
   }
 }
 </style>
