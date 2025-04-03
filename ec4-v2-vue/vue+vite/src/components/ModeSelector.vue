@@ -26,6 +26,8 @@ const ec4 = useEc4Store();
 
 <style scoped lang="scss">
 @use '../assets/main.scss' as *;
+@use '@picocss/pico/scss/colors/index.scss' as *;
+
 #modeselect {
   border: 1px solid white;
   border-bottom: none;
@@ -40,11 +42,12 @@ const ec4 = useEc4Store();
   a {
     text-decoration: none;
     color: inherit;
+    filter: brightness(0.6);
 
     &.active {
-      background-color: $active-field-color;
-      border-radius: 0.3em;
-      box-shadow: 0 0 10px $active-field-color;
+      filter: brightness(1);
+      color: $white;
+      font-weight: bold;
     }
   }
 }
