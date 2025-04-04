@@ -46,8 +46,7 @@ const ec4 = useEc4Store();
 
     &.active {
       filter: brightness(1);
-      color: $white;
-      font-weight: bold;
+      color: $yellow;
     }
   }
 }
