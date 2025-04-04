@@ -8,6 +8,7 @@ import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
 import Confirm from '@/components/Confirm.vue';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
+import BgWaves from '@/components/BgWaves.vue';
 
 const props = defineProps<{
   bundleId?: string;
@@ -72,7 +73,9 @@ function handleKeyDown(e: KeyboardEvent) {
       download="ec4-sysex.syx"
       style="display: none"
     ></a>
-    <h1 class="header">Web-MIDI Editor for the Faderfox EC4</h1>
+    <BgWaves class="bg-waves">
+      <h1 class="header">Web-MIDI Editor for the Faderfox EC4</h1>
+    </BgWaves>
     <MidiSettings class="midi-settings" />
     <SetupListing class="group-selector" />
     <FrontPanel :group-id="groupId" class="front-panel" />
@@ -97,7 +100,6 @@ function handleKeyDown(e: KeyboardEvent) {
         appliance or any other interactions with this page are not tracked. If in doubt, feel free
         to check the source code.
       </p>
-      Showing bundle #{{ props.bundleId || 'undefined' }}
     </div>
   </main>
 </template>
@@ -148,8 +150,11 @@ function handleKeyDown(e: KeyboardEvent) {
   .credits {
     grid-area: credits;
     padding: 1em;
-    //border: 2px solid $white;
-    //border-radius: 4px;
+  }
+  .bg-waves {
+    background-color: transparent;
+    grid-area: header;
+    height: 12vh;
   }
 }
 </style>
