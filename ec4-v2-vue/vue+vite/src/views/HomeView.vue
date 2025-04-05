@@ -8,6 +8,7 @@ import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import BgWaves from '@/components/BgWaves.vue';
+import { onKeyStroke } from '@vueuse/core';
 
 const props = defineProps<{
   bundleId?: string;
@@ -53,14 +54,13 @@ watch(
   { immediate: true },
 );
 
-// Shift + space to toggle editor mode
-function handleKeyDown(e: KeyboardEvent) {
-  if (e.key === ' ' && e.shiftKey) {
-    e.preventDefault();
-    e.stopPropagation();
-    ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
-  }
-}
+onKeyStroke(' ', (e) => {
+  if (!e.shiftKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
+  ec4.controlFocusRequests++;
+});
 </script>
 
 <template>

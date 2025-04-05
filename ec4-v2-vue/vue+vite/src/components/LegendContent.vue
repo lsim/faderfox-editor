@@ -5,7 +5,7 @@ const shortcuts = [
   { keys: ['Ctrl', 'd'], help: 'Focus encoder to the left' },
   { keys: ['Ctrl', 'f'], help: 'Focus encoder to the right' },
   { keys: ['Ctrl', 'o'], help: 'Switch focus between encoders and oled fields' },
-  { keys: ['Ctrl', 'space'], help: 'Toggle between turn/push modes' },
+  { keys: ['Shift', 'space'], help: 'Toggle between turn/push modes' },
 ];
 </script>
 
