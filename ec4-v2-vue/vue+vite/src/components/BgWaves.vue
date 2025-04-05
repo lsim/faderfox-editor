@@ -1,8 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const paused = ref(false);
+</script>
 
 <template>
-  <div class="hero_area">
-    <div class="slot"><slot /></div>
+  <div class="hero_area" @click="paused = !paused">
     <svg
       class="waves"
       xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +20,7 @@
           d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
         />
       </defs>
-      <g class="parallax">
+      <g class="parallax" :class="{ paused: paused }">
         <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(0,0,0,0.7" />
         <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(0,0,0,0.5)" />
         <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(0,0,0,0.3)" />
@@ -32,7 +35,7 @@
 .hero_area {
   position: relative;
   height: 100vh;
-  background-color: black;
+  background-color: transparent;
 }
 
 .waves {
@@ -43,30 +46,36 @@
   left: 0;
 }
 
-.parallax > use {
-  animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
-}
+.parallax {
+  > use {
+    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+  }
 
-.parallax > use:nth-child(1) {
-  animation-delay: -2s;
-  animation-duration: 17s;
-  fill: rgba($yellow, 0.2);
-}
+  &.paused > use {
+    animation-play-state: paused;
+  }
 
-.parallax > use:nth-child(2) {
-  animation-delay: -3s;
-  animation-duration: 25s;
-  fill: rgba($blue, 0.2);
-}
+  > use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 17s;
+    fill: rgba($yellow-300, 0.3);
+  }
 
-.parallax > use:nth-child(3) {
-  animation-delay: -4s;
-  animation-duration: 33s;
-}
+  > use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 30s;
+    fill: rgba($blue-500, 0.3);
+  }
 
-.parallax > use:nth-child(4) {
-  animation-delay: -5s;
-  animation-duration: 40s;
+  > use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 40s;
+  }
+
+  > use:nth-child(4) {
+    animation-delay: -5s;
+    animation-duration: 60s;
+  }
 }
 
 @keyframes move-forever {
@@ -78,18 +87,4 @@
     transform: translate3d(85px, 0, 0);
   }
 }
-
-/*Shrinking for mobile*/
-
-@media (max-width: 768px) {
-  .waves {
-    height: 40px;
-    min-height: 40px;
-  }
-}
-
-//.slot * {
-//  background-clip: text;
-//  -webkit-background-clip: text;
-//}
 </style>

@@ -73,9 +73,10 @@ function handleKeyDown(e: KeyboardEvent) {
       download="ec4-sysex.syx"
       style="display: none"
     ></a>
-    <BgWaves class="bg-waves">
-      <h1 class="header">Web-MIDI Editor for the Faderfox EC4</h1>
-    </BgWaves>
+    <div class="header">
+      <BgWaves class="bg-waves" />
+      <h1>Faderfox EC4 Editor</h1>
+    </div>
     <MidiSettings class="midi-settings" />
     <SetupListing class="group-selector" />
     <FrontPanel :group-id="groupId" class="front-panel" />
@@ -123,7 +124,18 @@ function handleKeyDown(e: KeyboardEvent) {
   .header {
     grid-area: header;
     margin-bottom: 2em;
-    justify-self: center;
+    h1 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      justify-self: center;
+    }
+
+    .bg-waves {
+      z-index: 1;
+      height: 12vh;
+    }
   }
 
   .midi-settings {
@@ -150,11 +162,6 @@ function handleKeyDown(e: KeyboardEvent) {
   .credits {
     grid-area: credits;
     padding: 1em;
-  }
-  .bg-waves {
-    background-color: transparent;
-    grid-area: header;
-    height: 12vh;
   }
 }
 </style>
