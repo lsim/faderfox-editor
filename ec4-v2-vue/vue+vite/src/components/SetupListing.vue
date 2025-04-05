@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { onKeyDown, onKeyUp } from '@vueuse/core';
 
 const ec4 = useEc4Store();
 
@@ -11,7 +12,7 @@ const gridRows = computed(() => {
 function handleFocus(e: Event, setupId: number, groupId: number) {
   ec4.selectedSetupIndex = setupId;
   ec4.selectedGroupIndex = groupId;
-  (e.target as any)?.select();
+  (e.target as { select: () => void } | null)?.select();
 }
 
 const setupColors = [
@@ -36,34 +37,97 @@ const setupColors = [
   'zinc',
   'slate',
 ];
+const copyMode = ref(false);
+onKeyDown('Alt', (e) => {
+  copyMode.value = true;
+});
+onKeyUp('Alt', (e) => {
+  copyMode.value = false;
+});
+
+watch(
+  () => ec4.selectedSetupIndex,
+  (newIndex: number) => {
+    // Focus the setup name
+    const nameInput = document.querySelectorAll('.setup-name input')[newIndex];
+    if (nameInput) (nameInput as HTMLInputElement).focus();
+  },
+);
+
+watch(
+  () => ec4.selectedGroupIndex,
+  (newIndex) => {
+    // Focus the group name
+    const nameInput = document.querySelectorAll('.group-name input')[newIndex];
+    if (nameInput) (nameInput as HTMLInputElement).focus();
+  },
+);
+
+const hoveredSetup = ref<number | null>(null);
+const hoveredGroup = ref<number | null>(null);
+
+const copyableSetup = computed(() => {
+  return hoveredSetup.value !== null ? hoveredSetup.value : ec4.selectedSetupIndex;
+});
+const copyableGroup = computed(() => {
+  return hoveredGroup.value !== null ? hoveredGroup.value : ec4.selectedGroupIndex;
+});
 </script>
 
 <template>
-  <div id="setupsandgroups" title="Select setup, group and edit name.">
+  <div
+    id="setupsandgroups"
+    title="Select setup, group and edit name."
+    :class="{ 'copy-mode': copyMode }"
+  >
     <h3>Setup</h3>
     <h3>Group</h3>
     <template v-for="([s, g], idx) in gridRows" :key="s.id">
-      <input
-        v-model="s.name"
-        :class="{
-          selected: idx === ec4.selectedSetupIndex,
-          [`color-${setupColors[idx]}`]: true,
-        }"
-        class="setup-name matrix_font"
-        @focus="handleFocus($event, idx, ec4.selectedGroupIndex)"
-        maxlength="4"
-      />
-      <input
-        v-if="g"
-        v-model="g.name"
-        :class="{
-          selected: idx === ec4.selectedGroupIndex,
-          [`color-${setupColors[ec4.selectedSetupIndex]}`]: true,
-        }"
-        class="group-name matrix_font"
-        @focus="handleFocus($event, ec4.selectedSetupIndex, idx)"
-        maxlength="4"
-      />
+      <div class="setup-name" @mouseenter="hoveredSetup = idx" @mouseleave="hoveredSetup = null">
+        <input
+          v-model="s.name"
+          :class="{
+            selected: idx === ec4.selectedSetupIndex,
+            [`color-${setupColors[idx]}`]: true,
+          }"
+          class="matrix_font"
+          @focus="handleFocus($event, idx, ec4.selectedGroupIndex)"
+          maxlength="4"
+        />
+        <div class="setup copy-button" v-if="idx === copyableSetup" @click="ec4.copySetup(idx)">
+          copy
+        </div>
+        <div
+          class="setup paste-button"
+          v-if="idx === copyableSetup && ec4.canPasteSetup"
+          @click="ec4.pasteSetup(idx)"
+        >
+          paste
+        </div>
+      </div>
+
+      <div class="group-name" @mouseenter="hoveredGroup = idx" @mouseleave="hoveredGroup = null">
+        <input
+          v-model="g.name"
+          :class="{
+            selected: idx === ec4.selectedGroupIndex,
+            [`color-${setupColors[ec4.selectedSetupIndex]}`]: true,
+          }"
+          class="matrix_font"
+          @focus="handleFocus($event, ec4.selectedSetupIndex, idx)"
+          maxlength="4"
+        />
+        <div class="group copy-button" v-if="idx === copyableGroup" @click="ec4.copyGroup(idx)">
+          copy
+        </div>
+        <div
+          class="group paste-button"
+          v-if="idx === copyableGroup && ec4.canPasteGroup"
+          @click="ec4.pasteGroup(idx)"
+        >
+          paste
+        </div>
+      </div>
     </template>
 
     <!--    <div class="tools">-->
@@ -153,44 +217,12 @@ $picoColors: (
     cursor: pointer;
     padding: 5px;
 
-    $shadow: 30px;
+    $shadow: 10px;
+    transition: transform 0.3s ease;
+    outline: none;
 
     &.selected {
-      animation: pulse 3s infinite;
       z-index: 10;
-      box-shadow: 0 0 $shadow $white;
-
-      outline: none;
-    }
-
-    @keyframes pulse {
-      0% {
-        box-shadow: 0 0 $shadow $white;
-      }
-      //15% {
-      //  box-shadow: 0 0 15px $white;
-      //}
-      //30% {
-      //  box-shadow: 0 0 50px black;
-      //}
-      //30% {
-      //  box-shadow: 0 0 15px $white;
-      //}
-      50% {
-        box-shadow: 0 0 calc($shadow - 15px) $white;
-      }
-      //60% {
-      //  box-shadow: 0 0 5px black;
-      //}
-      //75% {
-      //  box-shadow: 0 0 15px $red;
-      //}
-      //90% {
-      //  box-shadow: 0 0 15px $white;
-      //}
-      100% {
-        box-shadow: 0 0 $shadow $white;
-      }
     }
 
     @for $i from 1 through 16 {
@@ -200,17 +232,67 @@ $picoColors: (
         background-color: $theColor;
       }
     }
+  }
 
-    //&.setup-name {
-    //  &.selected {
-    //  }
-    //}
+  .setup-name,
+  .group-name {
+    position: relative;
+    overflow: hidden;
+    z-index: 10;
+    padding: 2px;
+    &:has(.selected) {
+      border: 2px solid $white;
+      border-radius: 4px;
+      padding: 0;
+    }
 
-    //&.group-name {
-    //  //grid-area: groups;
-    //  //text-align: center;
-    //  //background-color: $active-field-color;
-    //}
+    .copy-button,
+    .paste-button {
+      position: absolute;
+      top: 9px;
+      opacity: 0;
+      transition:
+        opacity 0.3s ease,
+        left 0.3s ease,
+        right 0.3s ease;
+      font-size: 0.4em;
+      font-weight: bold;
+      line-height: 2em;
+      text-transform: uppercase;
+      rotate: -90deg;
+      background-color: $white;
+      border: 1px solid $black;
+      cursor: pointer;
+
+      width: 3.9em;
+      color: $black;
+    }
+    $radius: 4px;
+    .copy-button {
+      left: -3em;
+      border-bottom-right-radius: $radius;
+      border-bottom-left-radius: $radius;
+      border-top: none;
+    }
+    .paste-button {
+      right: -3em;
+      border-top-right-radius: $radius;
+      border-top-left-radius: $radius;
+      border-bottom: none;
+    }
+  }
+
+  &.copy-mode {
+    .copy-button,
+    .paste-button {
+      opacity: 0.8;
+    }
+    .copy-button {
+      left: -0.8em;
+    }
+    .paste-button {
+      right: -0.8em;
+    }
   }
 }
 </style>

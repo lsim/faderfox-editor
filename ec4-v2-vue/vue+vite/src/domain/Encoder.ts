@@ -238,4 +238,15 @@ export class Control {
     setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_upper', this.pb_upper);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'pb_link', this.pb_link);
   }
+
+  clone(setupId?: number, groupId?: number, controlId?: number): Control {
+    const c = new Control(
+      this.name,
+      controlId ?? this.id,
+      groupId ?? this.groupId,
+      setupId ?? this.setupId,
+    );
+
+    return Object.assign(c, { ...this, id: c.id, setupId: c.setupId, groupId: c.groupId });
+  }
 }

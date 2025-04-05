@@ -28,4 +28,13 @@ export class EncoderSetup {
       group.toBytes(buffer);
     }
   }
+
+  clone(setupId?: number): EncoderSetup {
+    const s = new EncoderSetup(this.id, this.name);
+    return Object.assign(s, {
+      ...this,
+      id: s.id,
+      groups: this.groups.map((g) => g.clone(g.setupId)),
+    });
+  }
 }

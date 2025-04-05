@@ -30,4 +30,14 @@ export class EncoderGroup {
       control.toBytes(buffer);
     }
   }
+
+  clone(setupId?: number, groupId?: number): EncoderGroup {
+    const g = new EncoderGroup(groupId ?? this.id, setupId ?? this.setupId, this.name);
+    return Object.assign(g, {
+      ...this,
+      id: g.id,
+      setupId: g.setupId,
+      controls: this.controls.map((c) => c.clone(g.setupId, g.id)),
+    });
+  }
 }

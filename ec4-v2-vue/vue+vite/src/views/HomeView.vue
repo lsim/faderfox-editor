@@ -88,7 +88,7 @@ onKeyStroke('g', (e) => {
 </script>
 
 <template>
-  <main @focusout="handleFocusOut" id="home" @keydown="handleKeyDown">
+  <main @focusout="handleFocusOut" id="home">
     <a
       :href="fileStorage.blobUrl.value"
       ref="downloadLink"
@@ -145,7 +145,6 @@ onKeyStroke('g', (e) => {
 
   .header {
     grid-area: header;
-    margin-bottom: 2em;
     h1 {
       position: absolute;
       top: 0;
