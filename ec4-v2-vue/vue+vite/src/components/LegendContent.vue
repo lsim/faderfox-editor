@@ -6,6 +6,10 @@ const shortcuts = [
   { keys: ['Ctrl', 'f'], help: 'Focus encoder to the right' },
   { keys: ['Ctrl', 'o'], help: 'Switch focus between encoders and oled fields' },
   { keys: ['Shift', 'space'], help: 'Toggle between turn/push modes' },
+  { keys: ['Ctrl', 'q'], help: 'Select previous setup' },
+  { keys: ['Ctrl', 'a'], help: 'Select next setup' },
+  { keys: ['Ctrl', 't'], help: 'Select previous group' },
+  { keys: ['Ctrl', 'g'], help: 'Select next group' },
 ];
 </script>
 

@@ -61,6 +61,30 @@ onKeyStroke(' ', (e) => {
   ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
   ec4.controlFocusRequests++;
 });
+onKeyStroke('q', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  ec4.selectedSetupIndex = Math.max(0, ec4.selectedSetupIndex - 1);
+});
+onKeyStroke('a', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  ec4.selectedSetupIndex = Math.min(16 - 1, ec4.selectedSetupIndex + 1);
+});
+onKeyStroke('t', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  ec4.selectedGroupIndex = Math.max(0, ec4.selectedGroupIndex - 1);
+});
+onKeyStroke('g', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  ec4.selectedGroupIndex = Math.min(16 - 1, ec4.selectedGroupIndex + 1);
+});
 </script>
 
 <template>
