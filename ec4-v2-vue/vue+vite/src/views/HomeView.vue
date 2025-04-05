@@ -6,7 +6,6 @@ import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
-import Confirm from '@/components/Confirm.vue';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import BgWaves from '@/components/BgWaves.vue';
 
@@ -66,7 +65,6 @@ function handleKeyDown(e: KeyboardEvent) {
 
 <template>
   <main @focusout="handleFocusOut" id="home" @keydown="handleKeyDown">
-    <Confirm />
     <a
       :href="fileStorage.blobUrl.value"
       ref="downloadLink"

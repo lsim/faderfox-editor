@@ -2,7 +2,6 @@ import { nextTick, ref } from 'vue';
 import { useStorage } from '@/composables/storage.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import { parseSetupsFromSysex } from '@/memoryLayout.ts';
-import useConfirm from '@/composables/confirm.ts';
 
 const downloadLink = ref<HTMLAnchorElement | null>(null);
 
@@ -22,7 +21,6 @@ export default function useFileStorage() {
     });
   }
 
-  const confirm = useConfirm();
   const storage = useStorage();
 
   async function loadBlobFromDisk(file: File) {
@@ -34,19 +32,11 @@ export default function useFileStorage() {
       // Create bundle
       await storage.addBundle(bytes, file.name);
     } catch (e) {
-      // Not a sysex file
-      await confirm.showIt(
-        'Invalid file',
-        `The file "${file.name}" is not a valid sysex file`,
-        'Ok',
-        '',
-      );
+      throw Error(`${file.name} does not appear to be a valid ec4 sysex file`);
     }
   }
 
   async function onDrop(files: File[] | null, e: DragEvent) {
-    e.preventDefault();
-    console.log('onDrop', files, e);
     for (const file of files || []) {
       await loadBlobFromDisk(file);
     }

@@ -28,7 +28,7 @@ const options: ComputedRef<ScaleOption[]> = computed(() => {
 });
 
 function handleChange(e: Event) {
-  const selectedValue: number = parseInt((e.target as HTMLSelectElement).value, 10) || 0;
+  const selectedValue: number = Number.parseInt((e.target as HTMLSelectElement).value, 10) || 0;
   emit('update:modelValue', selectedValue);
 }
 

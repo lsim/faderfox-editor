@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { type BundleMeta, useStorage } from '@/composables/storage.ts';
 import { formatDate, useDropZone } from '@vueuse/core';
-import useConfirm from '@/composables/confirm.ts';
+import Modal from '@/components/Modal.vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import router from '@/router';
 import { ref } from 'vue';
 import useMidi from '@/composables/useMidi.ts';
 
-const confirm = useConfirm();
 const fileStorage = useFileStorage();
+const invalidFileConfirm = ref<{ showIt: (...args: unknown[]) => Promise<void> } | null>(null);
+const confirmDeleteDialog = ref<{ showIt: (...args: unknown[]) => Promise<void> } | null>(null);
 
 const dropZone = ref<HTMLElement | null>(null);
 const { isOverDropZone } = useDropZone(dropZone, {
-  onDrop: fileStorage.onDrop,
+  onDrop,
   preventDefaultForUnhandled: true,
-  multiple: false,
+  multiple: true,
 });
 
 const storage = useStorage();
@@ -26,10 +27,10 @@ function dateString(date: number) {
 
 async function deleteBundle(meta: BundleMeta) {
   const shouldNavigate = meta.id === ec4.activeBundle.id;
-  await confirm
-    .showIt(
+  await confirmDeleteDialog.value
+    ?.showIt(
       'Delete stored configuration',
-      `Delete configuration "${meta.name} from ${dateString(meta.timestamp)}"?`,
+      `Delete configuration '${meta.name}' from ${dateString(meta.timestamp)}?`,
       'Delete',
       'Cancel',
     )
@@ -68,10 +69,23 @@ async function sendBundle(meta: BundleMeta) {
   if (!bundle?.bytes) return;
   midi.sendBundle(bundle);
 }
+
+async function onDrop(files: File[] | null, e: DragEvent) {
+  e.preventDefault();
+  try {
+    await fileStorage.onDrop(files, e);
+  } catch (e) {
+    const msg = (e as Error).message;
+    // Not a sysex file
+    invalidFileConfirm.value?.showIt('Invalid file', msg, 'Ok', '');
+  }
+}
 </script>
 
 <template>
   <div class="pico stored-confs" ref="dropZone" :class="{ dragover: isOverDropZone }">
+    <modal ref="invalidFileConfirm" />
+    <modal ref="confirmDeleteDialog" />
     <nav>
       <ul>
         <li><h2>Bundles stored locally</h2></li>

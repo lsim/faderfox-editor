@@ -5,6 +5,7 @@ import Oled from '@/components/Oled.vue';
 import type { FieldType } from '@/domain/Encoder.ts';
 import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import LegendButton from '@/components/LegendButton.vue';
 
 const props = defineProps<{
   groupId: number;
@@ -94,8 +95,9 @@ watch(
   <main @keydown.capture="handleKeyDown">
     <div class="beta-notice dymo-label">BETA</div>
     <div id="save-indicator" v-if="showSaveIndicator">💾</div>
-    <ModeSelector class="mode-selector" />
-    <Oled
+    <legend-button id="legend-button" />
+    <mode-selector class="mode-selector" />
+    <oled
       v-if="ec4.selectedEncoderIndex != null"
       :encoder-id="ec4.selectedEncoderIndex"
       :group-id="ec4.selectedGroupIndex"
@@ -105,7 +107,7 @@ watch(
       @update:active-field="activeField = $event"
     />
 
-    <EncoderPanel
+    <encoder-panel
       @select-encoder="ec4.selectedEncoderIndex = $event"
       class="encoders"
       :active-field="activeField"
@@ -229,5 +231,10 @@ main {
     top: 1.7em;
     rotate: -10deg;
   }
+}
+#legend-button {
+  position: absolute;
+  top: 4.25em;
+  right: 1.8em;
 }
 </style>

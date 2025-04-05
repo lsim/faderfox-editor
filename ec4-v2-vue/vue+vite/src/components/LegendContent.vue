@@ -1,0 +1,52 @@
+<script setup lang="ts">
+const shortcuts = [
+  { keys: ['Ctrl', 'e'], help: 'Focus encoder above' },
+  { keys: ['Ctrl', 's'], help: 'Focus encoder below' },
+  { keys: ['Ctrl', 'd'], help: 'Focus encoder to the left' },
+  { keys: ['Ctrl', 'f'], help: 'Focus encoder to the right' },
+  { keys: ['Ctrl', 'o'], help: 'Switch focus between encoders and oled fields' },
+  { keys: ['Ctrl', 'space'], help: 'Toggle between turn/push modes' },
+];
+</script>
+
+<template>
+  <section class="shortcuts">
+    <template v-for="s in shortcuts" :key="s.keys.join(',')">
+      <p class="keys">
+        <template v-for="k in s.keys" :key="k">
+          <kbd>{{ k }}</kbd
+          ><span class="and">+</span>
+        </template>
+      </p>
+      <span class="help">{{ s.help }}</span>
+    </template>
+  </section>
+</template>
+
+<style scoped lang="scss">
+.shortcuts {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  > .keys {
+    grid-column: 1;
+    display: flex;
+    kbd {
+      min-width: 4em;
+      text-align: center;
+    }
+
+    * {
+      margin: 0 0.5em;
+    }
+    justify-content: center;
+
+    .and:last-child {
+      display: none;
+    }
+  }
+
+  > .help {
+    grid-column: 2;
+  }
+}
+</style>
