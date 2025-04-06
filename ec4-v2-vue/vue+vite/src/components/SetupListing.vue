@@ -2,7 +2,6 @@
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useCopyPaste from '@/composables/copy-paste.ts';
 import { computed, ref, watch } from 'vue';
-import { onKeyDown, onKeyUp } from '@vueuse/core';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
 
 const ec4 = useEc4Store();
@@ -40,13 +39,6 @@ const setupColors = [
   'zinc',
   'slate',
 ];
-const copyMode = ref(false);
-onKeyDown('Alt', (e) => {
-  copyMode.value = true;
-});
-onKeyUp('Alt', (e) => {
-  copyMode.value = false;
-});
 
 watch(
   () => ec4.selectedSetupIndex,
@@ -81,7 +73,7 @@ const copyableGroup = computed(() => {
   <div
     id="setupsandgroups"
     title="Select setup, group and edit name."
-    :class="{ 'copy-mode': copyMode }"
+    :class="{ 'copy-mode': copyPaste.copyMode }"
   >
     <h3>Setup</h3>
     <h3>Group</h3>
@@ -89,7 +81,6 @@ const copyableGroup = computed(() => {
       <copy-paste-wrap
         class="setup-name"
         :can-paste="copyPaste.canPasteSetup.value"
-        :copy-active="copyMode"
         @copy="copyPaste.copySetup(idx)"
         @paste="copyPaste.pasteSetup(idx)"
         :always-show="idx === ec4.selectedSetupIndex"
@@ -109,7 +100,6 @@ const copyableGroup = computed(() => {
       <copy-paste-wrap
         class="group-name"
         :can-paste="copyPaste.canPasteGroup.value"
-        :copy-active="copyMode"
         @copy="copyPaste.copyGroup(idx)"
         @paste="copyPaste.pasteGroup(idx)"
         :always-show="idx === ec4.selectedGroupIndex"

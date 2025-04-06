@@ -108,7 +108,6 @@ watch(
     />
 
     <encoder-panel
-      @select-encoder="ec4.selectedEncoderIndex = $event"
       class="encoders"
       :active-field="activeField"
       :group-id="props.groupId"

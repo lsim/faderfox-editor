@@ -4,15 +4,17 @@ import { type FieldType } from '@/domain/Encoder';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { computed, watch, ref } from 'vue';
 import { onKeyStroke } from '@vueuse/core';
+import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
+import useCopyPaste from '@/composables/copy-paste';
 
 const props = defineProps<{
   selectedEncoderId: number;
   activeField: FieldType;
 }>();
 
-const emit = defineEmits<(event: 'select-encoder', encoderIndex: number) => void>();
-
 const ec4 = useEc4Store();
+
+const copyPaste = useCopyPaste();
 
 const controls = computed(() => {
   return ec4.encoderGroups[ec4.selectedGroupIndex].controls;
@@ -29,22 +31,26 @@ onKeyStroke('Escape', () => {
 </script>
 
 <template>
-  <div id="ctrlcontainer" ref="root">
-    <div class="encoder-container">
+  <div id="ctrlcontainer" ref="root" class="encoder-container">
+    <copy-paste-wrap
+      v-for="(control, index) in controls"
+      :key="control.id"
+      :can-paste="copyPaste.canPasteEncoder.value"
+      @copy="copyPaste.copyEncoder(index)"
+      @paste="copyPaste.pasteEncoder(index)"
+    >
       <single-encoder
-        v-for="(control, index) in controls"
-        :key="control.id"
         :encoder-id="control.id"
         :index="index"
         :active-field="props.activeField"
         :name-active="nameActive"
-        @click.capture="emit('select-encoder', index)"
-        @focus.capture="emit('select-encoder', index)"
+        @click="ec4.selectedEncoderIndex = index"
+        @focus="ec4.selectedEncoderIndex = index"
         @update:name-active="nameActive = $event"
         :class="{ selected: control.id === props.selectedEncoderId }"
         :selected="control.id === props.selectedEncoderId"
       />
-    </div>
+    </copy-paste-wrap>
   </div>
 </template>
 
@@ -53,12 +59,11 @@ onKeyStroke('Escape', () => {
 @use '@picocss/pico/scss/colors/index.scss' as *;
 
 #ctrlcontainer {
-  .encoder-container {
+  &.encoder-container {
     // A 4 x 4 grid of encoders
     display: grid;
     grid-template-columns: repeat(4, 110px);
     grid-template-rows: repeat(4, 118px);
-    border: 1px solid transparent;
 
     .selected {
       // Mark the selected encoder

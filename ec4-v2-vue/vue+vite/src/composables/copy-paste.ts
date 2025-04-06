@@ -3,6 +3,7 @@ import type { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import type { Control } from '@/domain/Encoder.ts';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import { onKeyDown, onKeyUp } from '@vueuse/core';
 
 export default function useCopyPaste() {
   const ec4 = useEc4Store();
@@ -13,6 +14,14 @@ export default function useCopyPaste() {
   const canPasteSetup = computed(() => !!copiedSetup.value);
   const canPasteGroup = computed(() => !!copiedGroup.value);
   const canPasteEncoder = computed(() => !!copiedEncoder.value);
+
+  const copyMode = ref(false);
+  onKeyDown('Alt', (e) => {
+    copyMode.value = true;
+  });
+  onKeyUp('Alt', (e) => {
+    copyMode.value = false;
+  });
 
   return {
     canPasteSetup,
@@ -49,5 +58,6 @@ export default function useCopyPaste() {
       copiedGroup.value = null;
       copiedEncoder.value = null;
     },
+    copyMode,
   };
 }

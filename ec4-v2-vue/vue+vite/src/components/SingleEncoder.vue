@@ -356,9 +356,11 @@ function toggleLink() {
 .encoder-container {
   overflow: hidden;
   position: relative;
+  padding: 3px;
 
   .inputs {
     z-index: 1;
+    position: relative;
 
     display: grid;
     grid-template-rows: 1fr 1fr 1fr 1fr;

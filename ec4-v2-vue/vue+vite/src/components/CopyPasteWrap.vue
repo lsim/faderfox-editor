@@ -1,21 +1,28 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-const props = defineProps<{
-  copyActive: boolean;
-  alwaysShow: boolean;
-  canPaste: boolean;
-}>();
+import useCopyPaste from '@/composables/copy-paste';
+const props = withDefaults(
+  defineProps<{
+    alwaysShow?: boolean;
+    canPaste: boolean;
+  }>(),
+  {
+    alwaysShow: false,
+  },
+);
 
 const emit = defineEmits<{
   (event: 'copy', e: MouseEvent): void;
   (event: 'paste', e: MouseEvent): void;
 }>();
 
+const copyPaste = useCopyPaste();
+
 const isHovered = ref(false);
 
-const showCopy = computed(() => props.copyActive && (props.alwaysShow || isHovered.value));
+const showCopy = computed(() => copyPaste.copyMode.value && (props.alwaysShow || isHovered.value));
 const showPaste = computed(
-  () => props.copyActive && props.canPaste && (props.alwaysShow || isHovered.value),
+  () => copyPaste.copyMode.value && props.canPaste && (props.alwaysShow || isHovered.value),
 );
 </script>
 
@@ -33,49 +40,49 @@ const showPaste = computed(
 
 .wrapper {
   position: relative;
+  overflow: hidden;
 }
 
 .copy-button,
 .paste-button {
+  display: flex;
+  padding: 2px;
+  align-items: center;
   position: absolute;
-  top: 1px;
+  top: 10%;
+  height: 20%;
+  min-height: 1.5em;
   opacity: 0;
   transition:
     opacity 0.3s ease,
     left 0.3s ease,
     right 0.3s ease;
-  font-size: 0.4em;
+  font-size: 70%;
   font-weight: bold;
-  line-height: 4em;
   text-transform: uppercase;
-  rotate: -90deg;
-  background-color: $white;
+  background: $white;
   border: 1px solid $black;
   cursor: pointer;
-
-  width: 3.9em;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 10%;
   color: $black;
+
   &.in {
-    opacity: 0.8;
+    opacity: 0.9;
+    pointer-events: all;
   }
 }
-$radius: 4px;
 .copy-button {
-  left: -3em;
-  border-bottom-right-radius: $radius;
-  border-bottom-left-radius: $radius;
-  border-top: none;
+  left: -100%;
   &.in {
-    left: -0.7em;
+    left: 0;
   }
 }
 .paste-button {
-  right: -3em;
-  border-top-right-radius: $radius;
-  border-top-left-radius: $radius;
-  border-bottom: none;
+  right: -100%;
   &.in {
-    right: -0.7em;
+    right: 0;
   }
 }
 </style>
