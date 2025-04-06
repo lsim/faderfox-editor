@@ -501,7 +501,7 @@ function toggleLink() {
     &.push::before {
       content: '\00a0';
       left: 0;
-      bottom: 0;
+      bottom: 7px;
       width: 35px;
       background-image: url(../assets/tap-svgrepo-com.svg);
       background-size: 100% 100%;
@@ -528,6 +528,7 @@ function toggleLink() {
     &.turn::before {
       color: rgba(255, 255, 255, 0.5);
       content: '↻';
+      bottom: 6px;
 
       animation: turn 0.5s;
 

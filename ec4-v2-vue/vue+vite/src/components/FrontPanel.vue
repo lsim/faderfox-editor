@@ -172,23 +172,22 @@ main {
     text-align: center;
     line-height: $diameter;
     position: absolute;
-    top: 181px;
-    left: 37px;
+    top: 243px;
+    left: 233px;
     width: $diameter;
     height: $diameter;
     border-radius: 50%;
-    color: $white;
-    background-color: rgba($green-800, 0.5);
+    filter: drop-shadow(0 0 0.5rem $green-800);
     opacity: 0;
 
-    animation: pulse 1s;
+    animation: pulse 1.5s ease;
     @keyframes pulse {
       0% {
         opacity: 1;
         rotate: 0deg;
-        box-shadow: 0 0 0 0 rgba($green-300, 0.8);
+        box-shadow: 0 0 0 0 rgba($green-700, 0.8);
       }
-      70% {
+      50% {
         rotate: 360deg;
         opacity: 1;
         box-shadow: 0 0 0 $diameter rgba($green-800, 0);
@@ -212,7 +211,7 @@ main {
 }
 #legend-button {
   position: absolute;
-  top: 4.25em;
-  right: 1.8em;
+  top: 80px;
+  right: 34px;
 }
 </style>
