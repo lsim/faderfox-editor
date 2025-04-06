@@ -1,0 +1,22 @@
+{
+  "name": "Faderfox EC4 Editor",
+  "short_name": "FFox EC4",
+  "description": "A midi-enabled web-based editor for the Faderfox EC4 midi controller.",
+  "theme_color": "#c2c457",
+  "background_color": "#5160b0",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/faderfox-editor/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/faderfox-editor/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

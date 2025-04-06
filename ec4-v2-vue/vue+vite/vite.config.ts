@@ -5,12 +5,19 @@ import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import pwaManifest from './src/pwa-manifest.json';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    VitePWA({ registerType: 'autoUpdate', devOptions: { enabled: true } }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      devOptions: { enabled: true },
+      manifest: pwaManifest,
+      includeAssets: ['assets'],
+    }),
   ],
   resolve: {
     alias: {
