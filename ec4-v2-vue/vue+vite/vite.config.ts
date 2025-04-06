@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import { VitePWA } from 'vite-plugin-pwa';
 
-import pwaManifest from './src/pwa-manifest.json';
+import pwaManifest from './src/pwa-manifest';
 
 // https://vite.dev/config/
 export default defineConfig({
