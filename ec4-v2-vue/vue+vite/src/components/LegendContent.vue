@@ -11,6 +11,7 @@ const shortcuts = [
   { keys: ['Ctrl', 't'], help: 'Select previous group' },
   { keys: ['Ctrl', 'g'], help: 'Select next group' },
   { keys: ['Alt'], help: 'Hold to copy/paste' },
+  { keys: ['?'], help: 'Show keyboard shortcuts' },
 ];
 </script>
 

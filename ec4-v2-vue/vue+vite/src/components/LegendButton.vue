@@ -2,12 +2,18 @@
 import Modal from '@/components/Modal.vue';
 import LegendContent from '@/components/LegendContent.vue';
 import { ref } from 'vue';
+import { onKeyStroke } from '@vueuse/core';
 
 const dialog = ref<{ showIt: (...args: unknown[]) => Promise<void> } | null>(null);
 
 function showIt() {
   dialog.value?.showIt('Keyboard shortcuts', null, 'Got it', null).catch(() => {});
 }
+
+onKeyStroke('?', (e) => {
+  e.preventDefault();
+  showIt();
+});
 </script>
 
 <template>
