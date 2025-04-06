@@ -37,6 +37,7 @@ const shortcuts = [
   > .keys {
     grid-column: 1;
     display: flex;
+    justify-content: center;
     kbd {
       min-width: 4em;
       text-align: center;
@@ -45,7 +46,6 @@ const shortcuts = [
     * {
       margin: 0 0.5em;
     }
-    justify-content: center;
 
     .and:last-child {
       display: none;

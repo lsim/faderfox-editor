@@ -207,11 +207,11 @@ tbody tr {
   }
 
   td.actions {
+    font-size: 80%;
     * {
       margin: 0;
       padding: 0;
     }
-    font-size: 80%;
     ul {
       flex: 1 0 auto;
       height: 100%;
@@ -221,8 +221,6 @@ tbody tr {
 
       li {
         flex: 1 0 auto;
-        a {
-        }
       }
     }
   }

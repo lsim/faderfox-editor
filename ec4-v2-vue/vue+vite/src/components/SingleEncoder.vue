@@ -434,6 +434,8 @@ function toggleLink() {
       bottom: 0;
       font-size: 0.6em;
       color: $yellow-600;
+      cursor: pointer;
+
       &.active {
         color: $yellow-100;
         ::before {
@@ -458,8 +460,6 @@ function toggleLink() {
         color: inherit;
         text-decoration: none;
       }
-
-      cursor: pointer;
     }
   }
 
