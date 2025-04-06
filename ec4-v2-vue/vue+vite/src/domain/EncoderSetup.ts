@@ -34,7 +34,7 @@ export class EncoderSetup {
     return Object.assign(s, {
       ...this,
       id: s.id,
-      groups: this.groups.map((g) => g.clone(g.setupId)),
+      groups: this.groups.map((g) => g.clone(s.id)),
     });
   }
 }
