@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import useCopyPaste from '@/composables/copy-paste.ts';
 import { computed, ref, watch } from 'vue';
 import { onKeyDown, onKeyUp } from '@vueuse/core';
 
 const ec4 = useEc4Store();
+const copyPaste = useCopyPaste();
 
 const gridRows = computed(() => {
   return ec4.activeBundle.setups.map((s, i) => [s, ec4.encoderGroups[i]]);
@@ -94,13 +96,17 @@ const copyableGroup = computed(() => {
           @focus="handleFocus($event, idx, ec4.selectedGroupIndex)"
           maxlength="4"
         />
-        <div class="setup copy-button" v-if="idx === copyableSetup" @click="ec4.copySetup(idx)">
+        <div
+          class="setup copy-button"
+          v-if="idx === copyableSetup"
+          @click="copyPaste.copySetup(idx)"
+        >
           copy
         </div>
         <div
           class="setup paste-button"
-          v-if="idx === copyableSetup && ec4.canPasteSetup"
-          @click="ec4.pasteSetup(idx)"
+          v-if="idx === copyableSetup && copyPaste.canPasteSetup.value"
+          @click="copyPaste.pasteSetup(idx)"
         >
           paste
         </div>
@@ -117,13 +123,17 @@ const copyableGroup = computed(() => {
           @focus="handleFocus($event, ec4.selectedSetupIndex, idx)"
           maxlength="4"
         />
-        <div class="group copy-button" v-if="idx === copyableGroup" @click="ec4.copyGroup(idx)">
+        <div
+          class="group copy-button"
+          v-if="idx === copyableGroup"
+          @click="copyPaste.copyGroup(idx)"
+        >
           copy
         </div>
         <div
           class="group paste-button"
-          v-if="idx === copyableGroup && ec4.canPasteGroup"
-          @click="ec4.pasteGroup(idx)"
+          v-if="idx === copyableGroup && copyPaste.canPasteGroup.value"
+          @click="copyPaste.pasteGroup(idx)"
         >
           paste
         </div>

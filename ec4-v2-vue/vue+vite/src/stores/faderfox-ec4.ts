@@ -55,13 +55,6 @@ export const useEc4Store = defineStore('ec4', () => {
   const selectedControl = computed(() => selectedGroup.value.controls[selectedEncoderIndex.value]);
   const lastStateSaved = ref(0);
 
-  const copiedSetup = ref<EncoderSetup | null>(null);
-  const copiedGroup = ref<EncoderGroup | null>(null);
-  const copiedEncoder = ref<Control | null>(null);
-  const canPasteSetup = computed(() => !!copiedSetup.value);
-  const canPasteGroup = computed(() => !!copiedGroup.value);
-  const canPasteEncoder = computed(() => !!copiedEncoder.value);
-
   // Auto save after a bit of inactivity
   let timeout = 0;
   watch(
@@ -94,40 +87,5 @@ export const useEc4Store = defineStore('ec4', () => {
     controlFocusRequests,
     lastStateSaved,
     activeBundle,
-    copySetup(idx: number) {
-      copiedSetup.value = activeBundle.value.setups[idx];
-    },
-    copyGroup(idx: number) {
-      console.log('copying group', activeBundle.value.setups[selectedSetupIndex.value].groups[idx]);
-      copiedGroup.value = activeBundle.value.setups[selectedSetupIndex.value].groups[idx];
-    },
-    copyEncoder(idx: number) {
-      copiedEncoder.value = selectedGroup.value.controls[idx];
-    },
-    pasteSetup(idx: number) {
-      if (!copiedSetup.value) return;
-      activeBundle.value.setups[idx] = copiedSetup.value.clone(idx);
-    },
-    pasteGroup(idx: number) {
-      if (!copiedGroup.value) return;
-      activeBundle.value.setups[selectedSetupIndex.value].groups[idx] = copiedGroup.value.clone(
-        selectedSetupIndex.value,
-        idx,
-      );
-    },
-    pasteEncoder(idx: number) {
-      if (!copiedEncoder.value) return;
-      activeBundle.value.setups[selectedSetupIndex.value].groups[selectedGroupIndex.value].controls[
-        idx
-      ] = copiedEncoder.value.clone(selectedSetupIndex.value, selectedGroupIndex.value, idx);
-    },
-    clearClipboard() {
-      copiedSetup.value = null;
-      copiedGroup.value = null;
-      copiedEncoder.value = null;
-    },
-    canPasteSetup,
-    canPasteGroup,
-    canPasteEncoder,
   };
 });
