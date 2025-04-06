@@ -3,6 +3,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useCopyPaste from '@/composables/copy-paste.ts';
 import { computed, ref, watch } from 'vue';
 import { onKeyDown, onKeyUp } from '@vueuse/core';
+import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
 
 const ec4 = useEc4Store();
 const copyPaste = useCopyPaste();
@@ -85,7 +86,14 @@ const copyableGroup = computed(() => {
     <h3>Setup</h3>
     <h3>Group</h3>
     <template v-for="([s, g], idx) in gridRows" :key="s.id">
-      <div class="setup-name" @mouseenter="hoveredSetup = idx" @mouseleave="hoveredSetup = null">
+      <copy-paste-wrap
+        class="setup-name"
+        :can-paste="copyPaste.canPasteSetup.value"
+        :copy-active="copyMode"
+        @copy="copyPaste.copySetup(idx)"
+        @paste="copyPaste.pasteSetup(idx)"
+        :always-show="idx === ec4.selectedSetupIndex"
+      >
         <input
           v-model="s.name"
           :class="{
@@ -96,23 +104,16 @@ const copyableGroup = computed(() => {
           @focus="handleFocus($event, idx, ec4.selectedGroupIndex)"
           maxlength="4"
         />
-        <div
-          class="setup copy-button"
-          v-if="idx === copyableSetup"
-          @click="copyPaste.copySetup(idx)"
-        >
-          copy
-        </div>
-        <div
-          class="setup paste-button"
-          v-if="idx === copyableSetup && copyPaste.canPasteSetup.value"
-          @click="copyPaste.pasteSetup(idx)"
-        >
-          paste
-        </div>
-      </div>
+      </copy-paste-wrap>
 
-      <div class="group-name" @mouseenter="hoveredGroup = idx" @mouseleave="hoveredGroup = null">
+      <copy-paste-wrap
+        class="group-name"
+        :can-paste="copyPaste.canPasteGroup.value"
+        :copy-active="copyMode"
+        @copy="copyPaste.copyGroup(idx)"
+        @paste="copyPaste.pasteGroup(idx)"
+        :always-show="idx === ec4.selectedGroupIndex"
+      >
         <input
           v-model="g.name"
           :class="{
@@ -123,42 +124,8 @@ const copyableGroup = computed(() => {
           @focus="handleFocus($event, ec4.selectedSetupIndex, idx)"
           maxlength="4"
         />
-        <div
-          class="group copy-button"
-          v-if="idx === copyableGroup"
-          @click="copyPaste.copyGroup(idx)"
-        >
-          copy
-        </div>
-        <div
-          class="group paste-button"
-          v-if="idx === copyableGroup && copyPaste.canPasteGroup.value"
-          @click="copyPaste.pasteGroup(idx)"
-        >
-          paste
-        </div>
-      </div>
+      </copy-paste-wrap>
     </template>
-
-    <!--    <div class="tools">-->
-    <!--      <a id="btncopysetup" title="Copy selected setup to clipboard" class="asbutton" tabindex="-1"-->
-    <!--        >Copy Setup</a-->
-    <!--      ><a id="btncopygroup" title="Copy selected group to clipboard" class="asbutton" tabindex="-1"-->
-    <!--        >Copy Group</a-->
-    <!--      ><a-->
-    <!--        id="btnpastesetup"-->
-    <!--        title="Paste setup from clipboard to selected setup"-->
-    <!--        class="asbutton"-->
-    <!--        tabindex="-1"-->
-    <!--        >Paste Setup</a-->
-    <!--      ><a-->
-    <!--        id="btnpastegroup"-->
-    <!--        title="Paste group from clipboard to selected group"-->
-    <!--        class="asbutton"-->
-    <!--        tabindex="-1"-->
-    <!--        >Paste Group</a-->
-    <!--      >-->
-    <!--    </div>-->
   </div>
 </template>
 
@@ -254,54 +221,6 @@ $picoColors: (
       border: 2px solid $white;
       border-radius: 4px;
       padding: 0;
-    }
-
-    .copy-button,
-    .paste-button {
-      position: absolute;
-      top: 1px;
-      opacity: 0;
-      transition:
-        opacity 0.3s ease,
-        left 0.3s ease,
-        right 0.3s ease;
-      font-size: 0.4em;
-      font-weight: bold;
-      line-height: 4em;
-      text-transform: uppercase;
-      rotate: -90deg;
-      background-color: $white;
-      border: 1px solid $black;
-      cursor: pointer;
-
-      width: 3.9em;
-      color: $black;
-    }
-    $radius: 4px;
-    .copy-button {
-      left: -3em;
-      border-bottom-right-radius: $radius;
-      border-bottom-left-radius: $radius;
-      border-top: none;
-    }
-    .paste-button {
-      right: -3em;
-      border-top-right-radius: $radius;
-      border-top-left-radius: $radius;
-      border-bottom: none;
-    }
-  }
-
-  &.copy-mode {
-    .copy-button,
-    .paste-button {
-      opacity: 0.8;
-    }
-    .copy-button {
-      left: -0.7em;
-    }
-    .paste-button {
-      right: -0.7em;
     }
   }
 }
