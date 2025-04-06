@@ -96,12 +96,12 @@ onKeyStroke('g', (e) => {
       style="display: none"
     ></a>
     <div class="header">
-      <BgWaves class="bg-waves" />
+      <bg-waves class="bg-waves" />
       <h1>Faderfox EC4 Editor</h1>
     </div>
-    <MidiSettings class="midi-settings" />
-    <SetupListing class="group-selector" />
-    <FrontPanel :group-id="groupId" class="front-panel" />
+    <midi-settings class="midi-settings" />
+    <setup-listing class="group-selector" />
+    <front-panel :group-id="groupId" class="front-panel" />
 
     <StoredConfs class="stored-confs" />
     <div class="credits">

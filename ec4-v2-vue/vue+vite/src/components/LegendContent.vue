@@ -12,6 +12,7 @@ const shortcuts = [
   { keys: ['Ctrl', 'g'], help: 'Select next group' },
   { keys: ['Alt'], help: 'Hold to copy/paste' },
   { keys: ['?'], help: 'Show keyboard shortcuts' },
+  { keys: ['Escape'], help: 'Return focus to the encoder section' },
 ];
 </script>
 

@@ -1,11 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useIdle } from '@vueuse/core';
+
+const { idle } = useIdle();
 
 const paused = ref(false);
+
+watch(
+  idle,
+  (newValue) => {
+    paused.value = !newValue;
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <div class="hero_area" @click="paused = !paused">
+  <div class="hero_area">
     <svg
       class="waves"
       xmlns="http://www.w3.org/2000/svg"
@@ -56,24 +67,24 @@ const paused = ref(false);
   }
 
   > use:nth-child(1) {
-    animation-delay: -2s;
+    animation-delay: -12s;
     animation-duration: 17s;
     fill: rgba($yellow-300, 0.3);
   }
 
   > use:nth-child(2) {
-    animation-delay: -3s;
+    animation-delay: -23s;
     animation-duration: 30s;
     fill: rgba($blue-500, 0.3);
   }
 
   > use:nth-child(3) {
-    animation-delay: -4s;
+    animation-delay: -44s;
     animation-duration: 40s;
   }
 
   > use:nth-child(4) {
-    animation-delay: -5s;
+    animation-delay: -15s;
     animation-duration: 60s;
   }
 }

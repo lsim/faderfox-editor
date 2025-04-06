@@ -3,15 +3,14 @@ import SingleEncoder from '@/components/SingleEncoder.vue';
 import { type FieldType } from '@/domain/Encoder';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { computed, watch, ref } from 'vue';
+import { onKeyStroke } from '@vueuse/core';
 
 const props = defineProps<{
   selectedEncoderId: number;
   activeField: FieldType;
 }>();
 
-const emit = defineEmits<{
-  (event: 'select-encoder', encoderIndex: number): void;
-}>();
+const emit = defineEmits<(event: 'select-encoder', encoderIndex: number) => void>();
 
 const ec4 = useEc4Store();
 
@@ -20,12 +19,19 @@ const controls = computed(() => {
 });
 
 const nameActive = ref<boolean>(false);
+
+const root = ref<HTMLElement | null>(null);
+onKeyStroke('Escape', () => {
+  if (!root.value?.querySelector('input:focus')) {
+    ec4.controlFocusRequests++;
+  }
+});
 </script>
 
 <template>
-  <div id="ctrlcontainer">
+  <div id="ctrlcontainer" ref="root">
     <div class="encoder-container">
-      <SingleEncoder
+      <single-encoder
         v-for="(control, index) in controls"
         :key="control.id"
         :encoder-id="control.id"

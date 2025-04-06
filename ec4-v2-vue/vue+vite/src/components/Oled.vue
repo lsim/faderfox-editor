@@ -13,6 +13,7 @@ import {
 import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
+import { onKeyStroke } from '@vueuse/core';
 
 const { t } = useI18n();
 
@@ -159,7 +160,7 @@ defineExpose({ focusActiveField });
 </script>
 
 <template>
-  <div id="oled" class="oled typed matrix_font">
+  <div id="oled" class="oled typed matrix_font" ref="root">
     <!-- Selected control id -->
     <label for="encoderId" :class="{ 'active-field': activeField === 'name' }"
       >{{ t('OLED_ENCODER_ID') }}:</label
