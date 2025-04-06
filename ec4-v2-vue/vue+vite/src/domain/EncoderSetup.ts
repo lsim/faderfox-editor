@@ -30,7 +30,7 @@ export class EncoderSetup {
   }
 
   clone(setupId?: number): EncoderSetup {
-    const s = new EncoderSetup(this.id, this.name);
+    const s = new EncoderSetup(setupId ?? this.id, this.name);
     return Object.assign(s, {
       ...this,
       id: s.id,
