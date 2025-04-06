@@ -15,8 +15,6 @@ const ec4 = useEc4Store();
 
 const activeField = ref<FieldType>('channel');
 
-const oled = ref<InstanceType<typeof Oled> | null>(null);
-
 function handleEncoderNav(e: KeyboardEvent) {
   const selectedRow = Math.floor(ec4.selectedEncoderIndex / 4);
   const selectedCol = ec4.selectedEncoderIndex % 4;
@@ -49,24 +47,6 @@ function handleKeyDown(e: KeyboardEvent) {
     if (['e', 'd', 'f', 's'].includes(e.key)) {
       handleEncoderNav(e);
       return;
-    }
-    switch (e.key) {
-      case 'o': {
-        const focused = document.activeElement as HTMLInputElement | null;
-        const isInOled = focused?.closest('.oled');
-        if (isInOled) {
-          // Switch focus to active encoder
-          ec4.controlFocusRequests++;
-        } else {
-          // Switch focus to active field in oled
-          oled.value?.focusActiveField();
-        }
-        e.preventDefault();
-        e.stopPropagation();
-        break;
-      }
-      default:
-        break;
     }
   }
 }
@@ -102,7 +82,6 @@ watch(
       :encoder-id="ec4.selectedEncoderIndex"
       :group-id="ec4.selectedGroupIndex"
       :active-field="activeField"
-      ref="oled"
       class="oled"
       @update:active-field="activeField = $event"
     />
@@ -114,11 +93,11 @@ watch(
       :selected-encoder-id="ec4.selectedEncoderIndex"
     />
 
-    <div class="fillnumbers" title="Fill with ascending values in chosen direction">
-      Fill &quot;<span>Numbers</span>&quot;:
-      <a href="" class="asbutton" data-action="filltopbottom">from top left to bottom right</a>
-      <a href="" class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>
-    </div>
+    <!--    <div class="fillnumbers" title="Fill with ascending values in chosen direction">-->
+    <!--      Fill &quot;<span>Numbers</span>&quot;:-->
+    <!--      <a href="" class="asbutton" data-action="filltopbottom">from top left to bottom right</a>-->
+    <!--      <a href="" class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>-->
+    <!--    </div>-->
 
     <input
       type="text"

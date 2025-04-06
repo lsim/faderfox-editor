@@ -4,7 +4,7 @@ const shortcuts = [
   { keys: ['Ctrl', 's'], help: 'Focus encoder below' },
   { keys: ['Ctrl', 'd'], help: 'Focus encoder to the left' },
   { keys: ['Ctrl', 'f'], help: 'Focus encoder to the right' },
-  { keys: ['Ctrl', 'o'], help: 'Switch focus between encoders and oled fields' },
+  { keys: ['Ctrl', 'o'], help: 'Switch focus to oled fields' },
   { keys: ['Shift', 'space'], help: 'Toggle between turn/push modes' },
   { keys: ['Ctrl', 'q'], help: 'Select previous setup' },
   { keys: ['Ctrl', 'a'], help: 'Select next setup' },

@@ -156,7 +156,10 @@ watch(
   },
 );
 
-defineExpose({ focusActiveField });
+onKeyStroke('o', (e) => {
+  if (!e.ctrlKey) return;
+  focusActiveField();
+});
 </script>
 
 <template>
