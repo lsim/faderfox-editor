@@ -259,7 +259,7 @@ $picoColors: (
     .copy-button,
     .paste-button {
       position: absolute;
-      top: 9px;
+      top: 1px;
       opacity: 0;
       transition:
         opacity 0.3s ease,
@@ -267,7 +267,7 @@ $picoColors: (
         right 0.3s ease;
       font-size: 0.4em;
       font-weight: bold;
-      line-height: 2em;
+      line-height: 4em;
       text-transform: uppercase;
       rotate: -90deg;
       background-color: $white;
@@ -298,10 +298,10 @@ $picoColors: (
       opacity: 0.8;
     }
     .copy-button {
-      left: -0.8em;
+      left: -0.7em;
     }
     .paste-button {
-      right: -0.8em;
+      right: -0.7em;
     }
   }
 }
