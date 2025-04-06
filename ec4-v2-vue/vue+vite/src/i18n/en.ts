@@ -5,7 +5,7 @@ export default {
   ENCODER_NUMBER: 'number',
   ENCODER_NUMBER_NOTE: 'note',
   ENCODER_NUMBER_H: 'MSB',
-  ENCODER_NUMBER_NRPN: '#MSB/LSB',
+  ENCODER_NUMBER_NRPN: 'MSB/LSB',
   ENCODER_LOWER: 'low',
   ENCODER_UPPER: 'high',
   ENCODER_MODE: 'mode',

@@ -135,7 +135,6 @@ function toggleLink() {
         <label>{{ t('ENCODER_NUMBER_NRPN') }}</label>
         <div class="double-inputs">
           <input
-            class="width_3"
             maxlength="3"
             ref="encoderInput"
             v-model="control.number_h"
@@ -143,7 +142,6 @@ function toggleLink() {
             :tabindex="props.nameActive ? -1 : 0"
           />
           <input
-            class="width_3"
             maxlength="3"
             v-model="control.number"
             @focus="setNameActive(false, $event.target)"
@@ -399,9 +397,10 @@ function toggleLink() {
     }
 
     .double-inputs {
+      display: flex;
+      justify-content: space-between;
       input {
-        width: 1.2em;
-        margin: 0 0.5em;
+        width: 3em;
       }
     }
 
@@ -468,7 +467,7 @@ function toggleLink() {
     width: 2.3em;
   }
   .width_4 {
-    width: 2.6em;
+    width: 4em;
   }
 
   $knob-size: 55px;

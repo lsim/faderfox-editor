@@ -45,7 +45,7 @@ onKeyStroke('Escape', () => {
         :active-field="props.activeField"
         :name-active="nameActive"
         @click="ec4.selectedEncoderIndex = index"
-        @focus="ec4.selectedEncoderIndex = index"
+        @focus.capture="ec4.selectedEncoderIndex = index"
         @update:name-active="nameActive = $event"
         :class="{ selected: control.id === props.selectedEncoderId }"
         :selected="control.id === props.selectedEncoderId"

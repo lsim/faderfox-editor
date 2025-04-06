@@ -46,7 +46,7 @@ const showPaste = computed(
 .copy-button,
 .paste-button {
   display: flex;
-  padding: 2px;
+  padding: 3px;
   align-items: center;
   position: absolute;
   top: 10%;
@@ -67,6 +67,7 @@ const showPaste = computed(
   z-index: 1;
   border-radius: 10%;
   color: $black;
+  filter: drop-shadow(0 0 0.5rem $black);
 
   &.in {
     opacity: 0.9;

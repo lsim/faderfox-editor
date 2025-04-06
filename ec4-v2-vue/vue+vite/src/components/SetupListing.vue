@@ -57,16 +57,6 @@ watch(
     if (nameInput) (nameInput as HTMLInputElement).focus();
   },
 );
-
-const hoveredSetup = ref<number | null>(null);
-const hoveredGroup = ref<number | null>(null);
-
-const copyableSetup = computed(() => {
-  return hoveredSetup.value !== null ? hoveredSetup.value : ec4.selectedSetupIndex;
-});
-const copyableGroup = computed(() => {
-  return hoveredGroup.value !== null ? hoveredGroup.value : ec4.selectedGroupIndex;
-});
 </script>
 
 <template>
@@ -83,7 +73,6 @@ const copyableGroup = computed(() => {
         :can-paste="copyPaste.canPasteSetup.value"
         @copy="copyPaste.copySetup(idx)"
         @paste="copyPaste.pasteSetup(idx)"
-        :always-show="idx === ec4.selectedSetupIndex"
       >
         <input
           v-model="s.name"
@@ -102,7 +91,6 @@ const copyableGroup = computed(() => {
         :can-paste="copyPaste.canPasteGroup.value"
         @copy="copyPaste.copyGroup(idx)"
         @paste="copyPaste.pasteGroup(idx)"
-        :always-show="idx === ec4.selectedGroupIndex"
       >
         <input
           v-model="g.name"
