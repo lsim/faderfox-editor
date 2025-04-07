@@ -2,8 +2,8 @@ export default {
   name: 'Faderfox EC4 Editor',
   short_name: 'FFox EC4',
   description: 'A midi-enabled web-based editor for the Faderfox EC4 midi controller.',
-  theme_color: '#c2c457',
-  background_color: '#5160b0',
+  theme_color: '#e8e7a3',
+  background_color: '#000000',
   scope: '/faderfox-editor/',
   icons: [
     {

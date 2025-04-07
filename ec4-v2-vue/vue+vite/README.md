@@ -46,7 +46,7 @@ yarn lint
 
 ## TODO
 
-- Progressive web app possible? Vite PWA plugin looks good
+- Change shortcuts to something that works on Windows (Can't use Ctrl)
 - Add 'copy to all' features
 - Put sysex work on a service worker (vueuse useWebWorkerFn). Might help keep the UI responsive
 - IDEA: Shift + Ctrl + nav or eg Alt + Tab could select a range of encoders (eg for inserting incremental values)
