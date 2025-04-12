@@ -9,7 +9,6 @@ import useCopyPaste from '@/composables/copy-paste';
 
 const props = defineProps<{
   selectedEncoderId: number;
-  activeField: FieldType;
 }>();
 
 const ec4 = useEc4Store();
@@ -42,7 +41,6 @@ onKeyStroke('Escape', () => {
       <single-encoder
         :encoder-id="control.id"
         :index="index"
-        :active-field="props.activeField"
         :name-active="nameActive"
         @click="ec4.selectedEncoderIndex = index"
         @focus.capture="ec4.selectedEncoderIndex = index"

@@ -3,8 +3,7 @@ import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import { useStorage } from '@/composables/storage.ts';
-import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
-import type { Control } from '@/domain/Encoder.ts';
+import type { FieldType, NumberFieldType } from '@/domain/Encoder.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -44,6 +43,7 @@ export const useEc4Store = defineStore('ec4', () => {
   const encoderGroups = computed(() => activeBundle.value.setups[selectedSetupIndex.value].groups);
   const selectedGroupIndex = ref<number>(0);
   const selectedGroup = computed(() => encoderGroups.value[selectedGroupIndex.value]);
+  const currentValue = ref<{ k: string; v: number }>({ k: '', v: -1 });
 
   const editorMode = ref<'push' | 'turn'>('turn');
 
@@ -53,6 +53,8 @@ export const useEc4Store = defineStore('ec4', () => {
 
   const selectedEncoderIndex = ref<number>(0);
   const selectedControl = computed(() => selectedGroup.value.controls[selectedEncoderIndex.value]);
+  const activeField = ref<FieldType>('channel');
+
   const lastStateSaved = ref(0);
 
   // Auto save after a bit of inactivity
@@ -71,6 +73,12 @@ export const useEc4Store = defineStore('ec4', () => {
     { deep: true },
   );
 
+  const activeNumberField = computed(() => {
+    return Object.keys(selectedControl.value.numbers).includes(activeField.value)
+      ? (activeField.value as NumberFieldType)
+      : null;
+  });
+
   return {
     selectedSetupIndex,
     encoderGroups,
@@ -87,5 +95,8 @@ export const useEc4Store = defineStore('ec4', () => {
     controlFocusRequests,
     lastStateSaved,
     activeBundle,
+    activeField,
+    currentValue,
+    activeNumberField,
   };
 });

@@ -13,8 +13,6 @@ const props = defineProps<{
 
 const ec4 = useEc4Store();
 
-const activeField = ref<FieldType>('channel');
-
 function handleEncoderNav(e: KeyboardEvent) {
   const selectedRow = Math.floor(ec4.selectedEncoderIndex / 4);
   const selectedCol = ec4.selectedEncoderIndex % 4;
@@ -65,8 +63,8 @@ watch(
 watch(
   () => ec4.editorMode,
   (newMode) => {
-    if (newMode === 'push') activeField.value = 'pb_channel';
-    else activeField.value = 'channel';
+    if (newMode === 'push') ec4.activeField = 'pb_channel';
+    else ec4.activeField = 'channel';
   },
 );
 </script>
@@ -81,14 +79,12 @@ watch(
       v-if="ec4.selectedEncoderIndex != null"
       :encoder-id="ec4.selectedEncoderIndex"
       :group-id="ec4.selectedGroupIndex"
-      :active-field="activeField"
       class="oled"
-      @update:active-field="activeField = $event"
     />
 
     <encoder-panel
       class="encoders"
-      :active-field="activeField"
+      :active-field="ec4.activeField"
       :group-id="props.groupId"
       :selected-encoder-id="ec4.selectedEncoderIndex"
     />

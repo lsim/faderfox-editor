@@ -36,6 +36,9 @@ defineExpose({
   focus() {
     select.value?.focus();
   },
+  get value() {
+    return options.value[props.modelValue].short;
+  },
 });
 </script>
 

@@ -14,16 +14,14 @@ import { computed, type ComputedRef, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { onKeyStroke } from '@vueuse/core';
+import NoteInput from '@/components/NoteInput.vue';
 
 const { t } = useI18n();
 
 const props = defineProps<{
   encoderId: number;
   groupId: number;
-  activeField: FieldType;
 }>();
-
-const emit = defineEmits<(event: 'update:active-field', field: FieldType) => void>();
 
 const ec4 = useEc4Store();
 
@@ -37,13 +35,13 @@ function isInput(input: EventTarget | null): input is HTMLInputElement {
 }
 
 function setActiveField(field: FieldType, input: EventTarget | null) {
-  emit('update:active-field', field);
+  ec4.activeField = field;
   // Select all the text in the input field for easier editing
   let inputToSelect = input;
   if (!isInput(inputToSelect))
     inputToSelect = (input as Element | null)?.querySelector('input') || null;
-  if (!isInput(inputToSelect)) return;
-  inputToSelect?.select?.();
+  if (!isInput(inputToSelect)) focusActiveField();
+  else inputToSelect?.select?.();
 }
 
 const nameInput = ref<HTMLInputElement | null>(null);
@@ -62,34 +60,40 @@ const pbModeSelect = ref<HTMLSelectElement | null>(null);
 const pbTypeSelect = ref<HTMLSelectElement | null>(null);
 const pbNumberInput = ref<HTMLInputElement | null>(null);
 
-function focusActiveField() {
-  if (props.activeField === 'channel' || props.activeField === 'name') {
-    channelInput.value?.focus();
-  } else if (props.activeField === 'scale') {
-    scaleInput.value?.focus();
-  } else if (props.activeField === 'number') {
-    numberInput.value?.focus();
-  } else if (props.activeField === 'lower') {
-    lowerLimitInput.value?.focus();
-  } else if (props.activeField === 'upper') {
-    upperLimitInput.value?.focus();
-  } else if (props.activeField === 'mode') {
-    modeSelect.value?.focus();
-  } else if (props.activeField === 'pb_channel') {
-    pbChannelInput.value?.focus();
-  } else if (props.activeField === 'pb_display') {
-    pbDisplayInput.value?.focus();
-  } else if (props.activeField === 'pb_lower') {
-    pbLowerLimitInput.value?.focus();
-  } else if (props.activeField === 'pb_upper') {
-    pbUpperLimitInput.value?.focus();
-  } else if (props.activeField === 'pb_mode') {
-    pbModeSelect.value?.focus();
-  } else if (props.activeField === 'pb_type') {
-    pbTypeSelect.value?.focus();
-  } else if (props.activeField === 'pb_number') {
-    pbNumberInput.value?.focus();
+function doWithActiveField(f: (elm: HTMLElement | null) => void) {
+  if (ec4.activeField === 'name') {
+    f(channelInput.value);
+  } else if (ec4.activeField === 'channel') {
+    f(channelInput.value);
+  } else if (ec4.activeField === 'scale') {
+    f(scaleInput.value);
+  } else if (ec4.activeField === 'number') {
+    f(numberInput.value);
+  } else if (ec4.activeField === 'lower') {
+    f(lowerLimitInput.value);
+  } else if (ec4.activeField === 'upper') {
+    f(upperLimitInput.value);
+  } else if (ec4.activeField === 'mode') {
+    f(modeSelect.value);
+  } else if (ec4.activeField === 'pb_channel') {
+    f(pbChannelInput.value);
+  } else if (ec4.activeField === 'pb_display') {
+    f(pbDisplayInput.value);
+  } else if (ec4.activeField === 'pb_lower') {
+    f(pbLowerLimitInput.value);
+  } else if (ec4.activeField === 'pb_upper') {
+    f(pbUpperLimitInput.value);
+  } else if (ec4.activeField === 'pb_mode') {
+    f(pbModeSelect.value);
+  } else if (ec4.activeField === 'pb_number') {
+    f(pbNumberInput.value);
+  } else if (ec4.activeField === 'pb_type') {
+    f(pbTypeSelect.value);
   }
+}
+
+function focusActiveField() {
+  doWithActiveField((elm) => elm?.focus?.());
 }
 
 function isHidden(field: FieldType, control: Control): boolean {
@@ -124,14 +128,13 @@ function isHidden(field: FieldType, control: Control): boolean {
       excludingTypes = [0, 6, 7, 8, 9, 10, 11, 12];
       break;
   }
-  // if (field === 'pb_number') console.log('isHidden', field, control.pb_type, excludingTypes);
   return ec4.editorMode === 'push'
-    ? excludingTypes.includes(control.pb_type ?? -1)
-    : excludingTypes.includes(control.type ?? -1);
+    ? excludingTypes.includes(control.numbers.pb_type ?? -1)
+    : excludingTypes.includes(control.numbers.type ?? -1);
 }
 
 const pbChannelLabel = computed(() => {
-  switch (control.value.pb_type) {
+  switch (control.value.numbers.pb_type) {
     case pushButtonTypeByName('Grp'):
       return t('OLED_GROUP');
     case pushButtonTypeByName('Set'):
@@ -146,11 +149,11 @@ const ctrlIds = computed(() => {
   return Array.from(Array(16).keys()).map((i) => `${prefix}${(i + 1).toString().padStart(2, '0')}`);
 });
 
-// When control.type changes, we may need to change the active field as it may no longer be valid
+// When control.numbers.type changes, we may need to change the active field as it may no longer be valid
 watch(
-  () => control.value.type,
+  () => control.value.numbers.type,
   () => {
-    if (isHidden(props.activeField, control.value)) {
+    if (isHidden(ec4.activeField, control.value)) {
       setActiveField('name', nameInput.value);
     }
   },
@@ -163,9 +166,9 @@ onKeyStroke('o', (e) => {
 </script>
 
 <template>
-  <div id="oled" class="oled typed matrix_font" ref="root">
+  <div id="oled" class="oled typed matrix_font">
     <!-- Selected control id -->
-    <label for="encoderId" :class="{ 'active-field': activeField === 'name' }"
+    <label for="encoderId" :class="{ 'active-field': ec4.activeField === 'name' }"
       >{{ t('OLED_ENCODER_ID') }}:</label
     >
     <select v-model="ec4.selectedEncoderIndex" id="encoderId">
@@ -178,7 +181,7 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderChannel"
         :class="{
-          'active-field': activeField.includes('channel'),
+          'active-field': ec4.activeField.includes('channel'),
           hidden: isHidden('channel', control),
         }"
         >{{ t('OLED_CHANNEL') }}:</label
@@ -190,11 +193,11 @@ onKeyStroke('o', (e) => {
         type="number"
         min="1"
         max="16"
-        :value="control.channel"
+        :value="control.numbers.channel"
         @input="
-          control.channel = ($event.target as HTMLInputElement | null)?.checkValidity()
+          control.numbers.channel = ($event.target as HTMLInputElement | null)?.checkValidity()
             ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
-            : control.channel
+            : control.numbers.channel
         "
         @focus="setActiveField('channel', $event.target)"
         :class="{ hidden: isHidden('channel', control) }"
@@ -204,7 +207,7 @@ onKeyStroke('o', (e) => {
       <label
         for="pbChannel"
         :class="{
-          'active-field': activeField === 'pb_channel',
+          'active-field': ec4.activeField === 'pb_channel',
           hidden: isHidden('pb_channel', control),
         }"
         >{{ pbChannelLabel }}:</label
@@ -216,11 +219,11 @@ onKeyStroke('o', (e) => {
         type="number"
         min="1"
         max="16"
-        :value="control.pb_channel"
+        :value="control.numbers.pb_channel"
         @input="
-          control.pb_channel = ($event.target as HTMLInputElement | null)?.checkValidity()
+          control.numbers.pb_channel = ($event.target as HTMLInputElement | null)?.checkValidity()
             ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
-            : control.pb_channel
+            : control.numbers.pb_channel
         "
         @focus="setActiveField('pb_channel', $event.target)"
         :class="{ hidden: isHidden('pb_channel', control) }"
@@ -230,15 +233,15 @@ onKeyStroke('o', (e) => {
     <label
       for="encoderScale"
       :class="{
-        'active-field': activeField === 'scale' || activeField === 'pb_display',
+        'active-field': ec4.activeField === 'scale' || ec4.activeField === 'pb_display',
         hidden: isHidden('scale', control) || isHidden('pb_display', control),
       }"
       >{{ t('OLED_DISPLAY') }}:</label
     >
     <ScaleSelector
       v-if="ec4.editorMode === 'turn'"
-      :model-value="control.scale"
-      @update:modelValue="control.scale = $event"
+      :model-value="control.numbers.scale"
+      @update:modelValue="control.numbers.scale = $event"
       :abbreviated="true"
       id="encoderScale"
       ref="scaleInput"
@@ -247,8 +250,8 @@ onKeyStroke('o', (e) => {
     />
     <ScaleSelector
       v-else
-      :model-value="control.pb_display"
-      @update:modelValue="control.pb_display = $event"
+      :model-value="control.numbers.pb_display"
+      @update:modelValue="control.numbers.pb_display = $event"
       :abbreviated="true"
       id="encoderScale"
       ref="pbDisplayInput"
@@ -260,24 +263,24 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderNumber"
         :class="{
-          'active-field': activeField === 'number',
+          'active-field': ec4.activeField === 'number',
           hidden: isHidden('number', control),
         }"
         >{{ t('OLED_NUMBER') }}:</label
       >
 
-      <template v-if="control.type === encoderTypeByName('NRPN')">
+      <template v-if="control.numbers.type === encoderTypeByName('NRPN')">
         <span class="two-inputs" :class="{ hidden: isHidden('number', control) }">
           <input
             id="encoderNumber"
             ref="numberInput"
             maxlength="3"
-            v-model="control.number_h"
+            v-model="control.numbers.number_h"
             @focus="setActiveField('number', $event.target)"
           />
           <input
             maxlength="3"
-            v-model="control.number"
+            v-model="control.numbers.number"
             @focus="setActiveField('number', $event.target)"
           />
         </span>
@@ -287,40 +290,59 @@ onKeyStroke('o', (e) => {
           id="encoderNumber"
           ref="numberInput"
           maxlength="3"
-          v-model="control.number"
+          v-model="control.numbers.number"
           @focus="setActiveField('number', $event.target)"
           :class="{ hidden: isHidden('number', control) }"
         />
       </template>
     </template>
     <template v-else>
-      <label
-        for="encoderNumber"
-        :class="{
-          'active-field': activeField === 'pb_number',
-          hidden: isHidden('pb_number', control),
-        }"
-        >{{ t('OLED_NUMBER') }}:</label
-      >
-      <input
-        id="encoderNumber"
-        ref="pbNumberInput"
-        v-model="control.pb_number"
-        :class="{ hidden: isHidden('pb_number', control) }"
-        @focus="setActiveField('pb_number', $event.target)"
-      />
+      <template v-if="control.numbers.pb_type === pushButtonTypeByName('Note')">
+        <label
+          :class="{
+            'active-field': ec4.activeField === 'pb_number',
+            hidden: isHidden('pb_number', control),
+          }"
+          @click="setActiveField('pb_number', $event.target)"
+          >{{ t('OLED_NUMBER') }}:</label
+        >
+        <note-input
+          ref="pbNumberInput"
+          v-model="control.numbers.pb_number"
+          :class="{ hidden: isHidden('pb_number', control) }"
+          class="note-input"
+          @focus="setActiveField('pb_number', $event.target)"
+        />
+      </template>
+      <template v-else>
+        <label
+          for="encoderNumber"
+          :class="{
+            'active-field': ec4.activeField === 'pb_number',
+            hidden: isHidden('pb_number', control),
+          }"
+          >{{ t('OLED_NUMBER') }}:</label
+        >
+        <input
+          id="encoderNumber"
+          ref="pbNumberInput"
+          v-model="control.numbers.pb_number"
+          :class="{ hidden: isHidden('pb_number', control) }"
+          @focus="setActiveField('pb_number', $event.target)"
+        />
+      </template>
     </template>
 
     <!-- Encoder type -->
     <label
       for="encoderType"
-      :class="{ 'active-field': activeField === 'type' || activeField === 'pb_type' }"
+      :class="{ 'active-field': ec4.activeField === 'type' || ec4.activeField === 'pb_type' }"
       >{{ t('OLED_TYPE') }}:</label
     >
     <template v-if="ec4.editorMode === 'turn'">
       <select
         id="encoderType"
-        v-model="control.type"
+        v-model="control.numbers.type"
         @focus="setActiveField('type', $event.target)"
         ref="typeSelect"
       >
@@ -332,7 +354,7 @@ onKeyStroke('o', (e) => {
     <template v-else>
       <select
         id="encoderType"
-        v-model="control.pb_type"
+        v-model="control.numbers.pb_type"
         @focus="setActiveField('pb_type', $event.target)"
         ref="pbTypeSelect"
       >
@@ -346,7 +368,7 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderLowerLimit"
         :class="{
-          'active-field': activeField === 'lower',
+          'active-field': ec4.activeField === 'lower',
           hidden: isHidden('lower', control),
         }"
         >{{ t('OLED_LOWER') }}:</label
@@ -354,7 +376,7 @@ onKeyStroke('o', (e) => {
       <input
         id="encoderLowerLimit"
         ref="lowerLimitInput"
-        v-model="control.lower"
+        v-model="control.numbers.lower"
         @focus="setActiveField('lower', $event.target)"
         :class="{ hidden: isHidden('lower', control) }"
         type="number"
@@ -364,7 +386,7 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderLowerLimit"
         :class="{
-          'active-field': activeField === 'pb_lower',
+          'active-field': ec4.activeField === 'pb_lower',
           hidden: isHidden('pb_lower', control),
         }"
         >{{ t('OLED_LOWER') }}:</label
@@ -372,7 +394,7 @@ onKeyStroke('o', (e) => {
       <input
         id="encoderLowerLimit"
         ref="pbLowerLimitInput"
-        v-model="control.pb_lower"
+        v-model="control.numbers.pb_lower"
         @focus="setActiveField('pb_lower', $event.target)"
         :class="{ hidden: isHidden('pb_lower', control) }"
         type="number"
@@ -383,14 +405,14 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderMode"
         :class="{
-          'active-field': activeField === 'mode',
+          'active-field': ec4.activeField === 'mode',
           hidden: isHidden('mode', control),
         }"
         >{{ t('OLED_MODE') }}:</label
       >
       <select
         id="encoderMode"
-        v-model="control.mode"
+        v-model="control.numbers.mode"
         @focus="setActiveField('mode', $event.target)"
         ref="modeSelect"
         :class="{ hidden: isHidden('mode', control) }"
@@ -404,14 +426,14 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderMode"
         :class="{
-          'active-field': activeField === 'pb_mode',
+          'active-field': ec4.activeField === 'pb_mode',
           hidden: isHidden('pb_mode', control),
         }"
         >{{ t('OLED_MODE') }}:</label
       >
       <select
         id="encoderMode"
-        v-model="control.pb_mode"
+        v-model="control.numbers.pb_mode"
         @focus="setActiveField('pb_mode', $event.target)"
         ref="pbModeSelect"
         :class="{ hidden: isHidden('pb_mode', control) }"
@@ -426,7 +448,7 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderUpperLimit"
         :class="{
-          'active-field': activeField === 'upper',
+          'active-field': ec4.activeField === 'upper',
           hidden: isHidden('upper', control),
         }"
         >{{ t('OLED_UPPER') }}:</label
@@ -434,7 +456,7 @@ onKeyStroke('o', (e) => {
       <input
         id="encoderUpperLimit"
         ref="upperLimitInput"
-        v-model="control.upper"
+        v-model="control.numbers.upper"
         @focus="setActiveField('upper', $event.target)"
         :class="{ hidden: isHidden('upper', control) }"
         type="number"
@@ -444,7 +466,7 @@ onKeyStroke('o', (e) => {
       <label
         for="encoderUpperLimit"
         :class="{
-          'active-field': activeField === 'pb_upper',
+          'active-field': ec4.activeField === 'pb_upper',
           hidden: isHidden('pb_upper', control),
         }"
         >{{ t('OLED_UPPER') }}:</label
@@ -452,7 +474,7 @@ onKeyStroke('o', (e) => {
       <input
         id="encoderUpperLimit"
         ref="pbUpperLimitInput"
-        v-model="control.pb_upper"
+        v-model="control.numbers.pb_upper"
         @focus="setActiveField('pb_upper', $event.target)"
         :class="{ hidden: isHidden('pb_upper', control) }"
         type="number"
@@ -473,6 +495,37 @@ onKeyStroke('o', (e) => {
   caret-color: $yellow;
   background: linear-gradient(8deg, #000, #222, #333);
 
+  .hidden {
+    visibility: hidden;
+  }
+
+  label {
+    text-align: right;
+    background-color: transparent;
+    line-height: 1.8em;
+    &.active-field {
+      background-color: $active-field-color;
+    }
+    cursor: pointer;
+    text-transform: capitalize;
+  }
+
+  .two-inputs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .note-input {
+    width: 98px;
+  }
+}
+</style>
+<style lang="scss">
+@use '@picocss/pico/scss/colors/index.scss' as *;
+#oled {
+  // Not scoping these so they can apply to eg the note-input component when it is in the oled
   input {
     width: 100%;
     background-color: transparent;
@@ -498,28 +551,6 @@ onKeyStroke('o', (e) => {
   }
   select:focus {
     outline: $yellow groove 1px;
-  }
-
-  .hidden {
-    visibility: hidden;
-  }
-
-  label {
-    text-align: right;
-    background-color: transparent;
-    line-height: 1.8em;
-    &.active-field {
-      background-color: $active-field-color;
-    }
-    cursor: pointer;
-    text-transform: capitalize;
-  }
-
-  .two-inputs {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
   }
 }
 </style>
