@@ -42,11 +42,14 @@ export default function useCopyPaste() {
     },
     pasteGroup(idx: number) {
       if (!copiedGroup.value) return;
-      ec4.replaceGroup(idx, copiedGroup.value.clone(idx));
+      ec4.replaceGroup(idx, copiedGroup.value.clone(ec4.selectedSetupIndex, idx));
     },
     pasteEncoder(idx: number) {
       if (!copiedEncoder.value) return;
-      ec4.replaceControl(idx, copiedEncoder.value.clone(idx));
+      ec4.replaceControl(
+        idx,
+        copiedEncoder.value.clone(ec4.selectedSetupIndex, ec4.selectedGroupIndex, idx),
+      );
     },
     clearClipboard() {
       copiedSetup.value = null;
