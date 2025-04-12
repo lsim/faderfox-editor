@@ -42,6 +42,9 @@ onKeyStroke('?', (e) => {
   justify-content: center;
   align-items: center;
   border-radius: 50%;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
 
   &:hover {
     color: $yellow-200;

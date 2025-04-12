@@ -89,17 +89,12 @@ watch(
       :selected-encoder-id="ec4.selectedEncoderIndex"
     />
 
-    <!--    <div class="fillnumbers" title="Fill with ascending values in chosen direction">-->
-    <!--      Fill &quot;<span>Numbers</span>&quot;:-->
-    <!--      <a href="" class="asbutton" data-action="filltopbottom">from top left to bottom right</a>-->
-    <!--      <a href="" class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>-->
-    <!--    </div>-->
-
     <input
       type="text"
       class="bundle-name dymo-label"
       placeholder="Bundle name"
-      v-model="ec4.activeBundle.name"
+      :value="ec4.activeBundleName"
+      @input="ec4.setBundleName(($event.target as HTMLInputElement).value)"
     />
   </main>
 </template>
@@ -207,7 +202,7 @@ main {
 }
 #legend-button {
   position: absolute;
-  top: 80px;
-  right: 34px;
+  top: 81px;
+  right: 35px;
 }
 </style>

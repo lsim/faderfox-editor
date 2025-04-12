@@ -1,9 +1,11 @@
-import { ref, computed, type Ref, watch } from 'vue';
+import { ref, computed, type Ref, reactive } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import { useStorage } from '@/composables/storage.ts';
-import type { FieldType, NumberFieldType } from '@/domain/Encoder.ts';
+import { Control, type FieldType, type NumberFieldType } from '@/domain/Encoder.ts';
+import { watchDebounced } from '@vueuse/core';
+import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -43,7 +45,7 @@ export const useEc4Store = defineStore('ec4', () => {
   const encoderGroups = computed(() => activeBundle.value.setups[selectedSetupIndex.value].groups);
   const selectedGroupIndex = ref<number>(0);
   const selectedGroup = computed(() => encoderGroups.value[selectedGroupIndex.value]);
-  const currentValue = ref<{ k: string; v: number }>({ k: '', v: -1 });
+  // const currentValue = ref<{ k: string; v: number }>({ k: '', v: -1 });
 
   const editorMode = ref<'push' | 'turn'>('turn');
 
@@ -58,25 +60,25 @@ export const useEc4Store = defineStore('ec4', () => {
   const lastStateSaved = ref(0);
 
   // Auto save after a bit of inactivity
-  let timeout = 0;
-  watch(
+  watchDebounced(
     activeBundle,
     (newBundle, oldBundle) => {
-      clearTimeout(timeout);
       // No auto save if we are loading a new bundle
       if (!oldBundle || newBundle.id !== oldBundle.id) return;
-      timeout = setTimeout(async () => {
-        await storage.saveBundle(activeBundle.value);
-        lastStateSaved.value = Date.now();
-      }, 1000);
+      storage.saveBundle(activeBundle.value).then();
+      lastStateSaved.value = Date.now();
     },
-    { deep: true },
+    { deep: true, debounce: 1000 },
   );
 
   const activeNumberField = computed(() => {
     return Object.keys(selectedControl.value.numbers).includes(activeField.value)
       ? (activeField.value as NumberFieldType)
       : null;
+  });
+
+  const gridRows = computed(() => {
+    return activeBundle.value.setups.map((s, i) => [s, encoderGroups.value[i]]);
   });
 
   return {
@@ -94,9 +96,33 @@ export const useEc4Store = defineStore('ec4', () => {
     },
     controlFocusRequests,
     lastStateSaved,
-    activeBundle,
     activeField,
-    currentValue,
     activeNumberField,
+    gridRows,
+    activeBundleId: computed(() => activeBundle.value?.id),
+    activeBundleName: computed(() => activeBundle.value?.name),
+    setBundleName(name: string) {
+      if (activeBundle.value) activeBundle.value.name = name;
+    },
+    replaceSetup(idx: number, setup: EncoderSetup) {
+      if (activeBundle.value) {
+        activeBundle.value.setups[idx] = setup;
+      }
+    },
+    replaceGroup(idx: number, group: EncoderGroup) {
+      if (activeBundle.value) {
+        activeBundle.value.setups[selectedSetupIndex.value].groups[idx] = group;
+      }
+    },
+    replaceControl(idx: number, control: Control) {
+      if (activeBundle.value) {
+        activeBundle.value.setups[selectedSetupIndex.value].groups[
+          selectedGroupIndex.value
+        ].controls[idx] = control;
+      }
+    },
+    resetBundle() {
+      activeBundle.value = Ec4Bundle.createEmpty();
+    },
   };
 });

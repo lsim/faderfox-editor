@@ -6,10 +6,12 @@ export default function useMacros() {
 
   function copyToAll(value: number, prop: NumberFieldType | null) {
     if (!prop) return;
-    console.log('copyToAll', value, prop);
-    ec4.selectedGroup.controls.forEach((c) => {
+    const group = ec4.selectedGroup;
+    console.time('copyToAll');
+    for (const c of group.controls) {
       c.numbers[prop] = value;
-    });
+    }
+    console.timeEnd('copyToAll');
   }
   return {
     copyToAll,

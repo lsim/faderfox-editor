@@ -186,6 +186,8 @@ export class Control {
     this.groupId = groupId;
     this.setupId = setupId;
     this.name = getEncoderName(bytes, setupId, groupId, encoderId);
+    this.link = getMemField(bytes, setupId, groupId, encoderId, 'link') !== 0;
+    this.pb_link = getMemField(bytes, setupId, groupId, encoderId, 'pb_link') !== 0;
     this.numbers = {
       type: getMemField(bytes, setupId, groupId, encoderId, 'type') as any,
       channel: getMemField(bytes, setupId, groupId, encoderId, 'channel'),
@@ -205,8 +207,6 @@ export class Control {
       pb_lower: getMemField(bytes, setupId, groupId, encoderId, 'pb_lower'),
       pb_upper: getMemField(bytes, setupId, groupId, encoderId, 'pb_upper'),
     };
-    this.link = getMemField(bytes, setupId, groupId, encoderId, 'link') !== 0;
-    this.pb_link = getMemField(bytes, setupId, groupId, encoderId, 'pb_link') !== 0;
   }
 
   toBytes(buffer: Uint8Array<ArrayBufferLike>) {

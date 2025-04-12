@@ -27,31 +27,26 @@ export default function useCopyPaste() {
     canPasteSetup,
     canPasteGroup,
     canPasteEncoder,
-    copySetup(idx: number) {
-      copiedSetup.value = ec4.activeBundle.setups[idx];
+    copySetup(s: EncoderSetup) {
+      copiedSetup.value = s;
     },
-    copyGroup(idx: number) {
-      console.log('copying group', ec4.activeBundle.setups[ec4.selectedSetupIndex].groups[idx]);
-      copiedGroup.value = ec4.activeBundle.setups[ec4.selectedSetupIndex].groups[idx];
+    copyGroup(g: EncoderGroup) {
+      copiedGroup.value = g;
     },
-    copyEncoder(idx: number) {
-      copiedEncoder.value = ec4.selectedGroup.controls[idx];
+    copyEncoder(c: Control) {
+      copiedEncoder.value = c;
     },
     pasteSetup(idx: number) {
       if (!copiedSetup.value) return;
-      ec4.activeBundle.setups[idx] = copiedSetup.value.clone(idx);
+      ec4.replaceSetup(idx, copiedSetup.value.clone(idx));
     },
     pasteGroup(idx: number) {
       if (!copiedGroup.value) return;
-      ec4.activeBundle.setups[ec4.selectedSetupIndex].groups[idx] = copiedGroup.value.clone(
-        ec4.selectedSetupIndex,
-        idx,
-      );
+      ec4.replaceGroup(idx, copiedGroup.value.clone(idx));
     },
     pasteEncoder(idx: number) {
       if (!copiedEncoder.value) return;
-      ec4.activeBundle.setups[ec4.selectedSetupIndex].groups[ec4.selectedGroupIndex].controls[idx] =
-        copiedEncoder.value.clone(ec4.selectedSetupIndex, ec4.selectedGroupIndex, idx);
+      ec4.replaceControl(idx, copiedEncoder.value.clone(idx));
     },
     clearClipboard() {
       copiedSetup.value = null;

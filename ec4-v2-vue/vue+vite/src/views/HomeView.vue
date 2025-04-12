@@ -49,7 +49,7 @@ watch(
     if (newId) {
       ec4.loadBundle(Number.parseInt(newId, 10));
     } else if (oldId) {
-      ec4.activeBundle = Ec4Bundle.createEmpty();
+      ec4.resetBundle();
     }
   },
   { immediate: true },

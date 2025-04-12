@@ -26,7 +26,7 @@ function dateString(date: number) {
 }
 
 async function deleteBundle(meta: BundleMeta) {
-  const shouldNavigate = meta.id === ec4.activeBundle.id;
+  const shouldNavigate = meta.id === ec4.activeBundleId;
   await confirmDeleteDialog.value
     ?.showIt(
       'Delete stored configuration',
@@ -46,7 +46,7 @@ const ec4 = useEc4Store();
 const midi = useMidi();
 
 async function editBundle(meta: BundleMeta) {
-  if (meta.id === ec4.activeBundle.id) return;
+  if (meta.id === ec4.activeBundleId) return;
   await router.push({ name: 'bundle', params: { bundleId: meta.id } });
 }
 
@@ -105,7 +105,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
       <tbody>
         <tr
           tabIndex="-1"
-          :class="{ active: meta.id === ec4.activeBundle.id }"
+          :class="{ active: meta.id === ec4.activeBundleId }"
           @click.capture.prevent="editBundle(meta)"
           v-for="meta in (storage.bundleMetas.value || []).filter(
             (m: BundleMeta | undefined) => !!m,

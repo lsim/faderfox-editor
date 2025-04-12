@@ -35,7 +35,7 @@ onKeyStroke('Escape', () => {
       v-for="(control, index) in controls"
       :key="control.id"
       :can-paste="copyPaste.canPasteEncoder.value"
-      @copy="copyPaste.copyEncoder(index)"
+      @copy="copyPaste.copyEncoder(control)"
       @paste="copyPaste.pasteEncoder(index)"
     >
       <single-encoder

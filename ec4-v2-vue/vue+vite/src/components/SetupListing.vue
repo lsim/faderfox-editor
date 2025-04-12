@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useCopyPaste from '@/composables/copy-paste.ts';
-import { computed, ref, watch } from 'vue';
+import { watch } from 'vue';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
+import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
+import type { EncoderSetup } from '@/domain/EncoderSetup.ts';
 
 const ec4 = useEc4Store();
 const copyPaste = useCopyPaste();
 
-const gridRows = computed(() => {
-  return ec4.activeBundle.setups.map((s, i) => [s, ec4.encoderGroups[i]]);
-});
+// const gridRows = computed(() => {
+//   return ec4.activeBundle.setups.map((s, i) => [s, ec4.encoderGroups[i]]);
+// });
 
 function handleFocus(e: Event, setupId: number, groupId: number) {
   ec4.selectedSetupIndex = setupId;
@@ -67,11 +69,11 @@ watch(
   >
     <h3>Setup</h3>
     <h3>Group</h3>
-    <template v-for="([s, g], idx) in gridRows" :key="s.id">
+    <template v-for="([s, g], idx) in ec4.gridRows" :key="s.id">
       <copy-paste-wrap
         class="setup-name"
         :can-paste="copyPaste.canPasteSetup.value"
-        @copy="copyPaste.copySetup(idx)"
+        @copy="copyPaste.copySetup(s as EncoderSetup)"
         @paste="copyPaste.pasteSetup(idx)"
       >
         <input
@@ -89,7 +91,7 @@ watch(
       <copy-paste-wrap
         class="group-name"
         :can-paste="copyPaste.canPasteGroup.value"
-        @copy="copyPaste.copyGroup(idx)"
+        @copy="copyPaste.copyGroup(g as EncoderGroup)"
         @paste="copyPaste.pasteGroup(idx)"
       >
         <input
