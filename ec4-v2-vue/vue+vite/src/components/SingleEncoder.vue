@@ -227,7 +227,7 @@ function toggleLink() {
           :value="control.numbers.channel"
           @input="
             control.numbers.channel = ($event.target as HTMLInputElement).checkValidity()
-              ? parseInt(($event.target as HTMLInputElement).value, 10)
+              ? parseInt(($event.target as HTMLInputElement).value || '0', 10)
               : control.numbers.channel
           "
           type="number"
@@ -245,7 +245,7 @@ function toggleLink() {
           :value="control.numbers.pb_channel"
           @input="
             control.numbers.pb_channel = ($event.target as HTMLInputElement).checkValidity()
-              ? parseInt(($event.target as HTMLInputElement).value, 10)
+              ? parseInt(($event.target as HTMLInputElement).value || '0', 10)
               : control.numbers.pb_channel
           "
           type="number"

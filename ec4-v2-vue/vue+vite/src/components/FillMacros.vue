@@ -49,10 +49,34 @@ const macros = useMacros();
     >
       Copy to all
     </button>
-    <button @click.prevent="macros.copyToAll(1, 'channel')">Increment from</button>
-    <button @click.prevent="macros.copyToAll(2, 'channel')">Decrement from</button>
-    <span><button>Clear names</button><button>----</button></span>
-    <button>Reset encoder</button>
+    <button
+      v-if="ec4.activeNumberField"
+      @click.prevent="
+        macros.incrementFrom(
+          ec4.selectedControl.numbers[ec4.activeNumberField],
+          ec4.activeNumberField,
+        )
+      "
+    >
+      Increment from
+    </button>
+    <button
+      v-if="ec4.activeNumberField"
+      @click.prevent="
+        macros.incrementFrom(
+          ec4.selectedControl.numbers[ec4.activeNumberField],
+          ec4.activeNumberField,
+          -1,
+        )
+      "
+    >
+      Decrement from
+    </button>
+    <span
+      ><button @click.prevent="macros.setAllNames('')">Clear names</button
+      ><button @click.prevent="macros.setAllNames('----')">----</button></span
+    >
+    <button @click.prevent="macros.resetEncoder()">Reset encoder</button>
   </form>
 </template>
 
