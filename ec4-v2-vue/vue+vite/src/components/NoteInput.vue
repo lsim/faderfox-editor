@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { watch, ref } from 'vue';
+import { ref, computed } from 'vue';
 // From C-2 to G-8
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 const noteOptions = [...Array(128).keys()].map((n) => noteToObject(n));
 
 const props = defineProps<{
-  modelValue: number;
   tabindex?: number;
 }>();
+
+const value = defineModel<number>();
 
 const emit = defineEmits<{
   (event: 'update:modelValue', note: number): void;
@@ -26,31 +27,24 @@ function noteToObject(n: number) {
   };
 }
 
-watch(
-  () => props.tabindex,
-  (newVal) => {
-    console.log('tabIndex', newVal);
-  },
-);
-
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    console.log('note value', newVal);
-  },
-);
+const numDecimals = computed(() => {
+  return value.value?.toFixed(0).length ?? 0;
+});
 
 defineExpose({
   focus: () => noteInput.value?.focus(),
+  get value() {
+    return noteOptions[value.value ?? -1]?.text ?? '';
+  },
 });
 </script>
 
 <template>
   <span class="note-inputs"
     ><input
-      class="width_3"
+      :class="`decimals-${numDecimals}`"
       ref="noteInput"
-      :value="props.modelValue"
+      :value="value"
       type="number"
       :tabindex="props.tabindex ?? -1"
       @input="
@@ -62,8 +56,7 @@ defineExpose({
       maxlength="3"
       @focus="emit('focus', $event)"
     /><select
-      class="width_3"
-      :value="props.modelValue"
+      :value="value"
       :tabindex="props.tabindex ?? -1"
       @change="
         emit('update:modelValue', parseInt(($event.target as HTMLOptionElement)?.value ?? '0', 10))
@@ -81,10 +74,20 @@ defineExpose({
 
   max-width: 100%;
   input {
+    transition: flex 0.3s ease;
+    &.decimals-1 {
+      flex: 1 0 15px;
+    }
+    &.decimals-2 {
+      flex: 1 0 30px;
+    }
+    &.decimals-3 {
+      flex: 1 0 40px;
+    }
     min-width: 0;
     flex: 2 0 10px;
     text-align: right;
-    margin-right: 3px;
+    margin-right: 2px;
     // Remove the spinner
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -94,8 +97,11 @@ defineExpose({
   }
   select {
     min-width: 0;
-    flex: 3 0 10px;
-    margin-right: 3px;
+    text-align: left;
+    flex: 3 0 45px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
   }
 }
 </style>

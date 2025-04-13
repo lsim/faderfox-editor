@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import SingleEncoder from '@/components/SingleEncoder.vue';
-import { type FieldType } from '@/domain/Encoder';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { computed, watch, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { onKeyStroke } from '@vueuse/core';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
 import useCopyPaste from '@/composables/copy-paste';
 
 const props = defineProps<{
   selectedEncoderId: number;
-  activeField: FieldType;
 }>();
 
 const ec4 = useEc4Store();
@@ -36,13 +34,12 @@ onKeyStroke('Escape', () => {
       v-for="(control, index) in controls"
       :key="control.id"
       :can-paste="copyPaste.canPasteEncoder.value"
-      @copy="copyPaste.copyEncoder(index)"
+      @copy="copyPaste.copyEncoder(control)"
       @paste="copyPaste.pasteEncoder(index)"
     >
       <single-encoder
         :encoder-id="control.id"
         :index="index"
-        :active-field="props.activeField"
         :name-active="nameActive"
         @click="ec4.selectedEncoderIndex = index"
         @focus.capture="ec4.selectedEncoderIndex = index"

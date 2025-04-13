@@ -28,13 +28,17 @@ const options: ComputedRef<ScaleOption[]> = computed(() => {
 });
 
 function handleChange(e: Event) {
-  const selectedValue: number = Number.parseInt((e.target as HTMLSelectElement).value, 10) || 0;
+  const selectedValue: number =
+    Number.parseInt((e.target as HTMLSelectElement).value || '0', 10) || 0;
   emit('update:modelValue', selectedValue);
 }
 
 defineExpose({
   focus() {
     select.value?.focus();
+  },
+  get value() {
+    return options.value[props.modelValue].short;
   },
 });
 </script>

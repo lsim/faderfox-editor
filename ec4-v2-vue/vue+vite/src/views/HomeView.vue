@@ -6,9 +6,9 @@ import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
-import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import BgWaves from '@/components/BgWaves.vue';
 import { onKeyStroke } from '@vueuse/core';
+import FillMacros from '@/components/FillMacros.vue';
 
 const props = defineProps<{
   bundleId?: string;
@@ -48,7 +48,7 @@ watch(
     if (newId) {
       ec4.loadBundle(Number.parseInt(newId, 10));
     } else if (oldId) {
-      ec4.activeBundle = Ec4Bundle.createEmpty();
+      ec4.resetBundle();
     }
   },
   { immediate: true },
@@ -103,7 +103,8 @@ onKeyStroke('g', (e) => {
     <setup-listing class="group-selector" />
     <front-panel :group-id="groupId" class="front-panel" />
 
-    <StoredConfs class="stored-confs" />
+    <stored-confs class="stored-confs" />
+    <fill-macros class="fill-macros" />
     <div class="credits">
       <h3>Credits</h3>
       <p>
@@ -138,10 +139,11 @@ onKeyStroke('g', (e) => {
     'header header header'
     'alignment alignment alignment'
     'group-selector front-panel midi-settings'
+    'group-selector front-panel fill-macros'
     'bundles bundles bundles'
     'credits credits credits';
   grid-template-columns: 1fr auto 1fr;
-  grid-template-rows: auto 25px auto auto;
+  grid-template-rows: auto 25px auto 1fr auto;
 
   .header {
     grid-area: header;
@@ -172,12 +174,19 @@ onKeyStroke('g', (e) => {
 
   .front-panel {
     grid-area: front-panel;
-    grid-row: span 2;
+    grid-row: span 3;
   }
 
   .stored-confs {
     grid-area: bundles;
     margin-right: 1em;
+    grid-row: span 1;
+  }
+
+  .fill-macros {
+    grid-area: fill-macros;
+    align-self: start;
+    margin-top: 15px;
   }
 
   .credits {

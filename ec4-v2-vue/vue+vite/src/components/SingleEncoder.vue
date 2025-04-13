@@ -2,7 +2,6 @@
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import {
   type Control,
-  type FieldType,
   encoderTypes,
   pushButtonTypes,
   encoderModes,
@@ -19,7 +18,6 @@ const { t } = useI18n();
 
 const props = defineProps<{
   encoderId: number;
-  activeField: FieldType;
   nameActive: boolean;
   selected: boolean;
 }>();
@@ -36,6 +34,36 @@ const nameInput = ref<HTMLInputElement | null>(null);
 
 const encoderInput = ref<HTMLInputElement | null>(null);
 
+// const currentValue = computed(() => {
+//   if (!props.selected || !ec4.activeNumberField || !encoderInput.value) return null;
+//   let valueText: string | null = null;
+//   if (encoderInput.value.nodeName === 'INPUT') {
+//     valueText = (encoderInput.value as HTMLInputElement).value;
+//   } else if (encoderInput.value.nodeName === 'SELECT') {
+//     const s = encoderInput.value as unknown as HTMLSelectElement;
+//     if (s.selectedIndex >= 0) valueText = s.options[s.selectedIndex].text;
+//   } else if ((encoderInput.value as any).value != null) {
+//     valueText = (encoderInput.value as any).value;
+//   }
+//   console.log(
+//     'currentValue',
+//     control.value.id,
+//     ec4.activeNumberField,
+//     encoderInput.value,
+//     valueText,
+//   );
+//   if (valueText == null) return null;
+//   return {
+//     k: valueText,
+//     v: ec4.selectedControl.numbers[ec4.activeNumberField],
+//   };
+// });
+//
+// watch(currentValue, (newValue) => {
+//   if (!newValue) return;
+//   ec4.currentValue = newValue;
+// });
+
 function focusInput() {
   if (!props.selected) return;
   const x = window.scrollX;
@@ -51,7 +79,7 @@ function focusInput() {
 watch(
   () => ec4.appFocused,
   (focused) => {
-    if (!focused) return;
+    if (!focused || !props.selected) return;
     focusInput();
   },
 );
@@ -76,7 +104,7 @@ watch(
 );
 
 watch(
-  () => ec4.activeBundle.id,
+  () => ec4.activeBundleId,
   () => {
     if (props.encoderId === ec4.selectedEncoderIndex) {
       focusInput();
@@ -118,82 +146,89 @@ function toggleLink() {
           :tabindex="props.nameActive ? 0 : -1"
         />
       </div>
-      <template v-if="props.activeField === 'number' && control.type === encoderTypeByName('CCab')">
+      <template
+        v-if="ec4.activeField === 'number' && control.numbers.type === encoderTypeByName('CCab')"
+      >
         <label>{{ t('ENCODER_NUMBER') }}</label>
         <input
           class="width_3"
           maxlength="3"
           ref="encoderInput"
-          v-model="control.number"
+          v-model="control.numbers.number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
       <template
-        v-else-if="props.activeField === 'number' && control.type === encoderTypeByName('NRPN')"
+        v-else-if="
+          ec4.activeField === 'number' && control.numbers.type === encoderTypeByName('NRPN')
+        "
       >
         <label>{{ t('ENCODER_NUMBER_NRPN') }}</label>
         <div class="double-inputs">
           <input
             maxlength="3"
             ref="encoderInput"
-            v-model="control.number_h"
+            v-model="control.numbers.number_h"
             @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           />
           <input
             maxlength="3"
-            v-model="control.number"
+            v-model="control.numbers.number"
             @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           />
         </div>
       </template>
       <template
-        v-else-if="props.activeField === 'number' && control.type === encoderTypeByName('Note')"
+        v-else-if="
+          ec4.activeField === 'number' && control.numbers.type === encoderTypeByName('Note')
+        "
       >
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
         <note-input
           class="note-input"
-          v-model="control.number"
+          v-model="control.numbers.number"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'number'"> </template>
+      <template v-else-if="ec4.activeField === 'number'"> </template>
       <template
         v-else-if="
-          props.activeField === 'pb_number' && control.pb_type !== pushButtonTypeByName('Note')
+          ec4.activeField === 'pb_number' &&
+          control.numbers.pb_type !== pushButtonTypeByName('Note')
         "
       >
         <label>{{ t('ENCODER_NUMBER') }}</label>
         <input
           class="width_3"
-          v-model="control.pb_number"
+          v-model="control.numbers.pb_number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'pb_number'">
+      <template v-else-if="ec4.activeField === 'pb_number'">
         <label>{{ t('ENCODER_NUMBER_NOTE') }}</label>
         <note-input
           class="note-input"
-          v-model="control.pb_number"
+          v-model="control.numbers.pb_number"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'channel'">
-        <label>{{ control.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
+      <template v-else-if="ec4.activeField === 'channel'">
+        <label>{{ control.numbers.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
         <input
           class="width_3"
-          :value="control.channel"
+          :value="control.numbers.channel"
           @input="
-            control.channel = ($event.target as HTMLInputElement).checkValidity()
-              ? parseInt(($event.target as HTMLInputElement).value, 10)
-              : control.channel
+            control.numbers.channel = ($event.target as HTMLInputElement).checkValidity()
+              ? parseInt(($event.target as HTMLInputElement).value || '0', 10)
+              : control.numbers.channel
           "
           type="number"
           min="1"
@@ -203,15 +238,15 @@ function toggleLink() {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'pb_channel'">
+      <template v-else-if="ec4.activeField === 'pb_channel'">
         <label>{{ t('ENCODER_CHANNEL') }}</label>
         <input
           class="width_3"
-          :value="control.pb_channel"
+          :value="control.numbers.pb_channel"
           @input="
-            control.pb_channel = ($event.target as HTMLInputElement).checkValidity()
-              ? parseInt(($event.target as HTMLInputElement).value, 10)
-              : control.pb_channel
+            control.numbers.pb_channel = ($event.target as HTMLInputElement).checkValidity()
+              ? parseInt(($event.target as HTMLInputElement).value || '0', 10)
+              : control.numbers.pb_channel
           "
           type="number"
           min="1"
@@ -221,70 +256,70 @@ function toggleLink() {
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'lower'">
+      <template v-else-if="ec4.activeField === 'lower'">
         <label>{{ t('ENCODER_LOWER') }}</label>
         <input
           class="width_4"
-          v-model="control.lower"
+          v-model="control.numbers.lower"
           maxlength="4"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'pb_lower'">
+      <template v-else-if="ec4.activeField === 'pb_lower'">
         <label>{{ t('ENCODER_LOWER') }}</label>
         <input
           class="width_4"
-          v-model="control.pb_lower"
+          v-model="control.numbers.pb_lower"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'upper'">
+      <template v-else-if="ec4.activeField === 'upper'">
         <label>{{ t('ENCODER_UPPER') }}</label>
         <input
           class="width_4"
-          v-model="control.upper"
+          v-model="control.numbers.upper"
           maxlength="4"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'pb_upper'">
+      <template v-else-if="ec4.activeField === 'pb_upper'">
         <label>{{ t('ENCODER_UPPER') }}</label>
         <input
           class="width_4"
-          v-model="control.pb_upper"
+          v-model="control.numbers.pb_upper"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'scale'">
+      <template v-else-if="ec4.activeField === 'scale'">
         <label>{{ t('ENCODER_SCALE') }}</label>
         <ScaleSelector
-          v-model="control.scale"
+          v-model="control.numbers.scale"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'pb_display'">
+      <template v-else-if="ec4.activeField === 'pb_display'">
         <label>{{ t('ENCODER_SCALE') }}</label>
         <ScaleSelector
-          v-model="control.pb_display"
+          v-model="control.numbers.pb_display"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
-      <template v-else-if="props.activeField === 'type'">
+      <template v-else-if="ec4.activeField === 'type'">
         <label> {{ t('ENCODER_TYPE') }}</label>
         <select
-          v-model="control.type"
+          v-model="control.numbers.type"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
@@ -294,10 +329,10 @@ function toggleLink() {
           </option>
         </select>
       </template>
-      <template v-else-if="props.activeField === 'pb_type'">
+      <template v-else-if="ec4.activeField === 'pb_type'">
         <label>{{ t('ENCODER_TYPE') }}</label>
         <select
-          v-model="control.pb_type"
+          v-model="control.numbers.pb_type"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
@@ -307,10 +342,10 @@ function toggleLink() {
           </option>
         </select>
       </template>
-      <template v-else-if="props.activeField === 'mode'" class="mode">
+      <template v-else-if="ec4.activeField === 'mode'" class="mode">
         <label> {{ t('ENCODER_MODE') }}</label>
         <select
-          v-model="control.mode"
+          v-model="control.numbers.mode"
           @focus="setNameActive(false, $event.target)"
           ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"
@@ -318,10 +353,10 @@ function toggleLink() {
           <option v-for="n in encoderModes" :key="n.value" :value="n.value">{{ n.text }}</option>
         </select>
       </template>
-      <template v-else-if="props.activeField === 'pb_mode'">
+      <template v-else-if="ec4.activeField === 'pb_mode'">
         <label>{{ t('ENCODER_MODE') }}</label>
         <select
-          v-model="control.pb_mode"
+          v-model="control.numbers.pb_mode"
           @focus="setNameActive(false, $event.target)"
           ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"

@@ -48,6 +48,7 @@ yarn lint
 
 - Change shortcuts to something that works on Windows (Can't use Ctrl)
 - Add 'copy to all' features
+- Undo functionality somehow? Pinia has something built in
 - Put sysex work on a service worker (vueuse useWebWorkerFn). Might help keep the UI responsive
 - IDEA: Shift + Ctrl + nav or eg Alt + Tab could select a range of encoders (eg for inserting incremental values)
 - Send to EC4 activity indicator? Or a modal you can't dismiss? Or a simulated progress bar that also blocks further midi IO?

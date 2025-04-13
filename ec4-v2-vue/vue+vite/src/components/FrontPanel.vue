@@ -2,7 +2,6 @@
 import EncoderPanel from '@/components/EncoderPanel.vue';
 import ModeSelector from '@/components/ModeSelector.vue';
 import Oled from '@/components/Oled.vue';
-import type { FieldType } from '@/domain/Encoder.ts';
 import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import LegendButton from '@/components/LegendButton.vue';
@@ -12,8 +11,6 @@ const props = defineProps<{
 }>();
 
 const ec4 = useEc4Store();
-
-const activeField = ref<FieldType>('channel');
 
 function handleEncoderNav(e: KeyboardEvent) {
   const selectedRow = Math.floor(ec4.selectedEncoderIndex / 4);
@@ -65,8 +62,8 @@ watch(
 watch(
   () => ec4.editorMode,
   (newMode) => {
-    if (newMode === 'push') activeField.value = 'pb_channel';
-    else activeField.value = 'channel';
+    if (newMode === 'push') ec4.activeField = 'pb_channel';
+    else ec4.activeField = 'channel';
   },
 );
 </script>
@@ -81,29 +78,22 @@ watch(
       v-if="ec4.selectedEncoderIndex != null"
       :encoder-id="ec4.selectedEncoderIndex"
       :group-id="ec4.selectedGroupIndex"
-      :active-field="activeField"
       class="oled"
-      @update:active-field="activeField = $event"
     />
 
     <encoder-panel
       class="encoders"
-      :active-field="activeField"
+      :active-field="ec4.activeField"
       :group-id="props.groupId"
       :selected-encoder-id="ec4.selectedEncoderIndex"
     />
-
-    <!--    <div class="fillnumbers" title="Fill with ascending values in chosen direction">-->
-    <!--      Fill &quot;<span>Numbers</span>&quot;:-->
-    <!--      <a href="" class="asbutton" data-action="filltopbottom">from top left to bottom right</a>-->
-    <!--      <a href="" class="asbutton" data-action="fillbottomtop">from bottom left to top right</a>-->
-    <!--    </div>-->
 
     <input
       type="text"
       class="bundle-name dymo-label"
       placeholder="Bundle name"
-      v-model="ec4.activeBundle.name"
+      :value="ec4.activeBundleName"
+      @input="ec4.setBundleName(($event.target as HTMLInputElement).value)"
     />
   </main>
 </template>
@@ -211,7 +201,7 @@ main {
 }
 #legend-button {
   position: absolute;
-  top: 80px;
-  right: 34px;
+  top: 81px;
+  right: 35px;
 }
 </style>

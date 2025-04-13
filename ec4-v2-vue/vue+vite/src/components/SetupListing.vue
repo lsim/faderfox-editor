@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useCopyPaste from '@/composables/copy-paste.ts';
-import { computed, ref, watch } from 'vue';
+import { watch } from 'vue';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
+import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
+import type { EncoderSetup } from '@/domain/EncoderSetup.ts';
 
 const ec4 = useEc4Store();
 const copyPaste = useCopyPaste();
 
-const gridRows = computed(() => {
-  return ec4.activeBundle.setups.map((s, i) => [s, ec4.encoderGroups[i]]);
-});
+// const gridRows = computed(() => {
+//   return ec4.activeBundle.setups.map((s, i) => [s, ec4.encoderGroups[i]]);
+// });
 
 function handleFocus(e: Event, setupId: number, groupId: number) {
   ec4.selectedSetupIndex = setupId;
@@ -67,11 +69,11 @@ watch(
   >
     <h3>Setup</h3>
     <h3>Group</h3>
-    <template v-for="([s, g], idx) in gridRows" :key="s.id">
+    <template v-for="([s, g], idx) in ec4.gridRows" :key="s.id">
       <copy-paste-wrap
         class="setup-name"
         :can-paste="copyPaste.canPasteSetup.value"
-        @copy="copyPaste.copySetup(idx)"
+        @copy="copyPaste.copySetup(s as EncoderSetup)"
         @paste="copyPaste.pasteSetup(idx)"
       >
         <input
@@ -89,7 +91,7 @@ watch(
       <copy-paste-wrap
         class="group-name"
         :can-paste="copyPaste.canPasteGroup.value"
-        @copy="copyPaste.copyGroup(idx)"
+        @copy="copyPaste.copyGroup(g as EncoderGroup)"
         @paste="copyPaste.pasteGroup(idx)"
       >
         <input
@@ -137,27 +139,27 @@ $picoColors: (
   ('slate', $slate-700)
 );
 
-@function red($c) {
-  @return color.channel($c, 'red');
-}
-@function green($c) {
-  @return color.channel($c, 'green');
-}
-@function blue($c) {
-  @return color.channel($c, 'blue');
-}
-
-@mixin text-contrast($n) {
-  $color-brightness: round(math.div((red($n) * 299) + (green($n) * 587) + (blue($n) * 114), 1000));
-  $light-color: round(
-    math.div((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114), 1000)
-  );
-  @if abs($color-brightness) < (math.div($light-color, 2)) {
-    color: white;
-  } @else {
-    color: black;
-  }
-}
+//@function red($c) {
+//  @return color.channel($c, 'red');
+//}
+//@function green($c) {
+//  @return color.channel($c, 'green');
+//}
+//@function blue($c) {
+//  @return color.channel($c, 'blue');
+//}
+//
+//@mixin text-contrast($n) {
+//  $color-brightness: round(math.div((red($n) * 299) + (green($n) * 587) + (blue($n) * 114), 1000));
+//  $light-color: round(
+//    math.div((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114), 1000)
+//  );
+//  @if abs($color-brightness) < (math.div($light-color, 2)) {
+//    color: white;
+//  } @else {
+//    color: black;
+//  }
+//}
 
 #setupsandgroups {
   display: grid;
@@ -183,7 +185,8 @@ $picoColors: (
     @for $i from 1 through 16 {
       $theColor: list.nth(list.nth($picoColors, $i), 2);
       &.color-#{list.nth(list.nth($picoColors, $i), 1)} {
-        @include text-contrast($theColor);
+        color: $white;
+        //@include text-contrast($theColor);
         background-color: $theColor;
       }
     }
