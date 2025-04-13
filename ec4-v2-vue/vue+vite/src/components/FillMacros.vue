@@ -81,6 +81,7 @@ const macros = useMacros();
 </template>
 
 <style scoped lang="scss">
+@use '@picocss/pico/scss/colors/index.scss' as *;
 .fill-macros {
   display: flex;
   flex-direction: column;
