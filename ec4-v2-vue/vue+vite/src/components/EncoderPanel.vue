@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import SingleEncoder from '@/components/SingleEncoder.vue';
-import { type FieldType } from '@/domain/Encoder';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { computed, watch, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { onKeyStroke } from '@vueuse/core';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
 import useCopyPaste from '@/composables/copy-paste';

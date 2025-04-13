@@ -2,7 +2,6 @@
 import ScaleSelector from '@/components/ScaleSelector.vue';
 import {
   type Control,
-  type FieldType,
   encoderTypes,
   pushButtonTypes,
   encoderModes,

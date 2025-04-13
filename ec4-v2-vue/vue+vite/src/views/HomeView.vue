@@ -6,7 +6,6 @@ import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
-import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import BgWaves from '@/components/BgWaves.vue';
 import { onKeyStroke } from '@vueuse/core';
 import FillMacros from '@/components/FillMacros.vue';

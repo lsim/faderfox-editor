@@ -1,4 +1,4 @@
-import { ref, computed, type Ref, reactive } from 'vue';
+import { ref, computed, type Ref } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';

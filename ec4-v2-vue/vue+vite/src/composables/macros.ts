@@ -1,5 +1,5 @@
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import type { Control, NumberFieldType } from '@/domain/Encoder.ts';
+import type { NumberFieldType } from '@/domain/Encoder.ts';
 
 export default function useMacros() {
   const ec4 = useEc4Store();

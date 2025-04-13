@@ -139,27 +139,27 @@ $picoColors: (
   ('slate', $slate-700)
 );
 
-@function red($c) {
-  @return color.channel($c, 'red');
-}
-@function green($c) {
-  @return color.channel($c, 'green');
-}
-@function blue($c) {
-  @return color.channel($c, 'blue');
-}
-
-@mixin text-contrast($n) {
-  $color-brightness: round(math.div((red($n) * 299) + (green($n) * 587) + (blue($n) * 114), 1000));
-  $light-color: round(
-    math.div((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114), 1000)
-  );
-  @if abs($color-brightness) < (math.div($light-color, 2)) {
-    color: white;
-  } @else {
-    color: black;
-  }
-}
+//@function red($c) {
+//  @return color.channel($c, 'red');
+//}
+//@function green($c) {
+//  @return color.channel($c, 'green');
+//}
+//@function blue($c) {
+//  @return color.channel($c, 'blue');
+//}
+//
+//@mixin text-contrast($n) {
+//  $color-brightness: round(math.div((red($n) * 299) + (green($n) * 587) + (blue($n) * 114), 1000));
+//  $light-color: round(
+//    math.div((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114), 1000)
+//  );
+//  @if abs($color-brightness) < (math.div($light-color, 2)) {
+//    color: white;
+//  } @else {
+//    color: black;
+//  }
+//}
 
 #setupsandgroups {
   display: grid;
@@ -185,7 +185,8 @@ $picoColors: (
     @for $i from 1 through 16 {
       $theColor: list.nth(list.nth($picoColors, $i), 2);
       &.color-#{list.nth(list.nth($picoColors, $i), 1)} {
-        @include text-contrast($theColor);
+        color: $white;
+        //@include text-contrast($theColor);
         background-color: $theColor;
       }
     }

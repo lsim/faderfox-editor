@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 // From C-2 to G-8
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
