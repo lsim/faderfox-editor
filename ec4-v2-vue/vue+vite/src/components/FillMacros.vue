@@ -36,7 +36,7 @@ const currentValueText = computed(() => {
 
 const currentPropIsEnum = computed(() => {
   return (
-    ec4.activeNumberField &&
+    !!ec4.activeNumberField &&
     ['type', 'pb_type', 'mode', 'pb_mode', 'scale', 'pb_display'].includes(ec4.activeNumberField)
   );
 });
