@@ -154,6 +154,24 @@ function toggleLink() {
           class="width_3"
           maxlength="3"
           ref="encoderInput"
+          type="number"
+          v-model="control.numbers.number"
+          @focus="setNameActive(false, $event.target)"
+          :tabindex="props.nameActive ? -1 : 0"
+        />
+      </template>
+      <template
+        v-else-if="
+          ec4.activeField === 'number' && control.numbers.type === encoderTypeByName('CCah')
+        "
+      >
+        <!-- TODO -->
+        <label>{{ t('ENCODER_NUMBER') }}</label>
+        <input
+          class="width_3"
+          maxlength="5"
+          ref="encoderInput"
+          type="number"
           v-model="control.numbers.number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
@@ -170,12 +188,14 @@ function toggleLink() {
             maxlength="3"
             ref="encoderInput"
             v-model="control.numbers.number_h"
+            type="number"
             @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           />
           <input
             maxlength="3"
             v-model="control.numbers.number"
+            type="number"
             @focus="setNameActive(false, $event.target)"
             :tabindex="props.nameActive ? -1 : 0"
           />
@@ -206,6 +226,7 @@ function toggleLink() {
         <input
           class="width_3"
           v-model="control.numbers.pb_number"
+          type="number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -263,6 +284,7 @@ function toggleLink() {
           v-model="control.numbers.lower"
           maxlength="4"
           ref="encoderInput"
+          type="number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -273,6 +295,7 @@ function toggleLink() {
           class="width_4"
           v-model="control.numbers.pb_lower"
           ref="encoderInput"
+          type="number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -284,6 +307,7 @@ function toggleLink() {
           v-model="control.numbers.upper"
           maxlength="4"
           ref="encoderInput"
+          type="number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -294,6 +318,7 @@ function toggleLink() {
           class="width_4"
           v-model="control.numbers.pb_upper"
           ref="encoderInput"
+          type="number"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />

@@ -46,7 +46,7 @@ watch(
       tabindex="-1"
       v-model="midi.selectedInput.value"
     >
-      <option v-if="midi.inputs.value.length === 0">(No devices)</option>
+      <option v-if="midi.inputs.value.length === 0" :value="null">(None)</option>
       <option v-for="(i, k) in midi.inputs.value" :key="k" :value="i">{{ i.device.name }}</option>
     </select>
     <label for="midiOutDeviceId" tabindex="-1">MIDI Output:</label>
@@ -56,7 +56,7 @@ watch(
       tabindex="-1"
       v-model="midi.selectedOutput.value"
     >
-      <option v-if="midi.outputs.value.length === 0">(No devices)</option>
+      <option v-if="midi.outputs.value.length === 0" :value="null">(None)</option>
       <option v-for="(o, k) in midi.outputs.value" :key="k" :value="o">
         {{ o.device.name }}
       </option>

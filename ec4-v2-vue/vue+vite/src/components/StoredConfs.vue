@@ -7,6 +7,7 @@ import useFileStorage from '@/composables/fileStorage.ts';
 import router from '@/router';
 import { ref } from 'vue';
 import useMidi from '@/composables/useMidi.ts';
+import { Trash, HardDriveDownload, ArrowRight, KeyboardMusic } from 'lucide-vue-next';
 
 const fileStorage = useFileStorage();
 const invalidFileConfirm = ref<{ showIt: (...args: unknown[]) => Promise<void> } | null>(null);
@@ -127,9 +128,25 @@ async function onDrop(files: File[] | null, e: DragEvent) {
             <aside>
               <nav>
                 <ul>
-                  <li><a href="#" @click.prevent="deleteBundle(meta)">Delete</a></li>
-                  <li><a href="#" @click.prevent="downloadBundle(meta)">Download</a></li>
-                  <li><a href="#" @click.prevent="sendBundle(meta)">Send</a></li>
+                  <li>
+                    <a href="#" @click.prevent="downloadBundle(meta)" title="Save sysex to disk"
+                      ><hard-drive-download
+                    /></a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      @click.prevent="sendBundle(meta)"
+                      :class="{
+                        disabled: !midi.selectedOutput.value,
+                      }"
+                      title="Send to EC4"
+                      ><arrow-right />{{ midi.selectedOutput.value }}<keyboard-music
+                    /></a>
+                  </li>
+                  <li>
+                    <a href="#" @click.prevent="deleteBundle(meta)" title="Delete"><trash /></a>
+                  </li>
                 </ul>
               </nav>
             </aside>
@@ -216,11 +233,18 @@ tbody tr {
       flex: 1 0 auto;
       height: 100%;
       display: flex;
-      flex-direction: column;
       align-items: start;
 
       li {
         flex: 1 0 auto;
+
+        .disabled {
+          * {
+            cursor: not-allowed;
+            //color: $red;
+            opacity: 0.6;
+          }
+        }
       }
     }
   }

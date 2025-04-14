@@ -14,7 +14,7 @@ import {
 
 const ec4 = useEc4Store();
 
-const currentValue = computed(() => {
+const currentValueText = computed(() => {
   if (!ec4.activeNumberField || !ec4.selectedControl) return '';
   switch (ec4.activeNumberField) {
     case 'scale':
@@ -34,6 +34,13 @@ const currentValue = computed(() => {
   }
 });
 
+const currentPropIsEnum = computed(() => {
+  return (
+    ec4.activeNumberField &&
+    ['type', 'pb_type', 'mode', 'pb_mode', 'scale', 'pb_display'].includes(ec4.activeNumberField)
+  );
+});
+
 const nameToSet = ref('');
 
 const macros = useMacros();
@@ -41,9 +48,10 @@ const macros = useMacros();
 
 <template>
   <form class="fill-macros pico">
-    <h3 class="value-display">
-      <span v-if="ec4.activeNumberField">{{ ec4.activeNumberField }}: {{ currentValue }}</span>
-    </h3>
+    <h3>Macros</h3>
+    <span v-if="ec4.activeNumberField" class="value-display"
+      >{{ ec4.activeNumberField }}: {{ currentValueText }}</span
+    >
     <button
       v-if="ec4.activeNumberField"
       class="copy-to-all"
@@ -57,6 +65,7 @@ const macros = useMacros();
     <button
       v-if="ec4.activeNumberField"
       class="increment-from"
+      :disabled="currentPropIsEnum"
       @click.prevent="
         macros.incrementFrom(
           ec4.selectedControl.numbers[ec4.activeNumberField],
@@ -70,6 +79,7 @@ const macros = useMacros();
     <button
       v-if="ec4.activeNumberField"
       class="decrement-from"
+      :disabled="currentPropIsEnum"
       @click.prevent="
         macros.incrementFrom(
           ec4.selectedControl.numbers[ec4.activeNumberField],
@@ -107,23 +117,30 @@ const macros = useMacros();
   border-radius: 6px;
   padding: 15px;
 
+  h3 {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+    justify-self: center;
+  }
+
   .value-display {
     text-transform: capitalize;
     grid-column: 1 / span 2;
+    grid-row: 2;
   }
 
   .copy-to-all {
-    grid-row: 2;
+    grid-row: 3;
   }
 
   .increment-from,
   .decrement-from {
-    grid-row: 3;
+    grid-row: 4;
   }
 
   .set-name,
   .name-to-set {
-    grid-row: 4;
+    grid-row: 5;
     margin-bottom: 0;
   }
 }

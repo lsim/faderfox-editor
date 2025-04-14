@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import useCopyPaste from '@/composables/copy-paste';
-import { ClipboardCopy, ClipboardPaste } from 'lucide-vue-next';
+import { Copy, ClipboardPaste } from 'lucide-vue-next';
 const props = withDefaults(
   defineProps<{
     alwaysShow?: boolean;
@@ -37,7 +37,7 @@ const showPaste = computed(
       title="Copy"
       tabindex="-1"
     >
-      <clipboard-copy class="icon" />
+      <copy class="icon" />
     </a>
     <a
       class="paste-button"
@@ -75,9 +75,14 @@ const showPaste = computed(
     transition:
       opacity 0.3s ease,
       left 0.3s ease,
-      right 0.3s ease;
+      right 0.3s ease,
+      filter 0.2s ease;
     z-index: 2;
-    filter: drop-shadow(0 0 0.3rem $white);
+    border: solid 2px rgba(255, 255, 255, 0.6);
+
+    &:hover {
+      filter: drop-shadow(0 0 0.3rem $white);
+    }
 
     &.in {
       opacity: 1;
