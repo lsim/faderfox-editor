@@ -5,7 +5,7 @@ const isOpenClass = 'modal-is-open';
 const openingClass = 'modal-is-opening';
 const closingClass = 'modal-is-closing';
 const scrollbarWidthCssVar = '--pico-scrollbar-width';
-const animationDuration = 300; // ms
+const animationDuration = 200; // ms
 
 // Open modal
 export const openModal = (modal: HTMLDialogElement) => {

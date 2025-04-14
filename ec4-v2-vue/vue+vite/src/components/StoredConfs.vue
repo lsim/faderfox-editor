@@ -7,7 +7,7 @@ import useFileStorage from '@/composables/fileStorage.ts';
 import router from '@/router';
 import { ref } from 'vue';
 import useMidi from '@/composables/useMidi.ts';
-import { Trash, HardDriveDownload, ArrowRight, KeyboardMusic } from 'lucide-vue-next';
+import { Trash, HardDriveDownload, ArrowRight, KeyboardMusic, PackagePlus } from 'lucide-vue-next';
 
 const fileStorage = useFileStorage();
 const invalidFileConfirm = ref<{ showIt: (...args: unknown[]) => Promise<void> } | null>(null);
@@ -92,7 +92,9 @@ async function onDrop(files: File[] | null, e: DragEvent) {
         <li><h2>Bundles stored locally</h2></li>
       </ul>
       <ul>
-        <li><button @click="newBundle">New</button></li>
+        <li>
+          <button @click="newBundle" title="New bundle"><package-plus /></button>
+        </li>
       </ul>
     </nav>
     <table>
