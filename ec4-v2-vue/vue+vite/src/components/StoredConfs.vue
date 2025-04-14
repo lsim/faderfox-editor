@@ -196,7 +196,7 @@ tbody tr {
   cursor: pointer;
   &.active {
     cursor: default;
-    box-shadow: 0 0 20px inset $active-field-color;
+    box-shadow: 0 0 20px inset $slate-300;
     * {
       background-color: transparent;
     }

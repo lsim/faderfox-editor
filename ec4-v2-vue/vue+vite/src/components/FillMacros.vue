@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useMacros from '@/composables/macros.ts';
-import { computed } from 'vue';
+import { ArrowDown01, ArrowDown10, Eraser, ReplaceAll, CircleDashed } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import {
   encoderModes,
   encoderScaleOptions,
@@ -33,35 +34,42 @@ const currentValue = computed(() => {
   }
 });
 
+const nameToSet = ref('');
+
 const macros = useMacros();
 </script>
 
 <template>
   <form class="fill-macros pico">
-    <h3>
-      <span v-if="ec4.activeNumberField">{{ currentValue }} ({{ ec4.activeNumberField }})</span>
+    <h3 class="value-display">
+      <span v-if="ec4.activeNumberField">{{ ec4.activeNumberField }}: {{ currentValue }}</span>
     </h3>
     <button
       v-if="ec4.activeNumberField"
+      class="copy-to-all"
       @click.prevent="
         macros.copyToAll(ec4.selectedControl.numbers[ec4.activeNumberField], ec4.activeNumberField)
       "
+      title="Copy value to all"
     >
-      Copy to all
+      <replace-all class="icon" />
     </button>
     <button
       v-if="ec4.activeNumberField"
+      class="increment-from"
       @click.prevent="
         macros.incrementFrom(
           ec4.selectedControl.numbers[ec4.activeNumberField],
           ec4.activeNumberField,
         )
       "
+      title="Increment from"
     >
-      Increment from
+      <arrow-down-0-1 class="icon" />
     </button>
     <button
       v-if="ec4.activeNumberField"
+      class="decrement-from"
       @click.prevent="
         macros.incrementFrom(
           ec4.selectedControl.numbers[ec4.activeNumberField],
@@ -69,41 +77,54 @@ const macros = useMacros();
           -1,
         )
       "
+      title="Decrement from"
     >
-      Decrement from
+      <arrow-down-1-0 class="icon" />
     </button>
-    <span
-      ><button @click.prevent="macros.setAllNames('')">Clear names</button
-      ><button @click.prevent="macros.setAllNames('----')">----</button></span
-    >
-    <button @click.prevent="macros.resetEncoder()">Reset encoder</button>
+    <button class="set-name" @click.prevent="macros.setAllNames(nameToSet)" title="Set all names">
+      <eraser class="icon" />
+    </button>
+    <input
+      type="text"
+      placeholder="Name"
+      title="Name to set"
+      class="name-to-set"
+      v-model="nameToSet"
+    />
+    <button @click.prevent="macros.resetEncoder()" title="Reset encoder" class="reset-encoder">
+      <circle-dashed class="icon" />
+    </button>
   </form>
 </template>
 
 <style scoped lang="scss">
 @use '@picocss/pico/scss/colors/index.scss' as *;
 .fill-macros {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
   border: 2px solid white;
   border-radius: 6px;
   padding: 15px;
 
-  > button,
-  > span {
-    margin-bottom: 10px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  .value-display {
+    text-transform: capitalize;
+    grid-column: 1 / span 2;
   }
-  > span {
-    display: flex;
-    justify-content: space-between;
-    button {
-      flex: 1 0 auto;
-      &:not(:last-child) {
-        margin-right: 10px;
-      }
-    }
+
+  .copy-to-all {
+    grid-row: 2;
+  }
+
+  .increment-from,
+  .decrement-from {
+    grid-row: 3;
+  }
+
+  .set-name,
+  .name-to-set {
+    grid-row: 4;
+    margin-bottom: 0;
   }
 }
 </style>

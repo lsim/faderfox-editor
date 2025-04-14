@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router';
 
 <style lang="scss">
 @use '@picocss/pico/scss/pico' with (
-  $theme-color: 'yellow',
+  $theme-color: 'slate',
   $parent-selector: '.pico'
 );
 @use '@/assets/main.scss';

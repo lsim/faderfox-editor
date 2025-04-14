@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import useCopyPaste from '@/composables/copy-paste';
+import { ClipboardCopy, ClipboardPaste } from 'lucide-vue-next';
 const props = withDefaults(
   defineProps<{
     alwaysShow?: boolean;
@@ -29,8 +30,24 @@ const showPaste = computed(
 <template>
   <div class="wrapper" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
     <slot></slot>
-    <div class="copy-button" :class="{ in: showCopy }" @click="emit('copy', $event)">copy</div>
-    <div class="paste-button" :class="{ in: showPaste }" @click="emit('paste', $event)">paste</div>
+    <a
+      class="copy-button"
+      :class="{ in: showCopy }"
+      @click="emit('copy', $event)"
+      title="Copy"
+      tabindex="-1"
+    >
+      <clipboard-copy class="icon" />
+    </a>
+    <a
+      class="paste-button"
+      :class="{ in: showPaste }"
+      @click="emit('paste', $event)"
+      title="Paste"
+      tabindex="-1"
+    >
+      <clipboard-paste class="icon" />
+    </a>
   </div>
 </template>
 
@@ -41,49 +58,43 @@ const showPaste = computed(
 .wrapper {
   position: relative;
   overflow: hidden;
-}
+  display: grid;
 
-.copy-button,
-.paste-button {
-  display: flex;
-  padding: 3px;
-  align-items: center;
-  position: absolute;
-  top: 10%;
-  height: 20%;
-  min-height: 1.5em;
-  opacity: 0;
-  transition:
-    opacity 0.3s ease,
-    left 0.3s ease,
-    right 0.3s ease;
-  font-size: 70%;
-  font-weight: bold;
-  text-transform: uppercase;
-  background: $white;
-  border: 1px solid $black;
-  cursor: pointer;
-  pointer-events: none;
-  z-index: 1;
-  border-radius: 10%;
-  color: $black;
-  filter: drop-shadow(0 0 0.5rem $black);
+  .copy-button,
+  .paste-button {
+    position: absolute;
+    align-self: center;
+    top: 10%;
+    padding: 2px;
+    cursor: pointer;
+    opacity: 0;
+    display: flex;
+    background-color: $black;
+    pointer-events: none;
+    border-radius: 50%;
+    transition:
+      opacity 0.3s ease,
+      left 0.3s ease,
+      right 0.3s ease;
+    z-index: 2;
+    filter: drop-shadow(0 0 0.3rem $white);
 
-  &.in {
-    opacity: 0.9;
-    pointer-events: all;
+    &.in {
+      opacity: 1;
+      pointer-events: all;
+    }
   }
-}
-.copy-button {
-  left: -100%;
-  &.in {
-    left: 0;
+  .copy-button {
+    left: -100%;
+    &.in {
+      left: 0;
+    }
   }
-}
-.paste-button {
-  right: -100%;
-  &.in {
-    right: 0;
+  .paste-button {
+    right: -100%;
+    &.in {
+      right: 0;
+    }
   }
 }
 </style>

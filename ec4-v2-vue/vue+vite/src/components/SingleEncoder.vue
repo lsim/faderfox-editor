@@ -427,7 +427,7 @@ function toggleLink() {
           margin-top: -1px;
         }
         box-sizing: border-box;
-        text-align: center;
+        text-align: left;
       }
     }
 
