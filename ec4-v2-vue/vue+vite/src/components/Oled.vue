@@ -159,8 +159,8 @@ watch(
   },
 );
 
-onKeyStroke('o', (e) => {
-  if (!e.ctrlKey) return;
+onKeyStroke('End', (e) => {
+  if (!e.altKey || !e.shiftKey) return;
   focusActiveField();
 });
 </script>

@@ -5,6 +5,7 @@ import Oled from '@/components/Oled.vue';
 import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import LegendButton from '@/components/LegendButton.vue';
+import { onKeyStroke } from '@vueuse/core';
 
 const props = defineProps<{
   groupId: number;
@@ -18,16 +19,16 @@ function handleEncoderNav(e: KeyboardEvent) {
   let newSelectedRow = selectedRow;
   let newSelectedCol = selectedCol;
   switch (e.key) {
-    case 'e':
+    case 'ArrowUp':
       newSelectedRow = Math.round((selectedRow - 1 + 4) % 4);
       break;
-    case 'd':
+    case 'ArrowDown':
       newSelectedRow = Math.round((selectedRow + 1 + 4) % 4);
       break;
-    case 'f':
+    case 'ArrowRight':
       newSelectedCol = Math.round((selectedCol + 1 + 4) % 4);
       break;
-    case 's':
+    case 'ArrowLeft':
       newSelectedCol = Math.round((4 + selectedCol - 1) % 4);
       break;
     default:
@@ -36,16 +37,6 @@ function handleEncoderNav(e: KeyboardEvent) {
   ec4.selectedEncoderIndex = newSelectedRow * 4 + newSelectedCol;
   e.preventDefault();
   e.stopPropagation();
-}
-
-function handleKeyDown(e: KeyboardEvent) {
-  // Let Ctrl + s/d/f/e keys move focus between encoders
-  if (e.ctrlKey || e.metaKey) {
-    if (['e', 'd', 'f', 's'].includes(e.key)) {
-      handleEncoderNav(e);
-      return;
-    }
-  }
 }
 
 const showSaveIndicator = ref(false);
@@ -66,10 +57,17 @@ watch(
     else ec4.activeField = 'channel';
   },
 );
+
+// Let Alt + Shift + Up/Down/Left/Right keys move focus between encoders
+onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
+  if (e.altKey && e.shiftKey) {
+    handleEncoderNav(e);
+  }
+});
 </script>
 
 <template>
-  <main @keydown.capture="handleKeyDown">
+  <main>
     <div class="beta-notice dymo-label">BETA</div>
     <div id="save-indicator" v-if="showSaveIndicator">💾</div>
     <legend-button id="legend-button" />

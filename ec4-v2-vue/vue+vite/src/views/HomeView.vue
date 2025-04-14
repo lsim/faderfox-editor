@@ -7,7 +7,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
 import BgWaves from '@/components/BgWaves.vue';
-import { onKeyStroke } from '@vueuse/core';
+import { onKeyDown, onKeyStroke } from '@vueuse/core';
 import FillMacros from '@/components/FillMacros.vue';
 
 const props = defineProps<{
@@ -54,6 +54,8 @@ watch(
   { immediate: true },
 );
 
+const isCtrl = (e: KeyboardEvent) => e.ctrlKey || e.metaKey;
+
 onKeyStroke(' ', (e) => {
   if (!e.shiftKey) return;
   e.preventDefault();
@@ -61,29 +63,25 @@ onKeyStroke(' ', (e) => {
   ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
   ec4.controlFocusRequests++;
 });
-onKeyStroke('q', (e) => {
-  if (!e.ctrlKey) return;
+onKeyStroke('PageUp', (e) => {
+  if (!isCtrl(e)) return;
   e.preventDefault();
   e.stopPropagation();
-  ec4.selectedSetupIndex = Math.max(0, ec4.selectedSetupIndex - 1);
+  if (e.shiftKey) {
+    ec4.selectedGroupIndex = Math.max(0, ec4.selectedGroupIndex - 1);
+  } else {
+    ec4.selectedSetupIndex = Math.max(0, ec4.selectedSetupIndex - 1);
+  }
 });
-onKeyStroke('a', (e) => {
-  if (!e.ctrlKey) return;
+onKeyStroke('PageDown', (e) => {
+  if (!isCtrl(e)) return;
   e.preventDefault();
   e.stopPropagation();
-  ec4.selectedSetupIndex = Math.min(16 - 1, ec4.selectedSetupIndex + 1);
-});
-onKeyStroke('t', (e) => {
-  if (!e.ctrlKey) return;
-  e.preventDefault();
-  e.stopPropagation();
-  ec4.selectedGroupIndex = Math.max(0, ec4.selectedGroupIndex - 1);
-});
-onKeyStroke('g', (e) => {
-  if (!e.ctrlKey) return;
-  e.preventDefault();
-  e.stopPropagation();
-  ec4.selectedGroupIndex = Math.min(16 - 1, ec4.selectedGroupIndex + 1);
+  if (e.shiftKey) {
+    ec4.selectedGroupIndex = Math.min(16 - 1, ec4.selectedGroupIndex + 1);
+  } else {
+    ec4.selectedSetupIndex = Math.min(16 - 1, ec4.selectedSetupIndex + 1);
+  }
 });
 </script>
 

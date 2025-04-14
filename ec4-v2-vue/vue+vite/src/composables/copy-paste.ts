@@ -16,10 +16,10 @@ export default function useCopyPaste() {
   const canPasteEncoder = computed(() => !!copiedEncoder.value);
 
   const copyMode = ref(false);
-  onKeyDown('Alt', () => {
+  onKeyDown('Alt', (e) => {
     copyMode.value = true;
   });
-  onKeyUp('Alt', () => {
+  onKeyUp('Alt', (e) => {
     copyMode.value = false;
   });
 

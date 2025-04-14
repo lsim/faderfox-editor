@@ -1,18 +1,18 @@
 <script setup lang="ts">
 const shortcuts = [
-  { keys: ['Ctrl', 'e'], help: 'Focus encoder above' },
-  { keys: ['Ctrl', 's'], help: 'Focus encoder below' },
-  { keys: ['Ctrl', 'd'], help: 'Focus encoder to the left' },
-  { keys: ['Ctrl', 'f'], help: 'Focus encoder to the right' },
-  { keys: ['Ctrl', 'o'], help: 'Switch focus to oled fields' },
+  { keys: ['Shift', 'Alt', 'Up'], help: 'Focus encoder above' },
+  { keys: ['Shift', 'Alt', 'Down'], help: 'Focus encoder below' },
+  { keys: ['Shift', 'Alt', 'Left'], help: 'Focus encoder to the left' },
+  { keys: ['Shift', 'Alt', 'Right'], help: 'Focus encoder to the right' },
+  { keys: ['Shift', 'Alt', 'End'], help: 'Switch focus to oled fields' },
+  { keys: ['Escape'], help: 'Return focus to the encoder section' },
   { keys: ['Shift', 'space'], help: 'Toggle between turn/push modes' },
-  { keys: ['Ctrl', 'q'], help: 'Select previous setup' },
-  { keys: ['Ctrl', 'a'], help: 'Select next setup' },
-  { keys: ['Ctrl', 't'], help: 'Select previous group' },
-  { keys: ['Ctrl', 'g'], help: 'Select next group' },
+  { keys: ['Ctrl/Cmd', 'PgUp'], help: 'Select previous setup' },
+  { keys: ['Ctrl/Cmd', 'PgDn'], help: 'Select next setup' },
+  { keys: ['Ctrl/Cmd', 'Shift', 'PgUp'], help: 'Select previous group' },
+  { keys: ['Ctrl/Cmd', 'Shift', 'PgDn'], help: 'Select next group' },
   { keys: ['Alt'], help: 'Hold to copy/paste' },
   { keys: ['?'], help: 'Show keyboard shortcuts' },
-  { keys: ['Escape'], help: 'Return focus to the encoder section' },
 ];
 </script>
 
