@@ -51,13 +51,6 @@ async function editBundle(meta: BundleMeta) {
   await router.push({ name: 'bundle', params: { bundleId: meta.id } });
 }
 
-async function newBundle() {
-  ec4.selectedSetupIndex = 0;
-  ec4.selectedGroupIndex = 0;
-  ec4.selectedEncoderIndex = 0;
-  await router.push({ name: 'home' });
-}
-
 async function downloadBundle(meta: BundleMeta) {
   const bundle = await storage.getBundle(meta);
   if (!bundle?.bytes) return;
@@ -93,7 +86,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
       </ul>
       <ul>
         <li>
-          <button @click="newBundle" title="New bundle"><package-plus /></button>
+          <button @click="ec4.newBundle()" title="New bundle"><package-plus /></button>
         </li>
       </ul>
     </nav>

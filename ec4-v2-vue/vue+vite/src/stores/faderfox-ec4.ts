@@ -6,6 +6,7 @@ import { useStorage } from '@/composables/storage.ts';
 import { Control, type FieldType, type NumberFieldType } from '@/domain/Encoder.ts';
 import { watchDebounced } from '@vueuse/core';
 import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
+import router from '@/router';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -71,6 +72,13 @@ export const useEc4Store = defineStore('ec4', () => {
     { deep: true, debounce: 1000 },
   );
 
+  async function newBundle() {
+    selectedSetupIndex.value = 0;
+    selectedGroupIndex.value = 0;
+    selectedEncoderIndex.value = 0;
+    await router.push({ name: 'home' });
+  }
+
   const activeNumberField = computed(() => {
     return Object.keys(selectedControl.value.numbers).includes(activeField.value)
       ? (activeField.value as NumberFieldType)
@@ -124,5 +132,6 @@ export const useEc4Store = defineStore('ec4', () => {
     resetBundle() {
       activeBundle.value = Ec4Bundle.createEmpty();
     },
+    newBundle,
   };
 });
