@@ -90,6 +90,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
         </li>
       </ul>
     </nav>
+    <p class="hint">Tip: Drag and drop your sysex file here to edit it</p>
     <table>
       <thead>
         <tr>
@@ -243,5 +244,11 @@ tbody tr {
       }
     }
   }
+}
+
+.hint {
+  font-style: italic;
+  font-size: 80%;
+  opacity: 0.8;
 }
 </style>
