@@ -29,6 +29,7 @@ A few extra features have been added compared to the (already awesome) original 
 - Auto saving of data to the db (page reload no longer a thing to be feared!)
 - Multiple named configuration 'bundles' can be switched between, saved to a .syx file or sent to the EC4
 - Sysex dumps from the EC4 are shown as new bundles
+- Progressive Web App support, so you can install the editor on your desktop and use it offline
 - Keyboard shortcuts for navigation
 - Easy copy/paste of individual encoders in addition to groups/setups (as in the original). Tip: copying between bundles also works.
 - Pause-screen-animation when left idle 😀
