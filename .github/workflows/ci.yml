@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ec4-v2-vue/vue+vite
+        working-directory: ec4-v2-vue
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./ec4-v2-vue/vue+vite/dist
+          path: ./ec4-v2-vue/dist
   Deploy-Job:
     runs-on: ubuntu-latest
     needs: Build-Job

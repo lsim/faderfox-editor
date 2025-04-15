@@ -4,7 +4,6 @@
 version: 2
 updates:
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/ec4-v2-vue/vue+vite/" # Location of package manifests
-    target-branch: "vue-rework-attempt"
+    directory: "/ec4-v2-vue/" # Location of package manifests
     schedule:
       interval: "weekly"
