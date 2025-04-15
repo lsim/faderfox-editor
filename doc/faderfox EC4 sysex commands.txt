@@ -1,0 +1,116 @@
+FADERFOX EC4 SYSEX COMMANDS
+---------------------------------------------------------------------------------------
+
+request device-ID/setup/group (from DAW):
+F0 00 00 00 4E 20 10 F7
+
+answer (from EC4):
+F0 00 00 00 4E 2C 1i 4E 28 1s 4E 24 1g F7   
+
+F0 00 00 00 4E 2C 1B 4E 28 1F 4E 24 10 F7   
+            ^^^^^^^^ ^^^^^^^^ ^^^^^^^^
+           device-id   setup#   group#
+                i=11     s=16      g=1
+---------------------------------------------------------------------------------------
+
+select setup (from DAW and also by selecting on EC4):
+F0 00 00 00 4E 2C 1i 4E 28 1s F7   
+
+F0 00 00 00 4E 2C 1B 4E 28 14 F7   
+            ^^^^^^^^ ^^^^^^^^ 
+           device-id   setup# 
+                i=11      s=5
+
+answer (from EC4):
+F0 00 00 00 4E 2C 1B F7 (device-id)
+---------------------------------------------------------------------------------------
+
+select group (from DAW and also by selecting on EC4):
+F0 00 00 00 4E 2C 1i 4E 24 1g F7   
+
+F0 00 00 00 4E 2C 1B 4E 24 1D F7   
+            ^^^^^^^^ ^^^^^^^^ 
+           device-id   group# 
+                i=11     g=14
+
+answer (from EC4):
+F0 00 00 00 4E 2C 1B F7 (device-id)
+-------------------------------------------------------------------------------------------------------
+
+set encoder display (from DAW):
+F0 00 00 00 4E 2C 1i 4E 22 1t 4A 2a 1a 4D 2d 1d F7   
+
+F0 00 00 00 4E 2C 1B 4E 22 10 4A 23 1C 4D 25 12 4D 26 15 4D 27 13 4D 26 1F F7 (write ctrl name display)
+            ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^
+           device-id     type  address     data     data     data     data
+                i=11   	  t=0     a=61    d='R'    d='e'    d='s'    d='o'
+                     ctrl nam  ctrl 16
+
+F0 00 00 00 4E 2C 1B 4E 22 13 4A 21 1C 4D 25 12 4D 26 15 4D 27 13 4D 26 1F 4E 22 14 F7 (write/show total display)   
+            ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^^^^^ 
+           device-id     type  address     data     data     data     data    show
+                i=11   	  t=3     a=28     d='R'    d='e'    d='s'    d='o'  total
+                        total   middle                                     display
+		      display 2nd line	
+
+F0 00 00 00 4E 2C 1B 4E 22 14 F7 (show total display)
+F0 00 00 00 4E 2C 1B 4E 22 15 F7 (hide total display)
+
+
+answer (from EC4):
+F0 00 00 00 4E 2C 1B F7 (device-id)
+-------------------------------------------------------------------------------------------------------
+
+send snapshot from current group in EC4 (from DAW):
+F0 00 00 00 4E 2C 1i 4E 26 10 F7   
+
+F0 00 00 00 4E 2C 1B 4E 26 10 F7   
+            ^^^^^^^^ ^^^^^^^^ 
+           device-id     send 
+                i=11 snapshot
+
+answer (from EC4):
+F0 00 00 00 4E 2C 1B F7 (device-id)
+-------------------------------------------------------------------------------------------------------
+
+shift/pushbutton/user key status (from EC4):
+F0 00 00 00 4E 2C 1B 4E 26 11 4E 2E 11 F7  (shift press)
+F0 00 00 00 4E 2C 1B 4E 26 11 4E 2E 10 F7  (shift release)
+
+F0 00 00 00 4E 2C 1B 4E 26 12 4E 2E 11 F7  (user key 1 press)
+F0 00 00 00 4E 2C 1B 4E 26 12 4E 2E 10 F7  (user key 1 release)
+F0 00 00 00 4E 2C 1B 4E 26 13 4E 2E 11 F7  (user key 2 press)
+F0 00 00 00 4E 2C 1B 4E 26 13 4E 2E 10 F7  (user key 2 release)
+F0 00 00 00 4E 2C 1B 4E 26 14 4E 2E 11 F7  (user key 3 press)
+F0 00 00 00 4E 2C 1B 4E 26 14 4E 2E 10 F7  (user key 3 release)
+F0 00 00 00 4E 2C 1B 4E 26 15 4E 2E 11 F7  (user key 4 press)
+F0 00 00 00 4E 2C 1B 4E 26 15 4E 2E 10 F7  (user key 4 release)
+
+F0 00 00 00 4E 2C 1B 4E 2A 10 4E 2E 11 F7  (push button 1 press)
+F0 00 00 00 4E 2C 1B 4E 2A 10 4E 2E 10 F7  (push button 1 release)
+F0 00 00 00 4E 2C 1B 4E 2A 11 4E 2E 11 F7  (push button 2 press)
+F0 00 00 00 4E 2C 1B 4E 2A 11 4E 2E 10 F7  (push button 2 release)
+.
+.
+F0 00 00 00 4E 2C 1B 4E 2A 1E 4E 2E 11 F7  (push button 15 press)
+F0 00 00 00 4E 2C 1B 4E 2A 1E 4E 2E 10 F7  (push button 15 release)
+F0 00 00 00 4E 2C 1B 4E 2A 1F 4E 2E 11 F7  (push button 16 press)
+F0 00 00 00 4E 2C 1B 4E 2A 1F 4E 2E 10 F7  (push button 16 release)
+
+-------------------------------------------------------------------------------------------------------
+
+device-id		i=11 (EC4)
+setup#			s=1...16 (0x0...F)
+group#			g=1...16 (0x0...F)
+display	type		t=0,1,2,3 (0=control names, 1=setup names, 2=group names, 3=total display)
+start address/control	a=0...63 (0x0..3=control 1, 0x4..7=control 2 .... 0x3C..3F=control 16) 
+start address/setup	a=0...63 (0x0..3=setup 1, 0x4..7=setup 2 .... 0x3C..3F=setup 16) 
+start address/group	a=0...63 (0x0..3=group 1, 0x4..7=group 2 .... 0x3C..3F=group 16)
+start address/total	a=0...79 (0x0..13=line 1, 0x14..27=line 2 .... 0x3C..4F=line 4)
+data (max 64 digits)	d=0...127 (0x0...FF see char sets in file 'OLEDM204 char table.pdf')
+
+
+
+!!! display overwrite only for names with content '----' !!!
+
+necessarily wait for answer from EC4 after any commands before sending next command. (handshake)

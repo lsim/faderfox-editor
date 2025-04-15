@@ -1,0 +1,45 @@
+
+$textColor: #ddd;
+$active-field-color: #660;
+
+html {
+  background-color: #000 ;
+}
+
+@font-face {
+  font-family: 'LCD5x8';
+  src: url('5x8_lcd_hd44780u_a02.eot?') format('eot'),
+  url('5x8_lcd_hd44780u_a02.svg#5x8-LCD-HD44780U-A02') format('svg'),
+  url('5x8_lcd_hd44780u_a02.woff') format('woff'),
+  url('5x8_lcd_hd44780u_a02.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.matrix_font {
+  font-family: 'LCD5x8', Courier, monospace;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.dymo-label {
+  border-top:1px solid #6c5c5d;
+  rotate:-.5deg;
+  line-height:24px;
+  font-size:20px;
+  background: linear-gradient(to bottom, #31221f, #030000);
+  color:#c3bcb6;
+  text-shadow:
+          -1px -1px 0 #030000,
+          1px -1px 0 #030000,
+          -1px 1px 0 #030000,
+          1px 1px 0 #030000,
+          0 0 4px #fff;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  font-family:courier;
+}
