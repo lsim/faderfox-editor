@@ -82,7 +82,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
     <modal ref="confirmDeleteDialog" />
     <nav>
       <ul>
-        <li><h2>Bundles stored locally</h2></li>
+        <li><h2>Configuration bundles</h2></li>
       </ul>
       <ul>
         <li>
@@ -90,6 +90,10 @@ async function onDrop(files: File[] | null, e: DragEvent) {
         </li>
       </ul>
     </nav>
+    <p>
+      Note: Bundles are stored in your browser and do not leave your computer. Auto save simply
+      persists data so that you can close your browser without losing your work.
+    </p>
     <p class="hint">Tip: Drag and drop your sysex file here to edit it</p>
     <table>
       <thead>
