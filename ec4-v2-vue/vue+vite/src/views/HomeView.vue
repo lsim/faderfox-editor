@@ -136,9 +136,10 @@ onKeyStroke('PageDown', (e) => {
 @use '@picocss/pico/scss/colors/index.scss' as *;
 
 #home {
-  margin: 0 10%;
+  margin: 0 auto;
   width: auto;
   display: grid;
+  max-width: 1000px;
   grid-template-areas:
     'header header header'
     'alignment alignment alignment'
