@@ -15,7 +15,7 @@ Editor for the [PC4 Pot Controller](http://faderfox.de/pc4.html). You can find a
 This software was developed in co-operation with faderfox.
 
 
-### EC4 Editor reimplementation
+## EC4 Editor reimplementation
 
 A copycat reimplementation of the EC4 editor is available at [https://lsim.github.io/faderfox-editor/](https://lsim.github.io/faderfox-editor/).
 
