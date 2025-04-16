@@ -4,7 +4,7 @@ import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import { useStorage } from '@/composables/storage.ts';
 import { Control, type FieldType, type NumberFieldType } from '@/domain/Encoder.ts';
-import { watchDebounced } from '@vueuse/core';
+import { useDebouncedRefHistory, watchDebounced } from '@vueuse/core';
 import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import router from '@/router';
 
@@ -39,6 +39,12 @@ window.addEventListener('blur', () => {
 export const useEc4Store = defineStore('ec4', () => {
   const storage = useStorage();
   const activeBundle: Ref<Ec4Bundle> = ref(Ec4Bundle.createEmpty());
+
+  const history = useDebouncedRefHistory(activeBundle, {
+    deep: true,
+    debounce: 500,
+    clone: (bundle) => bundle.clone(),
+  });
 
   const selectedSetupIndex = ref<number>(0);
 
@@ -106,6 +112,7 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedControl,
     loadBundle: async (id: number) => {
       activeBundle.value = await storage.loadBundle(id);
+      history?.clear();
     },
     lastStateSaved,
     activeField,
@@ -134,5 +141,6 @@ export const useEc4Store = defineStore('ec4', () => {
       }
     },
     newBundle,
+    history,
   };
 });

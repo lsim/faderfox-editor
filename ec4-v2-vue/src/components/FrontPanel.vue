@@ -6,6 +6,7 @@ import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import LegendButton from '@/components/LegendButton.vue';
 import { onKeyStroke } from '@vueuse/core';
+import { Undo2 } from 'lucide-vue-next';
 
 const props = defineProps<{
   groupId: number;
@@ -70,6 +71,14 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
   <main>
     <div class="beta-notice dymo-label">BETA</div>
     <div id="save-indicator" v-if="showSaveIndicator">💾</div>
+    <div
+      id="undo-button"
+      class="undo-button"
+      :class="{ 'can-undo': ec4.history.canUndo }"
+      @click="ec4.history.undo()"
+    >
+      <undo-2 class="icon" />
+    </div>
     <legend-button id="legend-button" />
     <mode-selector class="mode-selector" />
     <oled
@@ -196,5 +205,11 @@ main {
   position: absolute;
   top: 81px;
   right: 35px;
+}
+
+#undo-button {
+  position: absolute;
+  top: 81px;
+  left: 5px;
 }
 </style>

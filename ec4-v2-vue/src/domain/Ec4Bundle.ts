@@ -39,4 +39,13 @@ export class Ec4Bundle {
       },
     ];
   }
+
+  clone(): Ec4Bundle {
+    const b = new Ec4Bundle(
+      this.name,
+      this.setups.map((s) => s.clone()),
+    );
+    b.id = this.id;
+    return b;
+  }
 }
