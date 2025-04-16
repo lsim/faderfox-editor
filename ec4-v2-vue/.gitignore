@@ -29,6 +29,7 @@ coverage
 
 *.tsbuildinfo
 .vite
+dev-dist
 
 
 

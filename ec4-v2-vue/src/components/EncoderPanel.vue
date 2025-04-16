@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import SingleEncoder from '@/components/SingleEncoder.vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { computed, ref } from 'vue';
+import { computed, ref, useTemplateRef, nextTick } from 'vue';
+import { type ComponentExposed } from 'vue-component-type-helpers';
 import { onKeyStroke } from '@vueuse/core';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
 import useCopyPaste from '@/composables/copy-paste';
-
-const props = defineProps<{
-  selectedEncoderId: number;
-}>();
 
 const ec4 = useEc4Store();
 
@@ -21,10 +18,27 @@ const controls = computed(() => {
 const nameActive = ref<boolean>(false);
 
 const root = ref<HTMLElement | null>(null);
+
+const selectedRef = useTemplateRef<ComponentExposed<typeof SingleEncoder>[]>('selected');
+
+function focusActiveEncoder() {
+  selectedRef.value?.[0]?.focusInput();
+}
+
+// Escape returns focus to the active encoder's input
 onKeyStroke('Escape', () => {
-  if (!root.value?.querySelector('input:focus')) {
-    ec4.controlFocusRequests++;
-  }
+  if (root.value?.querySelector('input:focus')) return;
+  focusActiveEncoder();
+});
+
+onKeyStroke(' ', (e) => {
+  if (!e.shiftKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
+  nextTick(() => {
+    focusActiveEncoder();
+  });
 });
 </script>
 
@@ -38,14 +52,16 @@ onKeyStroke('Escape', () => {
       @paste="copyPaste.pasteEncoder(index)"
     >
       <single-encoder
+        class="encoder"
         :encoder-id="control.id"
         :index="index"
         :name-active="nameActive"
         @click="ec4.selectedEncoderIndex = index"
         @focus.capture="ec4.selectedEncoderIndex = index"
         @update:name-active="nameActive = $event"
-        :class="{ selected: control.id === props.selectedEncoderId }"
-        :selected="control.id === props.selectedEncoderId"
+        :class="{ selected: control.id === ec4.selectedEncoderIndex }"
+        :selected="control.id === ec4.selectedEncoderIndex"
+        :ref="control.id === ec4.selectedEncoderIndex ? 'selected' : undefined"
       />
     </copy-paste-wrap>
   </div>

@@ -31,38 +31,7 @@ const control: ComputedRef<Control> = computed(() => {
 });
 
 const nameInput = ref<HTMLInputElement | null>(null);
-
 const encoderInput = ref<HTMLInputElement | null>(null);
-
-// const currentValue = computed(() => {
-//   if (!props.selected || !ec4.activeNumberField || !encoderInput.value) return null;
-//   let valueText: string | null = null;
-//   if (encoderInput.value.nodeName === 'INPUT') {
-//     valueText = (encoderInput.value as HTMLInputElement).value;
-//   } else if (encoderInput.value.nodeName === 'SELECT') {
-//     const s = encoderInput.value as unknown as HTMLSelectElement;
-//     if (s.selectedIndex >= 0) valueText = s.options[s.selectedIndex].text;
-//   } else if ((encoderInput.value as any).value != null) {
-//     valueText = (encoderInput.value as any).value;
-//   }
-//   console.log(
-//     'currentValue',
-//     control.value.id,
-//     ec4.activeNumberField,
-//     encoderInput.value,
-//     valueText,
-//   );
-//   if (valueText == null) return null;
-//   return {
-//     k: valueText,
-//     v: ec4.selectedControl.numbers[ec4.activeNumberField],
-//   };
-// });
-//
-// watch(currentValue, (newValue) => {
-//   if (!newValue) return;
-//   ec4.currentValue = newValue;
-// });
 
 function focusInput() {
   if (!props.selected) return;
@@ -93,17 +62,6 @@ watch(
 );
 
 watch(
-  () => ec4.controlFocusRequests,
-  (newCount) => {
-    if (newCount <= 0 || props.encoderId !== ec4.selectedEncoderIndex) return;
-    nextTick(() => {
-      ec4.controlFocusRequests = 0;
-      focusInput();
-    });
-  },
-);
-
-watch(
   () => ec4.activeBundleId,
   () => {
     if (props.encoderId === ec4.selectedEncoderIndex) {
@@ -125,6 +83,10 @@ function toggleLink() {
     control.value.pb_link = !control.value.pb_link;
   }
 }
+
+defineExpose({
+  focusInput,
+});
 </script>
 
 <template>
@@ -325,7 +287,7 @@ function toggleLink() {
       </template>
       <template v-else-if="ec4.activeField === 'scale'">
         <label>{{ t('ENCODER_SCALE') }}</label>
-        <ScaleSelector
+        <scale-selector
           v-model="control.numbers.scale"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"
@@ -334,7 +296,7 @@ function toggleLink() {
       </template>
       <template v-else-if="ec4.activeField === 'pb_display'">
         <label>{{ t('ENCODER_SCALE') }}</label>
-        <ScaleSelector
+        <scale-selector
           v-model="control.numbers.pb_display"
           ref="encoderInput"
           @focus="setNameActive(false, $event.target)"

@@ -41,7 +41,6 @@ export const useEc4Store = defineStore('ec4', () => {
   const activeBundle: Ref<Ec4Bundle> = ref(Ec4Bundle.createEmpty());
 
   const selectedSetupIndex = ref<number>(0);
-  const controlFocusRequests = ref(0);
 
   const encoderGroups = computed(() => activeBundle.value.setups[selectedSetupIndex.value].groups);
   const selectedGroupIndex = ref<number>(0);
@@ -102,7 +101,6 @@ export const useEc4Store = defineStore('ec4', () => {
     loadBundle: async (id: number) => {
       activeBundle.value = await storage.loadBundle(id);
     },
-    controlFocusRequests,
     lastStateSaved,
     activeField,
     activeNumberField,

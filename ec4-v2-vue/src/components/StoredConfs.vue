@@ -55,7 +55,7 @@ async function downloadBundle(meta: BundleMeta) {
   const bundle = await storage.getBundle(meta);
   if (!bundle?.bytes) return;
   console.log('Saving bytes to disk', bundle.bytes.length);
-  await fileStorage.saveSysexDataToDisk(bundle.bytes);
+  await fileStorage.saveSysexDataToDisk(bundle.bytes, meta.name);
 }
 
 async function sendBundle(meta: BundleMeta) {

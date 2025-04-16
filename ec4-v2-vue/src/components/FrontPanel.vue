@@ -79,12 +79,7 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
       class="oled"
     />
 
-    <encoder-panel
-      class="encoders"
-      :active-field="ec4.activeField"
-      :group-id="props.groupId"
-      :selected-encoder-id="ec4.selectedEncoderIndex"
-    />
+    <encoder-panel class="encoders" :active-field="ec4.activeField" :group-id="props.groupId" />
 
     <input
       type="text"

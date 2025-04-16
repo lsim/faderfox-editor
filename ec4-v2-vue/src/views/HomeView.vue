@@ -4,10 +4,9 @@ import MidiSettings from '@/components/MidiSettings.vue';
 import SetupListing from '@/components/SetupListing.vue';
 import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import useFileStorage from '@/composables/fileStorage.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
 import BgWaves from '@/components/BgWaves.vue';
-import { onKeyDown, onKeyStroke } from '@vueuse/core';
+import { onKeyStroke } from '@vueuse/core';
 import FillMacros from '@/components/FillMacros.vue';
 
 const props = defineProps<{
@@ -17,7 +16,6 @@ const props = defineProps<{
 const groupId = ref<number>(0);
 
 const ec4 = useEc4Store();
-const fileStorage = useFileStorage();
 
 // Insist that focus doesn't leave the editor inputs
 function handleFocusOut(e: FocusEvent) {
@@ -31,15 +29,6 @@ function handleFocusOut(e: FocusEvent) {
     window.scrollTo(x, y);
   }
 }
-
-// Make download link available to fileStorage composable
-const downloadLink = ref<HTMLAnchorElement | null>(null);
-watch(
-  () => downloadLink.value,
-  (link) => {
-    fileStorage.setDownloadLink(link);
-  },
-);
 
 watch(
   () => props.bundleId,
@@ -62,13 +51,6 @@ watch(
 
 const isCtrl = (e: KeyboardEvent) => e.ctrlKey || e.metaKey;
 
-onKeyStroke(' ', (e) => {
-  if (!e.shiftKey) return;
-  e.preventDefault();
-  e.stopPropagation();
-  ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
-  ec4.controlFocusRequests++;
-});
 onKeyStroke('PageUp', (e) => {
   if (!isCtrl(e)) return;
   e.preventDefault();
@@ -93,12 +75,6 @@ onKeyStroke('PageDown', (e) => {
 
 <template>
   <main @focusout="handleFocusOut" id="home">
-    <a
-      :href="fileStorage.blobUrl.value"
-      ref="downloadLink"
-      download="ec4-sysex.syx"
-      style="display: none"
-    ></a>
     <div class="header">
       <bg-waves class="bg-waves" />
       <h1>Faderfox EC4 Editor</h1>
