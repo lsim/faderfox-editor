@@ -1,10 +1,10 @@
-import { ref, computed, type Ref } from 'vue';
+import { ref, computed, type Ref, nextTick } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import { useStorage } from '@/composables/storage.ts';
 import { Control, type FieldType, type NumberFieldType } from '@/domain/Encoder.ts';
-import { useDebouncedRefHistory, watchDebounced } from '@vueuse/core';
+import { useRefHistory, watchDebounced } from '@vueuse/core';
 import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import router from '@/router';
 
@@ -40,9 +40,8 @@ export const useEc4Store = defineStore('ec4', () => {
   const storage = useStorage();
   const activeBundle: Ref<Ec4Bundle> = ref(Ec4Bundle.createEmpty());
 
-  const history = useDebouncedRefHistory(activeBundle, {
+  const history = useRefHistory(activeBundle, {
     deep: true,
-    debounce: 500,
     clone: (bundle) => bundle.clone(),
   });
 
@@ -87,6 +86,9 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedGroupIndex.value = 0;
     selectedEncoderIndex.value = 0;
     resetBundle();
+    nextTick(() => {
+      history.clear();
+    }).then();
     await router.push({ name: 'home' });
   }
 
@@ -112,7 +114,9 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedControl,
     loadBundle: async (id: number) => {
       activeBundle.value = await storage.loadBundle(id);
-      history?.clear();
+      nextTick(() => {
+        history.clear();
+      }).then();
     },
     lastStateSaved,
     activeField,
