@@ -13,6 +13,7 @@ import { computed, ref, type ComputedRef, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import NoteInput from '@/components/NoteInput.vue';
+import ChannelInput from '@/components/ChannelInput.vue';
 
 const { t } = useI18n();
 
@@ -205,36 +206,16 @@ defineExpose({
       </template>
       <template v-else-if="ec4.activeField === 'channel'">
         <label>{{ control.numbers.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
-        <input
-          class="width_3"
-          :value="control.numbers.channel"
-          @input="
-            control.numbers.channel = ($event.target as HTMLInputElement).checkValidity()
-              ? parseInt(($event.target as HTMLInputElement).value || '0', 10)
-              : control.numbers.channel
-          "
-          type="number"
-          min="1"
-          max="16"
-          ref="encoderInput"
+        <channel-input
+          v-model="control.numbers.channel"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
       <template v-else-if="ec4.activeField === 'pb_channel'">
         <label>{{ t('ENCODER_CHANNEL') }}</label>
-        <input
-          class="width_3"
-          :value="control.numbers.pb_channel"
-          @input="
-            control.numbers.pb_channel = ($event.target as HTMLInputElement).checkValidity()
-              ? parseInt(($event.target as HTMLInputElement).value || '0', 10)
-              : control.numbers.pb_channel
-          "
-          type="number"
-          min="1"
-          max="16"
-          ref="encoderInput"
+        <channel-input
+          v-model="control.numbers.pb_channel"
           @focus="setNameActive(false, $event.target)"
           :tabindex="props.nameActive ? -1 : 0"
         />

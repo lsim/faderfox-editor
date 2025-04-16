@@ -15,6 +15,7 @@ import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { onKeyStroke } from '@vueuse/core';
 import NoteInput from '@/components/NoteInput.vue';
+import ChannelInput from '@/components/ChannelInput.vue';
 
 const { t } = useI18n();
 
@@ -186,19 +187,9 @@ onKeyStroke('End', (e) => {
         }"
         >{{ t('OLED_CHANNEL') }}:</label
       >
-      <input
-        id="encoderChannel"
+      <channel-input
         ref="channelInput"
-        autocomplete="off"
-        type="number"
-        min="1"
-        max="16"
-        :value="control.numbers.channel"
-        @input="
-          control.numbers.channel = ($event.target as HTMLInputElement | null)?.checkValidity()
-            ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
-            : control.numbers.channel
-        "
+        v-model="control.numbers.channel"
         @focus="setActiveField('channel', $event.target)"
         :class="{ hidden: isHidden('channel', control) }"
       />
@@ -212,19 +203,9 @@ onKeyStroke('End', (e) => {
         }"
         >{{ pbChannelLabel }}:</label
       >
-      <input
-        id="pbChannel"
+      <channel-input
         ref="pbChannelInput"
-        autocomplete="off"
-        type="number"
-        min="1"
-        max="16"
-        :value="control.numbers.pb_channel"
-        @input="
-          control.numbers.pb_channel = ($event.target as HTMLInputElement | null)?.checkValidity()
-            ? parseInt(($event.target as HTMLInputElement | null)?.value || '0', 10)
-            : control.numbers.pb_channel
-        "
+        v-model="control.numbers.pb_channel"
         @focus="setActiveField('pb_channel', $event.target)"
         :class="{ hidden: isHidden('pb_channel', control) }"
       />

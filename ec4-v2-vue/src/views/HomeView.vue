@@ -35,17 +35,15 @@ watch(
   () => props.bundleId,
   async (newId, oldId) => {
     console.log('new bundleId', newId, oldId);
+    if (!newId) return;
     try {
-      if (newId) {
-        await ec4.loadBundle(Number.parseInt(newId, 10));
-        return;
-      }
+      await ec4.loadBundle(Number.parseInt(newId, 10));
+      return;
     } catch (e) {
       console.warn(e);
+      // No usable bundle id - reset the editor
       await ec4.newBundle();
     }
-    // No usable bundle id - reset the editor
-    ec4.resetBundle();
   },
   { immediate: true },
 );

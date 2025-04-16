@@ -64,17 +64,23 @@ export const useEc4Store = defineStore('ec4', () => {
     (newBundle, oldBundle) => {
       // No auto save if we are loading a new bundle
       console.debug('bundle changed', newBundle?.id, oldBundle?.id, oldBundle);
-      if (!oldBundle || !oldBundle.id || newBundle.id !== oldBundle.id) return;
+      if (!oldBundle || newBundle.id !== oldBundle.id) return;
       storage.saveBundle(activeBundle.value).then();
       lastStateSaved.value = Date.now();
     },
     { deep: true, debounce: 1000 },
   );
 
+  function resetBundle() {
+    console.log('resetBundle');
+    activeBundle.value = Ec4Bundle.createEmpty();
+  }
+
   async function newBundle() {
     selectedSetupIndex.value = 0;
     selectedGroupIndex.value = 0;
     selectedEncoderIndex.value = 0;
+    resetBundle();
     await router.push({ name: 'home' });
   }
 
@@ -126,9 +132,6 @@ export const useEc4Store = defineStore('ec4', () => {
           selectedGroupIndex.value
         ].controls[idx] = control;
       }
-    },
-    resetBundle() {
-      activeBundle.value = Ec4Bundle.createEmpty();
     },
     newBundle,
   };

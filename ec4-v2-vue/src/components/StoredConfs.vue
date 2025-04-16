@@ -37,7 +37,7 @@ async function deleteBundle(meta: BundleMeta) {
     )
     .then(async () => {
       await storage.deleteBundle(meta);
-      if (shouldNavigate) await router.push({ name: 'home' });
+      if (shouldNavigate) await ec4.newBundle();
     })
     .catch(() => {});
 }
