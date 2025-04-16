@@ -211,6 +211,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
 
 tbody tr {
   cursor: pointer;
+  transition: box-shadow 0.8s ease;
   &.active {
     cursor: default;
     box-shadow: 0 0 20px inset $slate-300;
