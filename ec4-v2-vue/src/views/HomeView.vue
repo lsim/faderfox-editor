@@ -21,6 +21,7 @@ const ec4 = useEc4Store();
 function handleFocusOut(e: FocusEvent) {
   const fromTag = (e.relatedTarget as HTMLElement | undefined)?.tagName;
   // const toTag = (e.target as HTMLElement | undefined)?.tagName;
+  console.log('focus out', fromTag, e.target, e.relatedTarget);
   if ((!fromTag || fromTag === 'A') && e.target) {
     const x = window.scrollX;
     const y = window.scrollY;

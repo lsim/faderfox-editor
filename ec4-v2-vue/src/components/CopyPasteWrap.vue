@@ -77,7 +77,7 @@ const showPaste = computed(
       left 0.3s ease,
       right 0.3s ease,
       filter 0.2s ease;
-    z-index: 2;
+    z-index: 100;
     border: solid 2px rgba(255, 255, 255, 0.6);
 
     &:hover {
