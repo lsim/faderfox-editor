@@ -46,7 +46,6 @@ yarn lint
 
 ## TODO
 
-- Bug: When loading the root url, the empty bundle is shown and immediately saved (creates a new entry)
 - Write protect bundle checkmark? Is there an easy way to make all inputs/links/... disabled?
 - Undo functionality somehow? Pinia has something built in
 - IDEA: Shift + Ctrl + nav or eg Alt + Tab could select a range of encoders (eg for inserting incremental values)

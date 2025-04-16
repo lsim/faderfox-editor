@@ -45,7 +45,6 @@ export const useEc4Store = defineStore('ec4', () => {
   const encoderGroups = computed(() => activeBundle.value.setups[selectedSetupIndex.value].groups);
   const selectedGroupIndex = ref<number>(0);
   const selectedGroup = computed(() => encoderGroups.value[selectedGroupIndex.value]);
-  // const currentValue = ref<{ k: string; v: number }>({ k: '', v: -1 });
 
   const editorMode = ref<'push' | 'turn'>('turn');
 
@@ -64,7 +63,8 @@ export const useEc4Store = defineStore('ec4', () => {
     activeBundle,
     (newBundle, oldBundle) => {
       // No auto save if we are loading a new bundle
-      if (!oldBundle || newBundle.id !== oldBundle.id) return;
+      console.debug('bundle changed', newBundle?.id, oldBundle?.id, oldBundle);
+      if (!oldBundle || !oldBundle.id || newBundle.id !== oldBundle.id) return;
       storage.saveBundle(activeBundle.value).then();
       lastStateSaved.value = Date.now();
     },
