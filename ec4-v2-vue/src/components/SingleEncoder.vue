@@ -125,10 +125,9 @@ defineExpose({
       </template>
       <template
         v-else-if="
-          ec4.activeField === 'number' && control.numbers.type === encoderTypeByName('CCah')
+          ec4.activeField === 'number' && control.numbers.type === encoderTypeByName('CCAh')
         "
       >
-        <!-- TODO -->
         <label>{{ t('ENCODER_NUMBER') }}</label>
         <input
           class="width_3"
