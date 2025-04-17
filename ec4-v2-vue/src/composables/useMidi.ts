@@ -1,7 +1,7 @@
 import { computed, type ComputedRef, ref, watch, type WatchHandle } from 'vue';
 import { filter, lastValueFrom, map, Subject, type Subscription, take, timeout } from 'rxjs';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { type Bundle, useStorage } from '@/composables/storage.ts';
+import { type DbBundle, useStorage } from '@/composables/storage.ts';
 
 const midi: Promise<MIDIAccess | null> =
   typeof navigator.requestMIDIAccess === 'function'
@@ -364,7 +364,7 @@ function initMidi() {
     },
   );
 
-  function sendBundle(bundle: Bundle) {
+  function sendBundle(bundle: DbBundle) {
     if (!m) return;
     selectedOutput.value?.send(bundle.bytes);
   }

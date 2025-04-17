@@ -208,6 +208,7 @@ defineExpose({
         <channel-input
           v-model="control.numbers.channel"
           @focus="setNameActive(false, $event.target)"
+          ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
@@ -216,6 +217,7 @@ defineExpose({
         <channel-input
           v-model="control.numbers.pb_channel"
           @focus="setNameActive(false, $event.target)"
+          ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>

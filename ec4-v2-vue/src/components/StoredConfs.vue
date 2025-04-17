@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type BundleMeta, useStorage } from '@/composables/storage.ts';
+import { type DbBundleMeta, useStorage } from '@/composables/storage.ts';
 import { formatDate, useDropZone } from '@vueuse/core';
 import Modal from '@/components/Modal.vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
@@ -26,7 +26,7 @@ function dateString(date: number) {
   return formatDate(new Date(date), 'DD/MM/YYYY HH:mm');
 }
 
-async function deleteBundle(meta: BundleMeta) {
+async function deleteBundle(meta: DbBundleMeta) {
   const shouldNavigate = meta.id === ec4.activeBundleId;
   await confirmDeleteDialog.value
     ?.showIt(
@@ -46,19 +46,19 @@ const ec4 = useEc4Store();
 
 const midi = useMidi();
 
-async function editBundle(meta: BundleMeta) {
+async function editBundle(meta: DbBundleMeta) {
   if (meta.id === ec4.activeBundleId) return;
   await router.push({ name: 'bundle', params: { bundleId: meta.id } });
 }
 
-async function downloadBundle(meta: BundleMeta) {
+async function downloadBundle(meta: DbBundleMeta) {
   const bundle = await storage.getBundle(meta);
   if (!bundle?.bytes) return;
   console.log('Saving bytes to disk', bundle.bytes.length);
   await fileStorage.saveSysexDataToDisk(bundle.bytes, meta.name);
 }
 
-async function sendBundle(meta: BundleMeta) {
+async function sendBundle(meta: DbBundleMeta) {
   const bundle = await storage.getBundle(meta);
   if (!bundle?.bytes) return;
   midi.sendBundle(bundle);
@@ -109,7 +109,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
           :class="{ active: meta.id === ec4.activeBundleId }"
           @click.capture.prevent="editBundle(meta)"
           v-for="meta in (storage.bundleMetas.value || []).filter(
-            (m: BundleMeta | undefined) => !!m,
+            (m: DbBundleMeta | undefined) => !!m,
           )"
           :key="meta.id"
         >
