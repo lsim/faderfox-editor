@@ -1,6 +1,6 @@
 import type { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { createEmptyEncoderSetups, type PartialBy } from '@/stores/faderfox-ec4.ts';
-import type { Bundle, BundleMeta } from '@/composables/storage.ts';
+import type { DbBundle, DbBundleMeta } from '@/composables/storage.ts';
 import { generateSysexData, parseSetupsFromSysex } from '@/memoryLayout.ts';
 
 export class Ec4Bundle {
@@ -18,7 +18,7 @@ export class Ec4Bundle {
     return new Ec4Bundle('', createEmptyEncoderSetups());
   }
 
-  public static fromDb(bundle: Bundle, meta: BundleMeta) {
+  public static fromDb(bundle: DbBundle, meta: DbBundleMeta) {
     const b = Ec4Bundle.createEmpty();
     b.name = meta.name;
     b.id = meta.id;
@@ -26,7 +26,7 @@ export class Ec4Bundle {
     return b;
   }
 
-  toDb(): [PartialBy<Bundle, 'id'>, PartialBy<BundleMeta, 'id'>] {
+  toDb(): [PartialBy<DbBundle, 'id'>, PartialBy<DbBundleMeta, 'id'>] {
     return [
       {
         bytes: generateSysexData(this.setups),
@@ -38,5 +38,14 @@ export class Ec4Bundle {
         timestamp: Date.now(),
       },
     ];
+  }
+
+  clone(): Ec4Bundle {
+    const b = new Ec4Bundle(
+      this.name,
+      this.setups.map((s) => s.clone()),
+    );
+    b.id = this.id;
+    return b;
   }
 }

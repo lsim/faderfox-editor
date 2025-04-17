@@ -2,11 +2,12 @@ import { ref, computed, type Ref } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
-import { useStorage } from '@/composables/storage.ts';
+import { type DbBundle, type DbBundleMeta, useStorage } from '@/composables/storage.ts';
 import { Control, type FieldType, type NumberFieldType } from '@/domain/Encoder.ts';
 import { watchDebounced } from '@vueuse/core';
 import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import router from '@/router';
+import useHistory from '@/composables/history.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -58,29 +59,32 @@ export const useEc4Store = defineStore('ec4', () => {
 
   const lastStateSaved = ref(0);
 
+  const history = useHistory();
+  let historyPaused = false;
+
   // Auto save after a bit of inactivity
   watchDebounced(
     activeBundle,
-    (newBundle, oldBundle) => {
+    async (newBundle, oldBundle) => {
       // No auto save if we are loading a new bundle
       console.debug('bundle changed', newBundle?.id, oldBundle?.id, oldBundle);
       if (!oldBundle || newBundle.id !== oldBundle.id) return;
-      storage.saveBundle(activeBundle.value).then();
+      console.debug('saving bundle change', newBundle?.id, oldBundle?.id, oldBundle);
+      const delta = await storage.saveBundle(activeBundle.value);
+      if (!delta) return;
+      if (!historyPaused) history.pushEdit(delta);
+      historyPaused = false;
       lastStateSaved.value = Date.now();
     },
     { deep: true, debounce: 1000 },
   );
 
-  function resetBundle() {
-    console.log('resetBundle');
-    activeBundle.value = Ec4Bundle.createEmpty();
-  }
-
   async function newBundle() {
     selectedSetupIndex.value = 0;
     selectedGroupIndex.value = 0;
     selectedEncoderIndex.value = 0;
-    resetBundle();
+    activeBundle.value = Ec4Bundle.createEmpty();
+    history.clear();
     await router.push({ name: 'home' });
   }
 
@@ -106,6 +110,7 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedControl,
     loadBundle: async (id: number) => {
       activeBundle.value = await storage.loadBundle(id);
+      history.clear();
     },
     lastStateSaved,
     activeField,
@@ -134,5 +139,15 @@ export const useEc4Store = defineStore('ec4', () => {
       }
     },
     newBundle,
+    history,
+    currentDbState() {
+      return activeBundle.value.toDb();
+    },
+    setState(bundle: DbBundle, meta: DbBundleMeta) {
+      activeBundle.value = Ec4Bundle.fromDb(bundle, meta);
+    },
+    skipHistory() {
+      historyPaused = true;
+    },
   };
 });

@@ -6,6 +6,7 @@ import { ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import LegendButton from '@/components/LegendButton.vue';
 import { onKeyStroke } from '@vueuse/core';
+import { Undo2, Redo2 } from 'lucide-vue-next';
 
 const props = defineProps<{
   groupId: number;
@@ -70,6 +71,21 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
   <main>
     <div class="beta-notice dymo-label">BETA</div>
     <div id="save-indicator" v-if="showSaveIndicator">💾</div>
+    <button
+      class="undo history-button"
+      :disabled="!ec4.history.canUndo"
+      :class="{ 'can-do': ec4.history.canUndo }"
+      @click="ec4.history.undo()"
+    >
+      <undo-2 class="icon" />
+    </button>
+    <button
+      class="redo history-button"
+      :class="{ 'can-do': ec4.history.canRedo }"
+      @click="ec4.history.redo()"
+    >
+      <redo-2 class="icon" />
+    </button>
     <legend-button id="legend-button" />
     <mode-selector class="mode-selector" />
     <oled
@@ -196,5 +212,28 @@ main {
   position: absolute;
   top: 81px;
   right: 35px;
+}
+
+.history-button {
+  position: absolute;
+  left: 36px;
+  width: 42px;
+  height: 42px;
+  color: $yellow-500;
+  border: 2px solid $yellow-500;
+  background: transparent;
+
+  border-radius: 50%;
+  &.undo {
+    top: 180px;
+  }
+  &.redo {
+    top: 79px;
+  }
+  &.can-do {
+    cursor: pointer;
+    color: $yellow-200;
+    border-color: $yellow-200;
+  }
 }
 </style>
