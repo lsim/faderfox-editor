@@ -27,6 +27,7 @@ A few extra features have been added compared to the (already awesome) original 
 
 - Storage of configuration data in the browser's IndexedDb
 - Auto saving of data to the db (page reload no longer a thing to be feared!)
+- Undo/Redo
 - Multiple named configuration 'bundles' can be switched between, saved to a .syx file or sent to the EC4
 - Sysex dumps from the EC4 are shown as new bundles
 - Progressive Web App support, so you can install the editor on your desktop and use it offline
@@ -38,7 +39,6 @@ A few extra features have been added compared to the (already awesome) original 
 
 These may or may not materialize as this has been a hobby project and I may lose interest at any time 😀
 
-- Undo/Redo
 - Built-in sharing of groups/setups between users
 - More advanced macro functionality
 
