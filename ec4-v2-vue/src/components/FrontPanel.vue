@@ -7,6 +7,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import LegendButton from '@/components/LegendButton.vue';
 import { onKeyStroke } from '@vueuse/core';
 import { Undo2, Redo2 } from 'lucide-vue-next';
+import Badger from '@/components/Badger.vue';
 
 const props = defineProps<{
   groupId: number;
@@ -71,21 +72,36 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
   <main>
     <div class="beta-notice dymo-label">BETA</div>
     <div id="save-indicator" v-if="showSaveIndicator">💾</div>
-    <button
-      class="undo history-button"
-      :disabled="!ec4.history.canUndo"
-      :class="{ 'can-do': ec4.history.canUndo }"
-      @click="ec4.history.undo()"
+    <badger
+      color="rgba(blue, 0.7)"
+      :value="ec4.history.undoSize.toString()"
+      class="undo"
+      :hide="!ec4.history.canUndo"
     >
-      <undo-2 class="icon" />
-    </button>
-    <button
-      class="redo history-button"
-      :class="{ 'can-do': ec4.history.canRedo }"
-      @click="ec4.history.redo()"
+      <button
+        :disabled="!ec4.history.canUndo"
+        :class="{ 'can-do': ec4.history.canUndo }"
+        class="history-button"
+        @click="ec4.history.undo()"
+      >
+        <undo-2 class="icon" />
+      </button>
+    </badger>
+    <badger
+      color="blue"
+      :value="ec4.history.redoSize.toString()"
+      class="redo"
+      :hide="!ec4.history.canRedo"
     >
-      <redo-2 class="icon" />
-    </button>
+      <button
+        :disabled="!ec4.history.canRedo"
+        :class="{ 'can-do': ec4.history.canRedo }"
+        class="history-button"
+        @click="ec4.history.redo()"
+      >
+        <redo-2 class="icon" />
+      </button>
+    </badger>
     <legend-button id="legend-button" />
     <mode-selector class="mode-selector" />
     <oled
@@ -214,22 +230,27 @@ main {
   right: 35px;
 }
 
-.history-button {
+.undo,
+.redo {
   position: absolute;
-  left: 36px;
   width: 42px;
   height: 42px;
+  left: 37px;
+}
+.undo {
+  top: 180px;
+}
+.redo {
+  top: 79px;
+}
+
+.history-button {
   color: $yellow-500;
   border: 2px solid $yellow-500;
   background: transparent;
+  height: 100%;
 
   border-radius: 50%;
-  &.undo {
-    top: 180px;
-  }
-  &.redo {
-    top: 79px;
-  }
   &.can-do {
     cursor: pointer;
     color: $yellow-200;

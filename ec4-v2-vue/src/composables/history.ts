@@ -29,6 +29,8 @@ export default function useHistory() {
 
   const canUndo = computed(() => undoStack.value.length > 0);
   const canRedo = computed(() => redoStack.value.length > 0);
+  const undoSize = computed(() => undoStack.value.length);
+  const redoSize = computed(() => redoStack.value.length);
 
   const ec4 = useEc4Store();
 
@@ -57,6 +59,8 @@ export default function useHistory() {
     undo,
     redo,
     canUndo,
+    undoSize,
+    redoSize,
     canRedo,
     clear() {
       undoStack.value = [];
