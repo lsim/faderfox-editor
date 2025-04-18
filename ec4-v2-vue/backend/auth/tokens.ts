@@ -1,6 +1,19 @@
 import { JWTPayload, jwtVerify, SignJWT } from 'npm:jose@6.0.10';
 import { kv } from '../kv.ts';
 
+/*
+ * Auth scheme:
+ * - Read secret from disk (not committed to git, included when deploying)
+ * - User registers with username and password
+ * - Backend stores
+ * - User logs in with username and password
+ * - User is issued a JWT token signed with the secret
+ * - User receives the token in the response to the login request
+ * - User authenticates against the bundle api with an Authorization: Bearer <token> http header
+ * - Backend validates the token by checking the signature against the secret
+ * - Backend extracts userId from the payload
+ * */
+
 export class User {
   constructor(
     public username: string,
@@ -28,7 +41,6 @@ async function createJWT(payload: JWTPayload): Promise<string> {
 async function verifyJWT(token: string): Promise<JWTPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secret);
-    console.log('JWT is valid:', payload);
     return payload;
   } catch (error) {
     console.error('Invalid JWT:', error);
@@ -47,24 +59,6 @@ export async function getValidatedUser(token: string): Promise<User | null> {
   const userRes = await kv.get<User>(userKey);
   return userRes.value;
 }
-
-// const token = await createJWT({ userId: 123, username: 'john_doe' });
-// console.log('Created JWT:', token);
-// const verifiedPayload = await verifyJWT(token);
-// console.log('Verified Payload:', verifiedPayload);
-
-/*
- * Auth scheme:
- * - Read secret from disk (not committed to git, included when deploying)
- * - User registers with username and password
- * - Backend stores
- * - User logs in with username and password
- * - User is issued a JWT token signed with the secret
- * - User receives the token in the response to the login request
- * - User authenticates against the bundle api with an Authorization: Bearer <token> http header
- * - Backend validates the token by checking the signature against the secret
- * - Backend extracts userId from the payload
- * */
 
 // Returns base64 encoded sha256 hash of the password
 async function digestPassword(password: string) {
