@@ -26,5 +26,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "lsim-faderfox-editor"
-          entrypoint: "main.ts"
+          entrypoint: "backend/main.ts"
           root: "."
