@@ -1,12 +1,9 @@
 name: Deploy backend
-on:
-  push:
-    branches: main
-  pull_request:
-    branches: main
+on: [push]
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/main'
     name: Deploy
     runs-on: ubuntu-latest
 
