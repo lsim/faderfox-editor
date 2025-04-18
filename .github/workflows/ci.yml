@@ -25,7 +25,7 @@ jobs:
         with:
           path: ./ec4-v2-vue/dist
   Deploy-Job:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' && github.repository == 'lsim/faderfox-editor'
     runs-on: ubuntu-latest
     needs: Build-Job
     permissions:
