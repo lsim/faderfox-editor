@@ -47,7 +47,6 @@ yarn lint
 ## TODO
 
 - Show non-empty group titles in shared setup listing
-- Only show auth UI when a request is pending which needs auth and we don't have a valid token (publication list doesn't) (perhaps do fast token validation through ws)
 - Gravatar support for authors
 - Rotate transition from store to settings?
 - Select encoder by clicking on the device buttons

@@ -2,6 +2,7 @@ import { computed, type ComputedRef, ref, watch, type WatchHandle } from 'vue';
 import { filter, lastValueFrom, map, Subject, type Subscription, take, timeout } from 'rxjs';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { type DbBundle, useStorage } from '@/composables/storage.ts';
+import useToast from '@/composables/toast.ts';
 
 const midi: Promise<MIDIAccess | null> =
   typeof navigator.requestMIDIAccess === 'function'
@@ -284,7 +285,7 @@ export class EC4SysexProtocol {
   }
 }
 
-function initMidi() {
+function initMidi(toast: ReturnType<typeof useToast>) {
   console.debug('Initializing MIDI');
   const midiSupport = ref<boolean>();
   const inputs = ref<Array<MidiInput>>([]);
@@ -352,6 +353,7 @@ function initMidi() {
       inboundBundlesSubscription = newLink?.input.receivedMessages$
         .pipe(filter(([msg, bytes]) => msg.type === 'sysex' && bytes.length > 1000))
         .subscribe(async ([msg, bytes]) => {
+          toast.show('Received full sysex dump from EC4', 'info');
           await storage.addBundle(bytes, 'Sysex from EC4');
         });
     },
@@ -383,8 +385,9 @@ function initMidi() {
 let midiExports: ReturnType<typeof initMidi> | null = null;
 
 export default function useMidi() {
+  const toast = useToast();
   if (!midiExports) {
-    midiExports = initMidi();
+    midiExports = initMidi(toast);
   }
   return midiExports;
 }
