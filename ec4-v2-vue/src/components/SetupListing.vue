@@ -63,6 +63,7 @@ watch(
 function startPublishing(setup: EncoderSetup) {
   ec4.setupToPublish = setup;
   ec4.showStore = true;
+  copyPaste.copyMode.value = false;
 }
 </script>
 

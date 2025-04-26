@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue';
 import useCopyPaste from '@/composables/copy-paste';
 import { Copy, ClipboardPaste, CloudUpload } from 'lucide-vue-next';
-import useApiClient from '@/composables/api-client.ts';
 
 const props = withDefaults(
   defineProps<{
@@ -15,8 +14,6 @@ const props = withDefaults(
     showPublishLink: false,
   },
 );
-
-const apiClient = useApiClient();
 
 const emit = defineEmits<{
   (event: 'copy', e: MouseEvent): void;

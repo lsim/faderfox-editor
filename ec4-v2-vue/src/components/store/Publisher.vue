@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import useApiClient from '@/composables/api-client.ts';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps<{
   setup: EncoderSetup;
@@ -15,16 +15,34 @@ const description = ref('');
 
 const apiClient = useApiClient();
 
+// Load existing description if backendId is set
+(async () => {
+  if (props.setup.backendId) {
+    await apiClient.loadPublications();
+    const setup = apiClient.backendPublications.value.find((s) => s.id === props.setup.backendId);
+    if (setup) {
+      description.value = setup.description;
+    }
+  }
+})();
+
 async function publish() {
   props.setup.backendId =
     (await apiClient.publishSetup(props.setup, description.value, Date.now())) || undefined;
   emit('done');
 }
+
+const headerText = computed(() => {
+  if (props.setup.backendId) {
+    return 'Update your setup';
+  }
+  return 'Publish your setup';
+});
 </script>
 
 <template>
   <form class="publisher">
-    <h3>Publishing '{{ props.setup.name }}'</h3>
+    <h3>{{ headerText }}</h3>
 
     <div class="field">
       <label for="description"
