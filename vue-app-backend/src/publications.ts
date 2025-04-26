@@ -72,6 +72,19 @@ async function storePublication(
   return Ok(publicationId, id ? 200 : 201);
 }
 
+async function patchPublication(id: string, description: string, timestamp: number, userId: string) {
+  const res = await kv.get<Publication>(['publications', id]);
+  if (!res.value) return Err('No publication found', 404);
+  if (res.value.authorId !== userId) return Err('Not authorized', 403);
+  if (description) res.value.description = description;
+  if (timestamp) res.value.timestamp = timestamp;
+  await kv.set(['publications', id], res.value);
+  broadcast({
+    type: 'publications-updated',
+  });
+  return Ok(res.value.id, 200);
+}
+
 async function deletePublication(id: string, userId: string) {
   const res = await kv.get<Publication>(['publications', id]);
   if (!res.value) return Err('No publication found', 404);
@@ -94,6 +107,10 @@ export async function handlePublicationRequest(request: Request, id: string, use
     if (!user) return Err('Not authorized', 401);
     const json = await request.json();
     return storePublication(json.name, json.data, json.timestamp, json.description, json.type, id, user.userId);
+  } else if (request.method === 'PATCH') {
+    if (!user) return Err('Not authorized', 401);
+    const { description, timestamp } = await request.json();
+    return patchPublication(id, description, timestamp, user.userId);
   } else if (request.method === 'DELETE') {
     if (!user) return Err('Not authorized', 401);
     return deletePublication(id, user.userId);

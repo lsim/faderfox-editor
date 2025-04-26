@@ -8,6 +8,7 @@ import { watchDebounced } from '@vueuse/core';
 import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import router from '@/router';
 import useHistory from '@/composables/history.ts';
+import type { Publication } from '@/composables/api-client.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -59,7 +60,8 @@ export const useEc4Store = defineStore('ec4', () => {
 
   const lastStateSaved = ref(0);
 
-  const setupToPublish = ref<EncoderSetup | null>(null);
+  const setupToPublish = ref<EncoderSetup | undefined>();
+  const publicationToUpdate = ref<Publication | undefined>();
   const showStore = ref(false);
 
   const history = useHistory();
@@ -120,6 +122,7 @@ export const useEc4Store = defineStore('ec4', () => {
     activeNumberField,
     gridRows,
     setupToPublish,
+    publicationToUpdate,
     activeBundleId: computed(() => activeBundle.value?.id),
     activeBundleName: computed(() => activeBundle.value?.name),
     setBundleName(name: string) {

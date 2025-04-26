@@ -5,7 +5,7 @@ import { User } from 'lucide-vue-next';
 import { formatDate } from '@vueuse/core';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import Publisher from '@/components/store/Publisher.vue';
-import { LogOut, CloudDownload, PackageMinus } from 'lucide-vue-next';
+import { LogOut, CloudDownload, PackageMinus, Pencil } from 'lucide-vue-next';
 import useCopyPaste from '@/composables/copy-paste.ts';
 import { computed, onMounted, ref } from 'vue';
 import { useFuse } from '@vueuse/integrations/useFuse';
@@ -91,9 +91,13 @@ onMounted(() => {
     </p>
     <authenticator v-if="apiClient.loginPromise.value" />
     <publisher
-      v-else-if="ec4.setupToPublish"
+      v-else-if="ec4.setupToPublish || ec4.publicationToUpdate"
       :setup="ec4.setupToPublish"
-      @done="ec4.setupToPublish = null"
+      :publication="ec4.publicationToUpdate"
+      @done="
+        ec4.setupToPublish = undefined;
+        ec4.publicationToUpdate = undefined;
+      "
     />
     <template v-else>
       <nav>
@@ -135,17 +139,30 @@ onMounted(() => {
                         ><cloud-download
                       /></a>
                     </li>
-                    <li title="Unpublish setup">
-                      <a
-                        href="#"
-                        v-if="
-                          publication.item.id &&
-                          publication.item.authorName === apiClient.userName.value
-                        "
-                        @click.prevent="unpublishSetup(publication.item.id, publication.item.name)"
-                        ><package-minus
-                      /></a>
-                    </li>
+                    <template
+                      v-if="
+                        publication.item.id &&
+                        publication.item.authorName === apiClient.userName.value
+                      "
+                    >
+                      <li title="Unpublish setup">
+                        <a
+                          href="#"
+                          @click.prevent="
+                            unpublishSetup(publication.item.id, publication.item.name)
+                          "
+                          ><package-minus
+                        /></a>
+                      </li>
+                      <li title="Edit description">
+                        <a
+                          href="#"
+                          v-if="publication.item.id"
+                          @click.prevent="ec4.publicationToUpdate = publication.item"
+                          ><pencil
+                        /></a>
+                      </li>
+                    </template>
                   </ul>
                 </nav>
               </td>

@@ -15,7 +15,7 @@ export interface Publication {
 }
 
 interface SetupPublication extends Publication {
-  data: EncoderSetup;
+  data: EncoderSetup | null;
   type: 'setup';
 }
 
@@ -231,6 +231,21 @@ class ApiClient {
     return setup;
   }
 
+  async patchPublication(id: string, description: string) {
+    const { data, response } = await this.fetch<Publication>('publications', id)
+      .patch({ description, timestamp: Date.now() })
+      .text();
+    if (!data.value || response.value?.status !== 200) {
+      console.error(
+        `Failed to update publication (${response.value?.status}): ${response.value?.statusText}`,
+      );
+      this.toast.show('Failed to update publication', 'error');
+      return null;
+    }
+    this.toast.show('Publication updated successfully', 'info');
+    return data.value;
+  }
+
   // Returns the backend id of the publication
   async publishSetup(
     setup: EncoderSetup,
@@ -256,16 +271,16 @@ class ApiClient {
       return null;
     }
     const encouragement = [
-      'You are awesome!',
-      'You are amazing!',
-      'You superstar!',
-      'You legend!',
-      'You hero, you!',
-      'Way to give back!',
+      'You are awesome',
+      'You are amazing',
+      'You superstar',
+      'You legend',
+      'You hero, you',
+      'Way to give back',
     ].sort(() => Math.random() - 0.5)[0];
 
     this.toast.show(
-      `The setup ${setup.name} was published successfully - ${encouragement}`,
+      `The setup ${setup.name} was published successfully. ${encouragement}!`,
       'celebrate',
     );
     return data.value;
