@@ -1,3 +1,4 @@
+@use '@picocss/pico/scss/colors/index.scss' as *;
 
 $textColor: #ddd;
 $active-field-color: #660;
@@ -43,3 +44,8 @@ html {
   text-transform:uppercase;
   font-family:courier;
 }
+
+.shadow {
+  box-shadow: 0 0 1.5rem rgba($white, 0.1);
+}
+

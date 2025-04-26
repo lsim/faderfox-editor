@@ -8,6 +8,7 @@ export interface DbBundleMeta {
   id: number;
   name: string;
   timestamp: number;
+  backendSetupIds?: Array<string | undefined>;
 }
 
 export interface DbBundle {
@@ -99,6 +100,7 @@ export function useStorage() {
   async function saveBundle(toSave: Ec4Bundle): Promise<DbBundleDelta | null> {
     // Update if it has an id, otherwise add
     const [bundle, meta] = toSave.toDb();
+    const backendSetupIds = toSave.setups.map((s) => s.backendId);
     const existingMeta = bundle.id ? await db.summaries.get(bundle.id) : undefined;
     if (existingMeta) {
       const prevBundle = await updateBundle(
@@ -109,7 +111,7 @@ export function useStorage() {
         ? new DbBundleDelta(prevBundle, existingMeta, bundle as DbBundle, meta as DbBundleMeta)
         : null;
     } else {
-      const newId = await addBundle(bundle.bytes, meta.name);
+      const newId = await addBundle(bundle.bytes, meta.name, backendSetupIds);
       await router.push({ name: 'bundle', params: { bundleId: newId } });
       return null;
     }
@@ -123,13 +125,15 @@ export function useStorage() {
     return Ec4Bundle.fromDb(bundle, meta);
   }
 
-  async function addBundle(bytes: Uint8Array, name = '') {
+  async function addBundle(bytes: Uint8Array, name = '', backendSetupIds?: (string | undefined)[]) {
     let newId = 0;
+    backendSetupIds = backendSetupIds || new Array(16).fill(undefined);
     await db.transaction('rw', db.bundles, db.summaries, async () => {
       const meta: DbBundleMeta = {
         name,
         timestamp: Date.now(),
         id: await db.bundles.add({ bytes }),
+        backendSetupIds,
       };
       console.log('addBundle', meta);
       newId = await db.summaries.add(meta);

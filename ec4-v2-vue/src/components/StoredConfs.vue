@@ -5,7 +5,7 @@ import Modal from '@/components/Modal.vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useFileStorage from '@/composables/fileStorage.ts';
 import router from '@/router';
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import useMidi from '@/composables/useMidi.ts';
 import { Trash, HardDriveDownload, ArrowRight, KeyboardMusic, PackagePlus } from 'lucide-vue-next';
 
@@ -23,7 +23,7 @@ const { isOverDropZone } = useDropZone(dropZone, {
 const storage = useStorage();
 
 function dateString(date: number) {
-  return formatDate(new Date(date), 'DD/MM/YYYY HH:mm');
+  return formatDate(new Date(date), 'DD / MM / YYYY HH:mm');
 }
 
 async function deleteBundle(meta: DbBundleMeta) {
@@ -48,7 +48,7 @@ const midi = useMidi();
 
 async function editBundle(meta: DbBundleMeta) {
   if (meta.id === ec4.activeBundleId) return;
-  await router.push({ name: 'bundle', params: { bundleId: meta.id } });
+  nextTick(() => router.push({ name: 'bundle', params: { bundleId: meta.id } })).then();
 }
 
 async function downloadBundle(meta: DbBundleMeta) {
@@ -82,7 +82,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
     <modal ref="confirmDeleteDialog" />
     <nav>
       <ul>
-        <li><h2>Configuration bundles</h2></li>
+        <li><h3>Local bundles</h3></li>
       </ul>
       <ul>
         <li>

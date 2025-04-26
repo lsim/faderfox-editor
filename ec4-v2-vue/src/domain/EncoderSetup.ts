@@ -6,6 +6,8 @@ export class EncoderSetup {
   id: number;
   name: string;
   groups: EncoderGroup[];
+  // Track the id of the same setup in the backend if it has been published, so we can update the publication later
+  backendId?: string;
 
   constructor(id: number, name: string) {
     this.id = id;
@@ -36,5 +38,13 @@ export class EncoderSetup {
       id: s.id,
       groups: this.groups.map((g) => g.clone(s.id)),
     });
+  }
+
+  fromObject(obj: any) {
+    this.name = obj.name;
+    this.backendId = obj.backendId;
+    for (const group of this.groups) {
+      group.fromObject(obj.groups[group.id]);
+    }
   }
 }

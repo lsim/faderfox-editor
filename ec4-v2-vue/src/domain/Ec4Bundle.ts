@@ -23,6 +23,11 @@ export class Ec4Bundle {
     b.name = meta.name;
     b.id = meta.id;
     parseSetupsFromSysex(bundle.bytes, b.setups);
+    if (meta.backendSetupIds) {
+      for (let i = 0; i < b.setups.length && i < meta.backendSetupIds.length; i++) {
+        b.setups[i].backendId = meta.backendSetupIds[i];
+      }
+    }
     return b;
   }
 
@@ -36,6 +41,7 @@ export class Ec4Bundle {
         id: this.id,
         name: this.name,
         timestamp: Date.now(),
+        backendSetupIds: this.setups.map((s) => s.backendId),
       },
     ];
   }

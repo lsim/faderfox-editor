@@ -242,4 +242,11 @@ export class Control {
 
     return Object.assign(c, { ...this, id: c.id, setupId: c.setupId, groupId: c.groupId });
   }
+
+  fromObject(obj: any) {
+    this.numbers = structuredClone<typeof this.numbers>(obj.numbers);
+    this.name = obj.name;
+    this.link = obj.link;
+    this.pb_link = obj.pb_link;
+  }
 }

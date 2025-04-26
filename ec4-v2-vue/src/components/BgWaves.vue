@@ -1,18 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
 import { useIdle } from '@vueuse/core';
 
-const { idle } = useIdle();
-
-const paused = ref(false);
-
-watch(
-  idle,
-  (newValue) => {
-    paused.value = !newValue;
-  },
-  { immediate: true },
-);
+const { idle } = useIdle(30000);
+idle.value = true;
 </script>
 
 <template>
@@ -31,7 +21,7 @@ watch(
           d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
         />
       </defs>
-      <g class="parallax" :class="{ paused: paused }">
+      <g class="parallax" :class="{ paused: !idle }">
         <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(0,0,0,0.7" />
         <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(0,0,0,0.5)" />
         <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(0,0,0,0.3)" />

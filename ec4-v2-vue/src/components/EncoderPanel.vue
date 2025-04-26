@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SingleEncoder from '@/components/SingleEncoder.vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
-import { computed, ref, useTemplateRef, nextTick } from 'vue';
+import { computed, ref, useTemplateRef, nextTick, onMounted } from 'vue';
 import { type ComponentExposed } from 'vue-component-type-helpers';
 import { onKeyStroke } from '@vueuse/core';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
@@ -36,6 +36,12 @@ onKeyStroke(' ', (e) => {
   e.preventDefault();
   e.stopPropagation();
   ec4.editorMode = ec4.editorMode === 'push' ? 'turn' : 'push';
+  nextTick(() => {
+    focusActiveEncoder();
+  });
+});
+
+onMounted(() => {
   nextTick(() => {
     focusActiveEncoder();
   });

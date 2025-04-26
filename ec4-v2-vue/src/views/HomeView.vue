@@ -8,6 +8,11 @@ import StoredConfs from '@/components/StoredConfs.vue';
 import BgWaves from '@/components/BgWaves.vue';
 import { onKeyStroke } from '@vueuse/core';
 import FillMacros from '@/components/FillMacros.vue';
+import { Earth, SlidersVertical } from 'lucide-vue-next';
+import Store from '@/components/store/Store.vue';
+import useApiClient from '@/composables/api-client.ts';
+import useToast from '@/composables/toast.ts';
+import Toaster from '@/components/Toaster.vue';
 
 const props = defineProps<{
   bundleId?: string;
@@ -15,13 +20,16 @@ const props = defineProps<{
 
 const groupId = ref<number>(0);
 
+const toast = useToast();
+
 const ec4 = useEc4Store();
+const apiClient = useApiClient();
 
 // Insist that focus doesn't leave the editor inputs
 function handleFocusOut(e: FocusEvent) {
   const fromTag = (e.relatedTarget as HTMLElement | undefined)?.tagName;
   // const toTag = (e.target as HTMLElement | undefined)?.tagName;
-  console.log('focus out', fromTag, e.target, e.relatedTarget);
+  console.debug('focus out', fromTag, e.target, e.relatedTarget);
   if ((!fromTag || fromTag === 'A') && e.target) {
     const x = window.scrollX;
     const y = window.scrollY;
@@ -34,7 +42,7 @@ function handleFocusOut(e: FocusEvent) {
 watch(
   () => props.bundleId,
   async (newId, oldId) => {
-    console.log('new bundleId', newId, oldId);
+    console.debug('new bundleId', newId, oldId);
     if (!newId) return;
     try {
       await ec4.loadBundle(Number.parseInt(newId, 10));
@@ -74,17 +82,31 @@ onKeyStroke('PageDown', (e) => {
 
 <template>
   <main @focusout="handleFocusOut" id="home">
+    <toaster />
     <div class="header">
       <bg-waves class="bg-waves" />
+      <div class="store-thumb shadow" @click="ec4.showStore = !ec4.showStore">
+        <earth
+          class="icon"
+          v-if="!ec4.showStore"
+          :size="50"
+          :class="{ animated: apiClient.token.value }"
+        /><sliders-vertical class="bordered icon" v-else :size="50" />
+      </div>
+
       <h1>Faderfox EC4 Editor</h1>
     </div>
-    <midi-settings class="midi-settings" />
-    <setup-listing class="group-selector" />
-    <front-panel :group-id="groupId" class="front-panel" />
-
-    <stored-confs class="stored-confs" />
-    <fill-macros class="fill-macros" />
-    <div class="credits">
+    <div class="midi-settings">
+      <midi-settings v-if="!ec4.showStore" class="shadow" />
+    </div>
+    <template v-if="!ec4.showStore">
+      <setup-listing class="group-selector shadow" />
+      <front-panel :group-id="groupId" class="front-panel shadow" />
+      <fill-macros class="fill-macros shadow" />
+      <stored-confs class="stored-confs" />
+    </template>
+    <store v-else class="the-store" />
+    <div class="credits" v-if="!ec4.showStore">
       <h3>Credits</h3>
       <p>
         This version of the EC4 Web-MIDI editor for the Faderfox EC4 was (re)built by Lars Ole Avery
@@ -99,9 +121,9 @@ onKeyStroke('PageDown', (e) => {
       </p>
       <h3>Complete Privacy:</h3>
       <p class="privacydeclaration">
-        This web application (page) does not track or transmit any data entered here. Visits,
-        appliance or any other interactions with this page are not tracked. If in doubt, feel free
-        to check the source code.
+        This web application (page) does not track or transmit any data entered here (unless you
+        actively publish a setup). Visits, appliance or any other interactions with this page are
+        not tracked. If in doubt, feel free to check the source code.
       </p>
     </div>
   </main>
@@ -123,10 +145,18 @@ onKeyStroke('PageDown', (e) => {
     'bundles bundles bundles'
     'credits credits credits';
   grid-template-columns: 1fr auto 1fr;
-  grid-template-rows: auto 25px auto 1fr auto;
+  grid-column-gap: 1em;
+  grid-template-rows: auto 14px auto 1fr auto;
+
+  .the-store {
+    grid-area: alignment;
+    grid-row: span 2;
+  }
 
   .header {
     grid-area: header;
+    position: relative;
+    margin-bottom: 1em;
     h1 {
       position: absolute;
       top: 0;
@@ -139,11 +169,44 @@ onKeyStroke('PageDown', (e) => {
       z-index: 1;
       height: 12vh;
     }
+    .store-thumb {
+      grid-area: midi-settings;
+      cursor: pointer;
+      position: absolute;
+      display: flex;
+      bottom: 0;
+      right: -54px;
+      border: 4px solid;
+      border-left: none;
+      border-top-right-radius: 50%;
+      border-bottom-right-radius: 50%;
+
+      .icon {
+        padding: 2px;
+        &.animated {
+          animation: rotate 30s linear infinite;
+          @keyframes rotate {
+            0% {
+              color: $yellow-600;
+              transform: rotate(0deg);
+            }
+            50% {
+              color: $blue-600;
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        }
+        color: $yellow-600;
+      }
+    }
   }
 
   .midi-settings {
     grid-area: midi-settings;
     align-self: start;
+    position: relative;
   }
 
   .group-selector {

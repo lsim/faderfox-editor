@@ -125,15 +125,15 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
 
 <style scoped lang="scss">
 @use '@picocss/pico/scss/colors/index.scss' as *;
-$oled-height: 130px;
-$oled-width: 300px;
+$oled-height: 138px;
+$oled-width: 305px;
 
 main {
   // This grid was tweaked to fit the outlines of the EC4 controller
   position: relative;
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
-  grid-template-rows: 73px 30px $oled-height 30px 480px 20px;
+  grid-template-rows: 65px 25px $oled-height 47px 500px 30px;
   grid-template-areas:
     'margin-left margin-top margin-right'
     'margin-left mode-selector margin-right'
@@ -144,10 +144,11 @@ main {
     'margin-left bundle-name margin-right';
   justify-items: center;
   width: 500px;
-  height: 818px;
-  background: url('../assets/ec4.jpg') no-repeat;
-  // The picture has a few too many pixels on the right, so make it a bit too big on that axis
-  background-size: 101.3% 100%;
+  height: 837px;
+  // The size and position of the picture is adjusted to fit the absolute size of the controls
+  background: url('../assets/ec4.jpg') no-repeat -16px -13px;
+  background-size: 536px 865px;
+  border-radius: 12px;
 
   .mode-selector {
     grid-area: mode-selector;
@@ -164,7 +165,6 @@ main {
 
   .encoders {
     grid-area: encoders;
-    padding-left: 5px;
   }
 
   .fillnumbers {
@@ -218,30 +218,32 @@ main {
     position: absolute;
     padding-right: 0.2em;
     padding-left: 0.5em;
+    padding-bottom: 0.2em;
     font-size: 150%;
-    left: 3.5em;
-    top: 1.7em;
+    left: 75px;
+    top: 40px;
     rotate: -10deg;
   }
 }
 #legend-button {
   position: absolute;
-  top: 81px;
-  right: 35px;
+  top: 73px;
+  right: 24px;
 }
 
 .undo,
 .redo {
   position: absolute;
-  width: 42px;
-  height: 42px;
-  left: 37px;
+  width: 43px;
+  height: 43px;
 }
 .undo {
-  top: 180px;
+  top: 176px;
+  left: 24px;
 }
 .redo {
-  top: 79px;
+  top: 179px;
+  right: 20px;
 }
 
 .history-button {

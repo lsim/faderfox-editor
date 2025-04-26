@@ -1,4 +1,4 @@
-import { ref, computed, type Ref } from 'vue';
+import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
@@ -59,6 +59,9 @@ export const useEc4Store = defineStore('ec4', () => {
 
   const lastStateSaved = ref(0);
 
+  const setupToPublish = ref<EncoderSetup | null>(null);
+  const showStore = ref(false);
+
   const history = useHistory();
   let historyPaused = false;
 
@@ -85,7 +88,7 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedEncoderIndex.value = 0;
     activeBundle.value = Ec4Bundle.createEmpty();
     history.clear();
-    await router.push({ name: 'home' });
+    await router.push({ name: 'new' });
   }
 
   const activeNumberField = computed(() => {
@@ -94,7 +97,7 @@ export const useEc4Store = defineStore('ec4', () => {
       : null;
   });
 
-  const gridRows = computed(() => {
+  const gridRows: ComputedRef<[EncoderSetup, EncoderGroup][]> = computed(() => {
     return activeBundle.value.setups.map((s, i) => [s, encoderGroups.value[i]]);
   });
 
@@ -116,6 +119,7 @@ export const useEc4Store = defineStore('ec4', () => {
     activeField,
     activeNumberField,
     gridRows,
+    setupToPublish,
     activeBundleId: computed(() => activeBundle.value?.id),
     activeBundleName: computed(() => activeBundle.value?.name),
     setBundleName(name: string) {
@@ -149,5 +153,6 @@ export const useEc4Store = defineStore('ec4', () => {
     skipHistory() {
       historyPaused = true;
     },
+    showStore,
   };
 });

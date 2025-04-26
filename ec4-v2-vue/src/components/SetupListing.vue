@@ -59,6 +59,11 @@ watch(
     if (nameInput) (nameInput as HTMLInputElement).focus();
   },
 );
+
+function startPublishing(setup: EncoderSetup) {
+  ec4.setupToPublish = setup;
+  ec4.showStore = true;
+}
 </script>
 
 <template>
@@ -75,6 +80,8 @@ watch(
         :can-paste="copyPaste.canPasteSetup.value"
         @copy="copyPaste.copySetup(s as EncoderSetup)"
         @paste="copyPaste.pasteSetup(idx)"
+        :show-publish-link="true"
+        @publish="startPublishing(s)"
       >
         <input
           v-model="s.name"
@@ -195,7 +202,6 @@ $picoColors: (
   .setup-name,
   .group-name {
     position: relative;
-    overflow: hidden;
     z-index: 10;
     padding: 2px;
     &:has(.selected) {

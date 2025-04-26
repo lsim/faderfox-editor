@@ -46,7 +46,11 @@ yarn lint
 
 ## TODO
 
-- Undo functionality somehow? Pinia has something built in
+- Show non-empty group titles in shared setup listing
+- Only show auth UI when a request is pending which needs auth and we don't have a valid token (publication list doesn't) (perhaps do fast token validation through ws)
+- Gravatar support for authors
+- Rotate transition from store to settings?
+- Select encoder by clicking on the device buttons
 - Write protect bundle checkmark? Is there an easy way to make all inputs/links/... disabled?
 - IDEA: Shift + Ctrl + nav or eg Alt + Tab could select a range of encoders (eg for inserting incremental values)
 - Send to EC4 activity indicator? Or a modal you can't dismiss? Or a simulated progress bar that also blocks further midi IO?

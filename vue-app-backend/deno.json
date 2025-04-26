@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --watch --unstable-kv --allow-net --allow-env main.ts"
+    "dev": "deno run --watch --unstable-kv --allow-net --allow-env src/main.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
@@ -11,6 +11,6 @@
       "**/node_modules"
     ],
     "include": [],
-    "entrypoint": "main.ts"
+    "entrypoint": "src/main.ts"
   }
 }

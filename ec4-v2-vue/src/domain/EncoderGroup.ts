@@ -40,4 +40,11 @@ export class EncoderGroup {
       controls: this.controls.map((c) => c.clone(g.setupId, g.id)),
     });
   }
+
+  fromObject(obj: any) {
+    this.name = obj.name;
+    for (const control of this.controls) {
+      control.fromObject(obj.controls[control.id]);
+    }
+  }
 }

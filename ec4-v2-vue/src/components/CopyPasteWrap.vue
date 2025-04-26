@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import useCopyPaste from '@/composables/copy-paste';
-import { Copy, ClipboardPaste } from 'lucide-vue-next';
+import { Copy, ClipboardPaste, CloudUpload } from 'lucide-vue-next';
+import useApiClient from '@/composables/api-client.ts';
+
 const props = withDefaults(
   defineProps<{
     alwaysShow?: boolean;
     canPaste: boolean;
+    showPublishLink?: boolean;
   }>(),
   {
     alwaysShow: false,
+    showPublishLink: false,
   },
 );
+
+const apiClient = useApiClient();
 
 const emit = defineEmits<{
   (event: 'copy', e: MouseEvent): void;
   (event: 'paste', e: MouseEvent): void;
+  (event: 'publish', e: MouseEvent): void;
 }>();
 
 const copyPaste = useCopyPaste();
@@ -25,28 +32,41 @@ const showCopy = computed(() => copyPaste.copyMode.value && (props.alwaysShow ||
 const showPaste = computed(
   () => copyPaste.copyMode.value && props.canPaste && (props.alwaysShow || isHovered.value),
 );
+const showPublish = computed(() => copyPaste.copyMode.value && isHovered.value);
 </script>
 
 <template>
   <div class="wrapper" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
     <slot></slot>
+    <div class="copy-wrapper">
+      <a
+        class="copy-button"
+        :class="{ in: showCopy }"
+        @click="emit('copy', $event)"
+        title="Copy"
+        tabindex="-1"
+      >
+        <copy class="icon" />
+      </a>
+      <a
+        class="paste-button"
+        :class="{ in: showPaste }"
+        @click="emit('paste', $event)"
+        title="Paste"
+        tabindex="-1"
+      >
+        <clipboard-paste class="icon" />
+      </a>
+    </div>
     <a
-      class="copy-button"
-      :class="{ in: showCopy }"
-      @click="emit('copy', $event)"
-      title="Copy"
+      class="publish-button"
+      :class="{ in: showPublish }"
+      v-if="showPublishLink"
+      @click="emit('publish', $event)"
+      title="Publish"
       tabindex="-1"
     >
-      <copy class="icon" />
-    </a>
-    <a
-      class="paste-button"
-      :class="{ in: showPaste }"
-      @click="emit('paste', $event)"
-      title="Paste"
-      tabindex="-1"
-    >
-      <clipboard-paste class="icon" />
+      <cloud-upload class="icon" />
     </a>
   </div>
 </template>
@@ -57,11 +77,22 @@ const showPaste = computed(
 
 .wrapper {
   position: relative;
-  overflow: hidden;
-  display: grid;
+
+  .copy-wrapper {
+    display: grid;
+    pointer-events: none;
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
 
   .copy-button,
-  .paste-button {
+  .paste-button,
+  .publish-button {
     position: absolute;
     align-self: center;
     top: 10%;
@@ -77,7 +108,6 @@ const showPaste = computed(
       left 0.3s ease,
       right 0.3s ease,
       filter 0.2s ease;
-    z-index: 100;
     border: solid 2px rgba(255, 255, 255, 0.6);
 
     &:hover {
@@ -99,6 +129,13 @@ const showPaste = computed(
     right: -100%;
     &.in {
       right: 0;
+    }
+  }
+
+  .publish-button {
+    left: 0;
+    &.in {
+      left: -30px;
     }
   }
 }

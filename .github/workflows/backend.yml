@@ -12,7 +12,7 @@ jobs:
       contents: read # Needed to clone the repository
     defaults:
       run:
-        working-directory: ./ec4-v2-vue/backend
+        working-directory: ./vue-app-backend
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -26,5 +26,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "lsim-faderfox-editor"
-          entrypoint: ./main.ts
-          root: ./ec4-v2-vue/backend/
+          entrypoint: ./src/main.ts
+          root: ./vue-app-backend/
