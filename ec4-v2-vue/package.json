@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@picocss/pico": "^2.1.1",
-    "@vueuse/components": "^13.0.0",
+    "@vueuse/components": "^13.1.0",
     "@vueuse/core": "^13.0.0",
     "@vueuse/integrations": "^13.1.0",
     "@vueuse/rxjs": "^13.0.0",
