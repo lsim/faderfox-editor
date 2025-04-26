@@ -130,7 +130,7 @@ class ApiClient {
   }
 
   async register(username: string, password: string, email: string) {
-    const { data, response } = (await this.fetch('auth/register'))
+    const { data, response } = await this.fetch('auth/register')
       .post({ username, password, email })
       .text();
     if (!response.value || response.value.status !== 201) {
