@@ -26,7 +26,7 @@ const toast = useToast();
 @use 'sass:color';
 
 @mixin colorize($color: string) {
-  filter: drop-shadow(0 0 5px rgba(color.scale($color, $lightness: 30%), 0.8));
+  filter: drop-shadow(0 0 5px rgba(color.scale($color, $lightness: 50%), 0.8));
   background-color: $color;
 }
 .toast-container {

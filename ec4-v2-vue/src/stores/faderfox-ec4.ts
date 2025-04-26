@@ -9,6 +9,7 @@ import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import router from '@/router';
 import useHistory from '@/composables/history.ts';
 import type { Publication } from '@/composables/api-client.ts';
+import useBusy from '@/composables/busy.ts';
 
 export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
@@ -40,6 +41,7 @@ window.addEventListener('blur', () => {
 
 export const useEc4Store = defineStore('ec4', () => {
   const storage = useStorage();
+  const { setBusy } = useBusy();
   const activeBundle: Ref<Ec4Bundle> = ref(Ec4Bundle.createEmpty());
 
   const selectedSetupIndex = ref<number>(0);
@@ -72,10 +74,8 @@ export const useEc4Store = defineStore('ec4', () => {
     activeBundle,
     async (newBundle, oldBundle) => {
       // No auto save if we are loading a new bundle
-      console.debug('bundle changed', newBundle?.id, oldBundle?.id, oldBundle);
       if (!oldBundle || newBundle.id !== oldBundle.id) return;
-      console.debug('saving bundle change', newBundle?.id, oldBundle?.id, oldBundle);
-      const delta = await storage.saveBundle(activeBundle.value);
+      const delta = await setBusy(storage.saveBundle(activeBundle.value));
       if (!delta) return;
       if (!historyPaused) history.pushEdit(delta);
       historyPaused = false;
@@ -114,7 +114,7 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedEncoderIndex,
     selectedControl,
     loadBundle: async (id: number) => {
-      activeBundle.value = await storage.loadBundle(id);
+      activeBundle.value = await setBusy(storage.loadBundle(id));
       history.clear();
     },
     lastStateSaved,

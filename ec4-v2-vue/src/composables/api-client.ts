@@ -1,8 +1,8 @@
 import { createFetch, useLocalStorage, useWebSocket, type UseWebSocketReturn } from '@vueuse/core';
 import { ref, watch } from 'vue';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
-import router from '@/router';
 import useToast from '@/composables/toast.ts';
+import useBusy from '@/composables/busy.ts';
 
 export interface Publication {
   name: string;
@@ -41,7 +41,10 @@ class ApiClient {
   public readonly loginResolver = ref<(() => void) | null>(null);
   public readonly numUpdates = ref(0);
 
-  constructor(private readonly toast: ReturnType<typeof useToast>) {
+  constructor(
+    private readonly toast: ReturnType<typeof useToast>,
+    private readonly busy: ReturnType<typeof useBusy>,
+  ) {
     this.connect();
   }
 
@@ -128,7 +131,9 @@ class ApiClient {
     id = '',
   ) {
     const argSuffix = id ? `/${id}` : '';
-    return this.useFetch<T>(`${path}${argSuffix}`);
+    const p = this.useFetch<T>(`${path}${argSuffix}`);
+    this.busy.setBusy(p).then();
+    return p;
   }
 
   async register(username: string, password: string, email: string) {
@@ -307,7 +312,8 @@ let apiClient: ApiClient | null = null;
 export default function useApiClient() {
   if (!apiClient) {
     const toast = useToast();
-    apiClient = new ApiClient(toast);
+    const busy = useBusy();
+    apiClient = new ApiClient(toast, busy);
   }
   return apiClient;
 }

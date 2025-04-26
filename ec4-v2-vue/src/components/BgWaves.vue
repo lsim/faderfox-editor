@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import { useIdle } from '@vueuse/core';
+import useBusy from '@/composables/busy';
+import { computed } from 'vue';
 
 const { idle } = useIdle(30000);
+const { isBusy } = useBusy();
+
 idle.value = true;
+
+const rollTheWaves = computed(() => {
+  return idle.value || isBusy.value > 0;
+});
 </script>
 
 <template>
@@ -21,7 +29,7 @@ idle.value = true;
           d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
         />
       </defs>
-      <g class="parallax" :class="{ paused: !idle }">
+      <g class="parallax" :class="{ paused: !rollTheWaves }">
         <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(0,0,0,0.7" />
         <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(0,0,0,0.5)" />
         <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(0,0,0,0.3)" />

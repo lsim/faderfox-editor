@@ -3,6 +3,7 @@ import { useObservable } from '@vueuse/rxjs';
 import { from } from 'rxjs';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
 import router from '@/router';
+import useBusy from '@/composables/busy.ts';
 
 export interface DbBundleMeta {
   id: number;
@@ -61,6 +62,7 @@ export class DbBundleDelta {
 }
 
 export function useStorage() {
+  const { setBusy } = useBusy();
   const db = new Dexie('ec4-editor-settings') as Dexie & {
     summaries: EntityTable<DbBundleMeta, 'id'>;
     bundles: EntityTable<DbBundle, 'id'>;
@@ -76,24 +78,28 @@ export function useStorage() {
   );
 
   async function getBundle(meta: DbBundleMeta) {
-    return db.bundles.get(meta.id);
+    return setBusy(db.bundles.get(meta.id));
   }
 
   async function updateBundle(meta: DbBundleMeta, bundle: DbBundle): Promise<DbBundle | null> {
-    return db.transaction('rw', db.bundles, db.summaries, async () => {
-      // Retrieve the old bytes so we can calculate the delta
-      const oldBundle = await db.bundles.get(meta.id);
-      await db.bundles.put(bundle);
-      await db.summaries.put(meta);
-      return oldBundle || null;
-    });
+    return setBusy(
+      db.transaction('rw', db.bundles, db.summaries, async () => {
+        // Retrieve the old bytes so we can calculate the delta
+        const oldBundle = await db.bundles.get(meta.id);
+        await db.bundles.put(bundle);
+        await db.summaries.put(meta);
+        return oldBundle || null;
+      }),
+    );
   }
 
   async function deleteBundle(meta: DbBundleMeta) {
-    await db.transaction('rw', db.bundles, db.summaries, async () => {
-      await db.bundles.delete(meta.id);
-      await db.summaries.delete(meta.id);
-    });
+    await setBusy(
+      db.transaction('rw', db.bundles, db.summaries, async () => {
+        await db.bundles.delete(meta.id);
+        await db.summaries.delete(meta.id);
+      }),
+    );
   }
 
   // Returns the delta to the bundle and the delta to the meta
