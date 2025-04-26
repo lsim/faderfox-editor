@@ -46,6 +46,7 @@ const toast = useToast();
     margin: 0.5em;
     border-radius: 5px;
     pointer-events: auto;
+    border: 2px solid rgba($white, 0.3);
     &.celebrate {
       @include colorize($purple-700);
       animation: colorFade 2s ease-in-out;
@@ -65,7 +66,7 @@ const toast = useToast();
       @include colorize($green-700);
     }
     &.info {
-      @include colorize($blue-900);
+      @include colorize($blue-850);
     }
     &.warning {
       @include colorize($orange-800);
@@ -82,11 +83,14 @@ const toast = useToast();
 
   .v-enter-active,
   .v-leave-active {
-    transition: transform 0.5s ease;
+    transition:
+      transform 0.5s ease,
+      opacity 1s ease;
   }
   .v-enter-from,
   .v-leave-to {
     transform: translateX(-120%);
+    opacity: 0;
   }
 }
 </style>

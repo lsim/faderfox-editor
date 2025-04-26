@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import useApiClient, { type Publication } from '@/composables/api-client.ts';
-import { ref, computed, nextTick, useTemplateRef, watch } from 'vue';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
 const props = defineProps<{
   setup?: EncoderSetup;
@@ -52,7 +52,6 @@ const unwatch = watch(descriptionRef, (validRef) => {
     unwatch();
   }
 });
-nextTick(() => {});
 </script>
 
 <template>
