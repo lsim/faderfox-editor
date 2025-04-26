@@ -62,13 +62,16 @@ const apiClient = useApiClient();
 
 async function resetPassword() {
   try {
-    await apiClient.resetPassword(password.value);
-    toast.show('Password updated successfully. You may now close this window.', 'success', 10000);
-    state.value = 'login';
+    const result = await apiClient.resetPassword(password.value);
+    if (result) {
+      toast.show('Password updated successfully. You may now close this window.', 'success', 10000);
+      state.value = 'login';
+      return;
+    }
   } catch (e) {
     console.error('Failed to update password', e);
-    toast.show('Failed to update password. Please try again.', 'error', 10000);
   }
+  toast.show('Failed to update password. Please try again.', 'error', 10000);
 }
 
 async function sendRecoveryEmail() {

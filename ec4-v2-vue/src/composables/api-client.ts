@@ -167,7 +167,10 @@ class ApiClient {
   }
 
   async sendRecoveryEmail(email: string) {
-    const url = new URL(window.location.protocol + window.location.host + import.meta.env.BASE_URL);
+    this.toast.show('Sending recovery email...', 'info');
+    const url = new URL(
+      window.location.protocol + window.location.host + import.meta.env.BASE_URL + '/',
+    );
     console.debug('Recovery url', url.toString());
     const { data, statusCode, response } = await this.fetch('auth/recovery')
       .post({ email, host: url.toString() })
@@ -189,7 +192,6 @@ class ApiClient {
     if (data.value) {
       this.token.value = data.value;
       this.loginResolver.value?.();
-      await router.push('home');
     }
     return !!data.value;
   }
@@ -286,8 +288,8 @@ class ApiClient {
 let apiClient: ApiClient | null = null;
 
 export default function useApiClient() {
-  const toast = useToast();
   if (!apiClient) {
+    const toast = useToast();
     apiClient = new ApiClient(toast);
   }
   return apiClient;
