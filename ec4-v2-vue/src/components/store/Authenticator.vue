@@ -78,7 +78,7 @@ async function sendRecoveryEmail() {
   try {
     await apiClient.sendRecoveryEmail(email.value);
     state.value = 'login';
-    toast.show('Recovery email sent. Please check your inbox.', 'success', 10000);
+    toast.show('Recovery email sent. Please check your inbox.', 'info', 10000);
   } catch (e) {
     console.error('Failed to send recovery email', e);
     toast.show('Failed to send recovery email. Please try again.', 'error', 10000);
