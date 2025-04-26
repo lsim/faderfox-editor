@@ -39,6 +39,15 @@ function handleFocusOut(e: FocusEvent) {
   }
 }
 
+// For pulsing the store icon
+const newUpdateReceived = ref(false);
+watch(apiClient.numUpdates, () => {
+  newUpdateReceived.value = true;
+  setTimeout(() => {
+    newUpdateReceived.value = false;
+  }, 2000);
+});
+
 watch(
   () => props.bundleId,
   async (newId, oldId) => {
@@ -90,7 +99,7 @@ onKeyStroke('PageDown', (e) => {
           class="icon"
           v-if="!ec4.showStore"
           :size="50"
-          :class="{ animated: apiClient.token.value }"
+          :class="{ animated: apiClient.token.value, pulsing: newUpdateReceived }"
         /><sliders-vertical class="bordered icon" v-else :size="50" />
       </div>
 
@@ -170,19 +179,21 @@ onKeyStroke('PageDown', (e) => {
       height: 12vh;
     }
     .store-thumb {
-      grid-area: midi-settings;
       cursor: pointer;
-      position: absolute;
+      position: fixed;
       display: flex;
-      bottom: 0;
-      right: -54px;
+      top: 100px;
+      right: 0;
       border: 4px solid;
-      border-left: none;
-      border-top-right-radius: 50%;
-      border-bottom-right-radius: 50%;
+      border-right: none;
+      border-top-left-radius: 50%;
+      border-bottom-left-radius: 50%;
 
       .icon {
         padding: 2px;
+        color: $yellow-600;
+        border-radius: 50%;
+
         &.animated {
           animation: rotate 30s linear infinite;
           @keyframes rotate {
@@ -198,7 +209,24 @@ onKeyStroke('PageDown', (e) => {
             }
           }
         }
-        color: $yellow-600;
+        &.pulsing {
+          animation: pulse 1.5s ease;
+          $diameter: 40px;
+          @keyframes pulse {
+            0% {
+              rotate: 0deg;
+              box-shadow: 0 0 0 0 rgba($green-500, 0.8);
+            }
+            50% {
+              rotate: 360deg;
+              box-shadow: 0 0 0 $diameter rgba($green-800, 0);
+            }
+            100% {
+              rotate: 360deg;
+              box-shadow: 0 0 0 $diameter rgba($green-800, 0);
+            }
+          }
+        }
       }
     }
   }

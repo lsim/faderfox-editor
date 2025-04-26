@@ -39,6 +39,7 @@ class ApiClient {
   // Show the login dialog when this promise is set
   public readonly loginPromise = ref<Promise<void> | null>(null);
   public readonly loginResolver = ref<(() => void) | null>(null);
+  public readonly numUpdates = ref(0);
 
   constructor(private readonly toast: ReturnType<typeof useToast>) {
     this.connect();
@@ -95,6 +96,7 @@ class ApiClient {
         console.debug('ws received', newData);
         const msg = JSON.parse(newData);
         if (msg.type === 'publications-updated') {
+          this.numUpdates.value++;
           this.loadPublications().then();
         }
         if (this.ws) this.ws.data.value = null;
