@@ -14,7 +14,7 @@ import useApiClient from '@/composables/api-client.ts';
 import useToast from '@/composables/toast.ts';
 import Toaster from '@/components/Toaster.vue';
 import useMidi from '@/composables/useMidi.ts';
-import router from '@/router';
+import useRemoteControl from '@/composables/remote-control.ts';
 
 const props = defineProps<{
   bundleId?: string;
@@ -27,6 +27,7 @@ const toast = useToast();
 const ec4 = useEc4Store();
 const apiClient = useApiClient();
 const midi = useMidi();
+useRemoteControl();
 
 onBeforeUnmount(() => {
   midi.dispose();

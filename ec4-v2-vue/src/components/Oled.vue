@@ -239,18 +239,17 @@ onKeyStroke('End', (e) => {
       @focus="setActiveField('pb_display', $event.target)"
       :class="{ hidden: isHidden('pb_display', control) }"
     />
-    <!-- Encoder number - NRPN/other/push button -->
+    <!-- Encoder number/address/note -->
     <template v-if="ec4.editorMode === 'turn'">
-      <label
-        for="encoderNumber"
-        :class="{
-          'active-field': ec4.activeField === 'number',
-          hidden: isHidden('number', control),
-        }"
-        >{{ t('OLED_NUMBER') }}:</label
-      >
-
       <template v-if="control.numbers.type === encoderTypeByName('NRPN')">
+        <label
+          for="encoderNumber"
+          :class="{
+            'active-field': ec4.activeField === 'number',
+            hidden: isHidden('number', control),
+          }"
+          >{{ t('OLED_NUMBER') }}:</label
+        >
         <span class="two-inputs" :class="{ hidden: isHidden('number', control) }">
           <input
             id="encoderNumber"
@@ -266,7 +265,33 @@ onKeyStroke('End', (e) => {
           />
         </span>
       </template>
+      <template v-else-if="control.numbers.type === encoderTypeByName('Note')">
+        <label
+          :class="{
+            'active-field': ec4.activeField === 'number',
+            hidden: isHidden('number', control),
+          }"
+          @click="setActiveField('number', $event.target)"
+          >{{ t('OLED_NUMBER') }}:</label
+        >
+        <note-input
+          ref="pbNumberInput"
+          v-model="control.numbers.number"
+          :class="{ hidden: isHidden('number', control) }"
+          class="note-input"
+          @focus="setActiveField('number', $event.target)"
+        />
+      </template>
+
       <template v-else>
+        <label
+          for="encoderNumber"
+          :class="{
+            'active-field': ec4.activeField === 'number',
+            hidden: isHidden('number', control),
+          }"
+          >{{ t('OLED_NUMBER') }}:</label
+        >
         <input
           id="encoderNumber"
           ref="numberInput"

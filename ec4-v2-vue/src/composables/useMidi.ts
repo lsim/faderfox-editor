@@ -358,6 +358,10 @@ function initMidi(toast: ReturnType<typeof useToast>) {
 
   let inboundBundlesSubscription: Subscription | undefined = undefined;
 
+  const inboundMessagesSubject = new Subject<[MidiMessage, Uint8Array]>();
+
+  let inboundMessagesSubscription: Subscription | undefined = undefined;
+
   const storage = useStorage();
 
   watch(
@@ -370,13 +374,17 @@ function initMidi(toast: ReturnType<typeof useToast>) {
           toast.show('Received full sysex dump from EC4', 'info');
           await storage.addBundle(bytes, 'Sysex from EC4');
         });
+      inboundMessagesSubscription?.unsubscribe();
+      inboundMessagesSubscription =
+        newLink?.input.receivedMessages$.subscribe(inboundMessagesSubject);
     },
+    { immediate: true },
   );
 
   watch(
     () => [ec4.selectedSetupIndex, ec4.selectedGroupIndex],
     async ([newSetupId, newGroupId]) => {
-      console.log('new setup/group', newSetupId, newGroupId);
+      protocol.value?.setSetupAndGroup(newSetupId, newGroupId);
     },
   );
 
@@ -393,6 +401,7 @@ function initMidi(toast: ReturnType<typeof useToast>) {
     selectedOutput,
     sendBundle,
     dispose,
+    inboundMessages$: inboundMessagesSubject.asObservable(),
   };
 }
 
