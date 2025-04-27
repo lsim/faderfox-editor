@@ -7,6 +7,7 @@ import useFileStorage from '@/composables/fileStorage.ts';
 import router from '@/router';
 import { ref, nextTick } from 'vue';
 import useMidi from '@/composables/useMidi.ts';
+import useToast from '@/composables/toast.ts';
 import { Trash, HardDriveDownload, ArrowRight, KeyboardMusic, PackagePlus } from 'lucide-vue-next';
 
 const fileStorage = useFileStorage();
@@ -45,6 +46,7 @@ async function deleteBundle(meta: DbBundleMeta) {
 const ec4 = useEc4Store();
 
 const midi = useMidi();
+const toast = useToast();
 
 async function editBundle(meta: DbBundleMeta) {
   if (meta.id === ec4.activeBundleId) return;
@@ -61,6 +63,10 @@ async function downloadBundle(meta: DbBundleMeta) {
 async function sendBundle(meta: DbBundleMeta) {
   const bundle = await storage.getBundle(meta);
   if (!bundle?.bytes) return;
+  toast.show(
+    'Sending to EC4. You should be in the receiving screen. You will see progress there',
+    'info',
+  );
   midi.sendBundle(bundle);
 }
 
@@ -107,7 +113,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
         <tr
           tabIndex="-1"
           :class="{ active: meta.id === ec4.activeBundleId }"
-          @click.capture.prevent="editBundle(meta)"
+          @click.prevent="editBundle(meta)"
           v-for="meta in (storage.bundleMetas.value || []).filter(
             (m: DbBundleMeta | undefined) => !!m,
           )"
@@ -129,7 +135,10 @@ async function onDrop(files: File[] | null, e: DragEvent) {
               <nav>
                 <ul>
                   <li>
-                    <a href="#" @click.prevent="downloadBundle(meta)" title="Save sysex to disk"
+                    <a
+                      href="#"
+                      @click.prevent.stop="downloadBundle(meta)"
+                      title="Save sysex to disk"
                       ><hard-drive-download
                     /></a>
                   </li>
@@ -145,7 +154,9 @@ async function onDrop(files: File[] | null, e: DragEvent) {
                     /></a>
                   </li>
                   <li>
-                    <a href="#" @click.prevent="deleteBundle(meta)" title="Delete"><trash /></a>
+                    <a href="#" @click.prevent.stop="deleteBundle(meta)" title="Delete"
+                      ><trash
+                    /></a>
                   </li>
                 </ul>
               </nav>

@@ -4,10 +4,6 @@ import { watch, onBeforeUnmount } from 'vue';
 
 const midi = useMidi();
 
-onBeforeUnmount(() => {
-  midi.dispose();
-});
-
 watch(
   () => midi.inputs.value,
   (newInputs) => {

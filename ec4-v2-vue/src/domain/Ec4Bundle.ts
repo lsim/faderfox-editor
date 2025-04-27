@@ -19,15 +19,20 @@ export class Ec4Bundle {
   }
 
   public static fromDb(bundle: DbBundle, meta: DbBundleMeta) {
-    const b = Ec4Bundle.createEmpty();
-    b.name = meta.name;
+    const b = Ec4Bundle.fromBytes(bundle.bytes, meta.name);
     b.id = meta.id;
-    parseSetupsFromSysex(bundle.bytes, b.setups);
     if (meta.backendSetupIds) {
       for (let i = 0; i < b.setups.length && i < meta.backendSetupIds.length; i++) {
         b.setups[i].backendId = meta.backendSetupIds[i];
       }
     }
+    return b;
+  }
+
+  public static fromBytes(bytes: Uint8Array, name: string) {
+    const b = Ec4Bundle.createEmpty();
+    b.name = name;
+    parseSetupsFromSysex(bytes, b.setups);
     return b;
   }
 

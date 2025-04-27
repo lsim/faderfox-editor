@@ -19,6 +19,7 @@ export default defineConfig({
       includeAssets: ['assets'],
     }),
   ],
+  assetsInclude: ['**/*.syx'],
   // root: fileURLToPath(new URL('./src', import.meta.url)),
   resolve: {
     alias: {

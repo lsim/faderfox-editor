@@ -2,7 +2,7 @@
 import FrontPanel from '@/components/FrontPanel.vue';
 import MidiSettings from '@/components/MidiSettings.vue';
 import SetupListing from '@/components/SetupListing.vue';
-import { ref, watch } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import StoredConfs from '@/components/StoredConfs.vue';
 import BgWaves from '@/components/BgWaves.vue';
@@ -13,6 +13,8 @@ import Store from '@/components/store/Store.vue';
 import useApiClient from '@/composables/api-client.ts';
 import useToast from '@/composables/toast.ts';
 import Toaster from '@/components/Toaster.vue';
+import useMidi from '@/composables/useMidi.ts';
+import router from '@/router';
 
 const props = defineProps<{
   bundleId?: string;
@@ -24,6 +26,11 @@ const toast = useToast();
 
 const ec4 = useEc4Store();
 const apiClient = useApiClient();
+const midi = useMidi();
+
+onBeforeUnmount(() => {
+  midi.dispose();
+});
 
 // Insist that focus doesn't leave the editor inputs
 function handleFocusOut(e: FocusEvent) {
@@ -55,11 +62,10 @@ watch(
     if (!newId) return;
     try {
       await ec4.loadBundle(Number.parseInt(newId, 10));
-      return;
     } catch (e) {
       console.warn(e);
       // No usable bundle id - reset the editor
-      await ec4.newBundle();
+      ec4.newBundle().then();
     }
   },
   { immediate: true },

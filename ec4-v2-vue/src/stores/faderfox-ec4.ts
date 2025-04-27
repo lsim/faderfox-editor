@@ -15,6 +15,14 @@ export function* generateIds() {
   for (let i = 0; i < 16; i++) yield i;
 }
 
+export async function getFactoryBundle() {
+  const r = await fetch(import.meta.env.BASE_URL + '/EC4-factory-v2.syx');
+  const blob = await r.blob();
+  const buffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  return Ec4Bundle.fromBytes(bytes, 'Factory Default');
+}
+
 function* generateDefaultNames(prefix: string) {
   for (let i = 0; i < 16; i++) {
     yield `${prefix}${String(i + 1).padStart(2, '0')}`;
@@ -39,10 +47,12 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
+const factoryBundle = getFactoryBundle();
 export const useEc4Store = defineStore('ec4', () => {
   const storage = useStorage();
   const { setBusy } = useBusy();
   const activeBundle: Ref<Ec4Bundle> = ref(Ec4Bundle.createEmpty());
+  (async () => (activeBundle.value = (await factoryBundle).clone()))();
 
   const selectedSetupIndex = ref<number>(0);
 
@@ -73,11 +83,12 @@ export const useEc4Store = defineStore('ec4', () => {
   watchDebounced(
     activeBundle,
     async (newBundle, oldBundle) => {
-      // No auto save if we are loading a new bundle
-      if (!oldBundle || newBundle.id !== oldBundle.id) return;
-      const delta = await setBusy(storage.saveBundle(activeBundle.value));
-      if (!delta) return;
-      if (!historyPaused) history.pushEdit(delta);
+      // No auto save if we are loading a bundle
+      if (!newBundle || newBundle !== oldBundle) return;
+      const delta = await setBusy(storage.saveBundle(newBundle));
+      if (delta && !historyPaused) {
+        history.pushEdit(delta);
+      }
       historyPaused = false;
       lastStateSaved.value = Date.now();
     },
@@ -88,7 +99,7 @@ export const useEc4Store = defineStore('ec4', () => {
     selectedSetupIndex.value = 0;
     selectedGroupIndex.value = 0;
     selectedEncoderIndex.value = 0;
-    activeBundle.value = Ec4Bundle.createEmpty();
+    activeBundle.value = (await getFactoryBundle()).clone();
     history.clear();
     await router.push({ name: 'new' });
   }
