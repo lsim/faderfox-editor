@@ -81,8 +81,8 @@ onMounted(() => {
   &.encoder-container {
     // A 4 x 4 grid of encoders
     display: grid;
-    grid-template-columns: repeat(4, 110px);
-    grid-template-rows: repeat(4, 118px);
+    grid-template-columns: repeat(4, 5.8em);
+    grid-template-rows: repeat(4, 6.5em);
 
     .selected {
       // Mark the selected encoder

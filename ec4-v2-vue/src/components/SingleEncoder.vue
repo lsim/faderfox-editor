@@ -474,11 +474,11 @@ defineExpose({
     width: 4em;
   }
 
-  $knob-size: 55px;
+  $knob-size: 3.2em;
   .knob {
     z-index: 0;
     position: absolute;
-    top: 10px;
+    top: 1.1em;
     left: 0;
     bottom: 0;
     right: 0;
@@ -489,8 +489,8 @@ defineExpose({
     margin: auto;
     border-radius: 50%;
     background-color: #222;
-    box-shadow: 0 0 15px #777;
-    border: 2px solid #000;
+    box-shadow: 0 0 1.1em #777;
+    border: 2px solid $black;
   }
 
   &.active {
@@ -505,8 +505,8 @@ defineExpose({
     &.push::before {
       content: '\00a0';
       left: 0;
-      bottom: 7px;
-      width: 35px;
+      bottom: 0.2em;
+      width: 0.9em;
       background-image: url(../assets/tap-svgrepo-com.svg);
       background-size: 100% 100%;
       background-repeat: no-repeat;
@@ -530,9 +530,9 @@ defineExpose({
       }
     }
     &.turn::before {
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba($white, 0.5);
       content: '↻';
-      bottom: 6px;
+      bottom: 0.1em;
 
       animation: turn 0.5s;
 

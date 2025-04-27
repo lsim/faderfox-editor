@@ -132,7 +132,7 @@ main {
   // This grid was tweaked to fit the outlines of the EC4 controller
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-columns: 0.1fr 2fr 0.1fr;
   grid-template-rows: 3.7em 1.3em $oled-height 1.3em 26.3em;
   grid-template-areas:
     'margin-left margin-top margin-right'
@@ -182,7 +182,6 @@ main {
     grid-row: span 2;
     padding-right: 1em;
     text-align: center;
-    margin-top: 0.3em;
     height: 1.5em;
     outline: none;
   }
@@ -232,23 +231,23 @@ main {
 }
 #legend-button {
   position: absolute;
-  top: 3.8em;
+  top: 3.9em;
   right: 1.3em;
 }
 
 .undo,
 .redo {
   position: absolute;
-  width: 2em;
-  height: 2em;
+  width: 2.1em;
+  height: 2.1em;
 }
 .undo {
-  top: 9.4em;
+  top: 9.45em;
   left: 1.3em;
 }
 .redo {
   top: 9.5em;
-  right: 1.3em;
+  right: 1.1em;
 }
 
 .history-button {

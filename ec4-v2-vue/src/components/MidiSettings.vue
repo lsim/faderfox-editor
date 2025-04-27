@@ -77,10 +77,13 @@ watch(
 #midisettings {
   border: 3px solid #ccc;
   border-radius: 7px;
-  padding: 15px;
+  padding: 0.8em;
 
   label {
     white-space: nowrap;
+  }
+  select {
+    font-size: small;
   }
   display: grid;
   align-items: baseline;
