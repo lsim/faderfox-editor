@@ -23,7 +23,7 @@ Imitation is the highest form of flattery, after all 😉
 
 I wanted to contribute new features but was not up to the task of properly working with the original implementation.
 
-A few extra features have been added compared to the (already awesome) original editor.
+Extra features have been added compared to the (already awesome) original editor.
 
 - Storage of configuration data in the browser's IndexedDb
 - Auto saving of data to the db (page reload no longer a thing to be feared!)
@@ -38,13 +38,6 @@ A few extra features have been added compared to the (already awesome) original 
 - Encoder selection possible via EC4 push buttons
 - Numeric values can be set with EC4 encoders
 - Pause-screen-animation when left idle 😀
-
-#### Some planned features
-
-These may or may not materialize as this has been a hobby project and I may lose interest at any time 😀
-
-- Built-in sharing of groups/setups between users
-- More advanced macro functionality
 
 #### Drawbacks of the reimplementation
 Lack of battle hardening means you may encounter bugs. I haven't had time to test the editor extensively, so please report any issues you find.
