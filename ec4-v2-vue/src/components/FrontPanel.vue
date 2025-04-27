@@ -132,7 +132,7 @@ main {
   // This grid was tweaked to fit the outlines of the EC4 controller
   position: relative;
   display: grid;
-  grid-template-columns: 0.1fr 2fr 0.1fr;
+  grid-template-columns: 1fr 2fr 1fr;
   grid-template-rows: 3.7em 1.3em $oled-height 1.3em 26.3em;
   grid-template-areas:
     'margin-left margin-top margin-right'
@@ -142,11 +142,11 @@ main {
     'margin-left encoders margin-right'
     'margin-left bundle-name margin-right';
   justify-items: center;
-  width: 26.3em;
+  width: 24.3em;
   height: 44.1em;
   // The size and position of the picture is adjusted to fit the absolute size of the controls
   background: url('../assets/ec4.jpg') no-repeat -0.83em -0.69em;
-  background-size: 28.2em 45.5em;
+  background-size: 26em 45.5em;
   border-radius: 0.5em;
 
   .mode-selector {
@@ -186,13 +186,13 @@ main {
     outline: none;
   }
 
-  $diameter: 39px;
+  $diameter: 3em;
   #save-indicator {
     text-align: center;
     line-height: $diameter;
     position: absolute;
-    top: 243px;
-    left: 233px;
+    z-index: 10;
+    top: 12.5em;
     width: $diameter;
     height: $diameter;
     border-radius: 50%;
@@ -209,7 +209,7 @@ main {
       50% {
         rotate: 360deg;
         opacity: 1;
-        box-shadow: 0 0 0 $diameter rgba($green-800, 0);
+        box-shadow: 0 0 0 2em rgba($green-600, 0);
       }
       100% {
         rotate: 360deg;
@@ -232,29 +232,30 @@ main {
 #legend-button {
   position: absolute;
   top: 3.9em;
-  right: 1.3em;
+  right: 1.25em;
 }
 
 .undo,
 .redo {
   position: absolute;
-  width: 2.1em;
-  height: 2.1em;
+  width: 2.3em;
+  height: 2.3em;
+  line-height: 1em;
 }
 .undo {
-  top: 9.45em;
-  left: 1.3em;
+  top: 9.39em;
+  left: 1.15em;
 }
 .redo {
   top: 9.5em;
-  right: 1.1em;
+  right: 0.88em;
 }
 
 .history-button {
   color: $yellow-500;
   border: 2px solid $yellow-500;
   background: transparent;
-  height: 100%;
+  height: calc(100% - 4px);
 
   border-radius: 50%;
   &.can-do {

@@ -141,7 +141,7 @@ async function onDrop(files: File[] | null, e: DragEvent) {
                         disabled: !midi.selectedOutput.value,
                       }"
                       title="Send to EC4"
-                      ><arrow-right />{{ midi.selectedOutput.value }}<keyboard-music
+                      ><arrow-right /><keyboard-music
                     /></a>
                   </li>
                   <li>
