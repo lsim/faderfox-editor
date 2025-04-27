@@ -47,8 +47,8 @@ window.addEventListener('blur', () => {
   appFocused.value = false;
 });
 
-const factoryBundle = getFactoryBundle();
 export const useEc4Store = defineStore('ec4', () => {
+  const factoryBundle = getFactoryBundle();
   const storage = useStorage();
   const { setBusy } = useBusy();
   const activeBundle: Ref<Ec4Bundle> = ref(Ec4Bundle.createEmpty());
