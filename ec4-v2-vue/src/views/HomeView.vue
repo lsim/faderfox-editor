@@ -145,7 +145,7 @@ onKeyStroke('PageDown', (e) => {
   margin: 0 auto;
   width: auto;
   display: grid;
-  max-width: 1000px;
+  max-width: 47.8em;
   grid-template-areas:
     'header header header'
     'alignment alignment alignment'
@@ -155,7 +155,7 @@ onKeyStroke('PageDown', (e) => {
     'credits credits credits';
   grid-template-columns: 1fr auto 1fr;
   grid-column-gap: 1em;
-  grid-template-rows: auto 14px auto 1fr auto;
+  grid-template-rows: auto 0.7em auto 1fr auto;
 
   .the-store {
     grid-area: alignment;
@@ -176,15 +176,16 @@ onKeyStroke('PageDown', (e) => {
 
     .bg-waves {
       z-index: 1;
-      height: 12vh;
+      height: 7.6em;
     }
     .store-thumb {
       cursor: pointer;
       position: fixed;
+      z-index: 10;
       display: flex;
-      top: 100px;
+      top: 5em;
       right: 0;
-      border: 4px solid;
+      border: 3px solid;
       border-right: none;
       border-top-left-radius: 50%;
       border-bottom-left-radius: 50%;
@@ -211,7 +212,7 @@ onKeyStroke('PageDown', (e) => {
         }
         &.pulsing {
           animation: pulse 1.5s ease;
-          $diameter: 40px;
+          $diameter: 3em;
           @keyframes pulse {
             0% {
               rotate: 0deg;
@@ -250,14 +251,13 @@ onKeyStroke('PageDown', (e) => {
 
   .stored-confs {
     grid-area: bundles;
-    margin-right: 1em;
     grid-row: span 1;
   }
 
   .fill-macros {
     grid-area: fill-macros;
     align-self: start;
-    margin-top: 15px;
+    margin-top: 0.8em;
   }
 
   .credits {

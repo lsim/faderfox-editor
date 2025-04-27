@@ -29,7 +29,6 @@ const ec4 = useEc4Store();
 @use '@picocss/pico/scss/colors/index.scss' as *;
 
 #modeselect {
-  border: 1px solid white;
   border-bottom: none;
   border-top-left-radius: 0.5em;
   border-top-right-radius: 0.5em;
@@ -37,6 +36,7 @@ const ec4 = useEc4Store();
   justify-content: space-around;
   align-items: center;
   color: $textColor;
+  background-color: rgba($black, 0.6);
   padding: 4px;
 
   a {

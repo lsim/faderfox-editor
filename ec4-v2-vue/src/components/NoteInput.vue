@@ -22,7 +22,7 @@ function noteToObject(n: number) {
   const name = noteNames[n % 12];
   const octave = Math.round(n / 12) - 2;
   return {
-    text: `${name} ${octave || ''}`,
+    text: `${name}${octave || ''}`,
     value: n,
   };
 }
@@ -74,18 +74,17 @@ defineExpose({
 
   max-width: 100%;
   input {
-    transition: flex 0.3s ease;
+    transition: flex 0.2s ease;
     &.decimals-1 {
-      flex: 1 0 15px;
+      flex: 1 0 1em;
     }
     &.decimals-2 {
-      flex: 1 0 30px;
+      flex: 1 0 1.5em;
     }
     &.decimals-3 {
-      flex: 1 0 40px;
+      flex: 1 0 2.5em;
     }
     min-width: 0;
-    flex: 2 0 10px;
     text-align: right;
     margin-right: 2px;
     // Remove the spinner
@@ -98,7 +97,7 @@ defineExpose({
   select {
     min-width: 0;
     text-align: left;
-    flex: 3 0 45px;
+    flex: 3 0 2em;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;

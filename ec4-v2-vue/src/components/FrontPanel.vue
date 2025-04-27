@@ -125,42 +125,47 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
 
 <style scoped lang="scss">
 @use '@picocss/pico/scss/colors/index.scss' as *;
-$oled-height: 138px;
-$oled-width: 305px;
+$oled-height: 8.58em;
+$oled-width: 17.5em;
 
 main {
   // This grid was tweaked to fit the outlines of the EC4 controller
   position: relative;
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
-  grid-template-rows: 65px 25px $oled-height 47px 500px 30px;
+  grid-template-rows: 3.7em 1.3em $oled-height 1.3em 26.3em;
   grid-template-areas:
     'margin-left margin-top margin-right'
     'margin-left mode-selector margin-right'
     'margin-left oled margin-right'
     'margin-left spacer margin-right'
     'margin-left encoders margin-right'
-    'margin-left fillnumbers margin-right'
     'margin-left bundle-name margin-right';
   justify-items: center;
-  width: 500px;
-  height: 837px;
+  width: 26.3em;
+  height: 44.1em;
   // The size and position of the picture is adjusted to fit the absolute size of the controls
-  background: url('../assets/ec4.jpg') no-repeat -16px -13px;
-  background-size: 536px 865px;
-  border-radius: 12px;
+  background: url('../assets/ec4.jpg') no-repeat -0.83em -0.69em;
+  background-size: 28.2em 45.5em;
+  border-radius: 0.5em;
 
   .mode-selector {
     grid-area: mode-selector;
-    width: 100px;
+    z-index: 2;
+    width: 5.5em;
+    border: 1px solid black;
+    filter: drop-shadow(0 -0.2em 0.3rem rgba($white, 0.3));
   }
 
   .oled {
     grid-area: oled;
+    z-index: 1;
+    padding: 3px;
     width: $oled-width;
     height: $oled-height;
     border-radius: 6px;
-    border: 1px solid #fff;
+    border: 1px solid rgba(black, 0.8);
+    filter: drop-shadow(-0.1em -0.1em 0.3rem rgba($white, 0.3));
   }
 
   .encoders {
@@ -175,10 +180,10 @@ main {
   .bundle-name {
     grid-area: bundle-name;
     grid-row: span 2;
-    padding-right: 20px;
+    padding-right: 1em;
     text-align: center;
-    margin-top: 5px;
-    height: 30px;
+    margin-top: 0.3em;
+    height: 1.5em;
     outline: none;
   }
 
@@ -220,30 +225,30 @@ main {
     padding-left: 0.5em;
     padding-bottom: 0.2em;
     font-size: 150%;
-    left: 75px;
-    top: 40px;
+    left: 3em;
+    top: 1.4em;
     rotate: -10deg;
   }
 }
 #legend-button {
   position: absolute;
-  top: 73px;
-  right: 24px;
+  top: 3.8em;
+  right: 1.3em;
 }
 
 .undo,
 .redo {
   position: absolute;
-  width: 43px;
-  height: 43px;
+  width: 2em;
+  height: 2em;
 }
 .undo {
-  top: 176px;
-  left: 24px;
+  top: 9.4em;
+  left: 1.3em;
 }
 .redo {
-  top: 179px;
-  right: 20px;
+  top: 9.5em;
+  right: 1.3em;
 }
 
 .history-button {

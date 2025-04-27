@@ -33,7 +33,7 @@ const props = defineProps<{
     min-width: 1.5em;
     height: 1.5em;
     background-color: $red-700;
-    padding: 2px;
+    padding: 3px;
     pointer-events: none;
 
     border-radius: 50%;

@@ -496,10 +496,12 @@ onKeyStroke('End', (e) => {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    font-size: 0.9em;
   }
 
   .note-input {
-    width: 98px;
+    width: 5.5em;
+    font-size: 0.9em;
   }
 }
 </style>
