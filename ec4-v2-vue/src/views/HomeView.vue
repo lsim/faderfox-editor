@@ -37,11 +37,10 @@ onBeforeUnmount(() => {
 function handleFocusOut(e: FocusEvent) {
   const fromTag = (e.relatedTarget as HTMLElement | undefined)?.tagName;
   // const toTag = (e.target as HTMLElement | undefined)?.tagName;
-  console.debug('focus out', fromTag, e.target, e.relatedTarget);
+  // console.debug('focus out', fromTag, e.target, e.relatedTarget);
   if ((!fromTag || fromTag === 'A') && e.target) {
     const x = window.scrollX;
     const y = window.scrollY;
-    // console.log('focus out', x, y, e.target, e.relatedTarget);
     (e.target as HTMLElement).focus?.();
     window.scrollTo(x, y);
   }
