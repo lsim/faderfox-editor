@@ -28,11 +28,15 @@ A few extra features have been added compared to the (already awesome) original 
 - Storage of configuration data in the browser's IndexedDb
 - Auto saving of data to the db (page reload no longer a thing to be feared!)
 - Undo/Redo
+- Easy sharing of setups between users. Show off your awesome configurations!
 - Multiple named configuration 'bundles' can be switched between, saved to a .syx file or sent to the EC4
 - Sysex dumps from the EC4 are shown as new bundles
-- Progressive Web App support, so you can install the editor on your desktop and use it offline
+- Progressive Web App support, so you can install the editor on your desktop/ipad and use it offline
 - Keyboard shortcuts for navigation
 - Easy copy/paste of individual encoders in addition to groups/setups (as in the original). Tip: copying between bundles also works.
+- Setup/group synchronization between the editor and the EC4. Use that muscle memory!
+- Encoder selection possible via EC4 push buttons
+- Numeric values can be set with EC4 encoders
 - Pause-screen-animation when left idle 😀
 
 #### Some planned features
