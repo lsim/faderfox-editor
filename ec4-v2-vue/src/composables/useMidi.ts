@@ -299,12 +299,26 @@ function initMidi(toast: ReturnType<typeof useToast>) {
       const old = oldInputs.find((i) => i.device.id === v.id);
       inputs.value.push(old || new MidiInput(v));
     }
+    // Clear selected input if it's not in the list anymore
+    if (
+      selectedInput.value &&
+      !inputs.value.find((i) => i.device.id === selectedInput.value?.device.id)
+    ) {
+      selectedInput.value = null;
+    }
 
     const oldOutputs = outputs.value;
     outputs.value = [];
     for (const [k, v] of m.outputs.entries()) {
       const old = oldOutputs.find((i) => i.device.id === v.id);
       outputs.value.push(old || new MidiOutput(v));
+    }
+    // Clear selected output if it's not in the list anymore
+    if (
+      selectedOutput.value &&
+      !outputs.value.find((i) => i.device.id === selectedOutput.value?.device.id)
+    ) {
+      selectedOutput.value = null;
     }
   }
 
