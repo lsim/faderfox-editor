@@ -55,9 +55,13 @@ const rollTheWaves = computed(() => {
   left: 0;
 }
 
+:root * {
+  --duration-baseline: 60s;
+}
+
 .parallax {
   > use {
-    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+    animation: move-forever var(--duration-baseline) cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
   }
 
   &.paused > use {
@@ -65,25 +69,25 @@ const rollTheWaves = computed(() => {
   }
 
   > use:nth-child(1) {
-    animation-delay: -12s;
-    animation-duration: 17s;
+    animation-delay: calc(var(--duration-baseline) * -0.21);
+    animation-duration: calc(var(--duration-baseline) * 0.65);
     fill: rgba($yellow-300, 0.3);
   }
 
   > use:nth-child(2) {
-    animation-delay: -23s;
-    animation-duration: 30s;
+    animation-delay: calc(var(--duration-baseline) * -0.443);
+    animation-duration: var(--duration-baseline);
     fill: rgba($blue-500, 0.3);
   }
 
   > use:nth-child(3) {
-    animation-delay: -44s;
-    animation-duration: 40s;
+    animation-delay: calc(var(--duration-baseline) * -0.77);
+    animation-duration: calc(var(--duration-baseline) * 1.33);
   }
 
   > use:nth-child(4) {
-    animation-delay: -15s;
-    animation-duration: 60s;
+    animation-delay: calc(var(--duration-baseline) * -0.25);
+    animation-duration: calc(var(--duration-baseline) * 2.1);
   }
 }
 

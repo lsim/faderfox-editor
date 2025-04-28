@@ -76,7 +76,7 @@ class ApiClient {
   });
 
   async loadPublications() {
-    this.backendPublications.value = (await this.getPublications()) || [];
+    this.backendPublications.value = (await this.busy.setBusy(this.getPublications())) || [];
   }
 
   connect() {
@@ -131,9 +131,7 @@ class ApiClient {
     id = '',
   ) {
     const argSuffix = id ? `/${id}` : '';
-    const p = this.useFetch<T>(`${path}${argSuffix}`);
-    this.busy.setBusy(p).then();
-    return p;
+    return this.useFetch<T>(`${path}${argSuffix}`);
   }
 
   async register(username: string, password: string, email: string) {
