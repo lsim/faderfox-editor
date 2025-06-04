@@ -19,9 +19,10 @@ export default function useRemoteControl() {
     if (msg.type === 'noteOn' && msg.key != null) {
       ec4.selectedEncoderIndex = msg.key % 16;
     } else if (msg.type === 'controllerChange' && msg.value != null && msg.controller != null) {
-      const numberField = ec4.activeNumberField;
-      if (!numberField) return;
-      ec4.selectedGroup.controls[msg.controller % 16].numbers[numberField] = msg.value;
+      // NOTE: Don't do this. It's surprising and annoying to have configurations change when you're testing your bundle on the EC4
+      // const numberField = ec4.activeNumberField;
+      // if (!numberField) return;
+      // ec4.selectedGroup.controls[msg.controller % 16].numbers[numberField] = msg.value;
     } else if (msg.type === 'sysex' && bytes != null && bytes.length > 13 && deviceIdOk(bytes)) {
       /*
         answer (from EC4):
