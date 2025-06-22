@@ -240,7 +240,13 @@ export class Control {
       setupId ?? this.setupId,
     );
 
-    return Object.assign(c, { ...this, id: c.id, setupId: c.setupId, groupId: c.groupId });
+    return Object.assign(c, {
+      ...this,
+      id: c.id,
+      setupId: c.setupId,
+      groupId: c.groupId,
+      numbers: { ...this.numbers },
+    });
   }
 
   fromObject(obj: any) {
