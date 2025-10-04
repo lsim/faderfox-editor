@@ -1,0 +1,7 @@
+#!/usr/bin/env just --justfile
+
+dependencies:
+  yarn
+
+run: dependencies
+  yarn dev
