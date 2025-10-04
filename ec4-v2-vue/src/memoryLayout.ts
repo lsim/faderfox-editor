@@ -92,7 +92,7 @@ function parseSysexData(
   let version = 0.0;
 
   while (!finished) {
-    let c = nextChunk();
+    const c = nextChunk();
     switch (c.cmd) {
       case 0x41: // CMD_DOWNLOAD_START, device id
         if (c.val != deviceId) {
@@ -281,8 +281,8 @@ const P = {
   } as Record<string, MemSpec>,
 
   _getMemAddr: function (spec: MemSpec, setupId: number, groupId: number) {
-    let startAddr = 'memstart' in spec ? (spec.memstart ?? 0) : MEM.addrPresets;
-    let lengthGroup = 'grouplen' in spec ? (spec.grouplen ?? 0) : MEM.lengthGroup;
+    const startAddr = 'memstart' in spec ? (spec.memstart ?? 0) : MEM.addrPresets;
+    const lengthGroup = 'grouplen' in spec ? (spec.grouplen ?? 0) : MEM.lengthGroup;
     return startAddr + (setupId * 16 + groupId) * lengthGroup + spec.pos;
   },
 
@@ -408,8 +408,8 @@ const P = {
 };
 
 function hiloNibbles(v: number) {
-  let hi = ((v & 0xf0) >> 4) + 0x20;
-  let lo = (v & 0x0f) + 0x10;
+  const hi = ((v & 0xf0) >> 4) + 0x20;
+  const lo = (v & 0x0f) + 0x10;
   return [hi, lo];
 }
 
@@ -422,7 +422,7 @@ export function generateSysexData(encoderSetups: EncoderSetup[]) {
   }
 
   const deviceparts = hiloNibbles(deviceId);
-  let dataout = [
+  const dataout = [
     0xf0,
     0x00,
     0x00,

@@ -164,6 +164,95 @@ onKeyStroke('End', (e) => {
   if (!e.altKey || !e.shiftKey) return;
   focusActiveField();
 });
+
+// Input validation handlers based on reference implementation checkValue logic
+function handleNumberInput(e: Event) {
+  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
+  let value = isNaN(asNumber) ? 0 : asNumber;
+
+  // CC14bit (CCAh) number field has max 31 when data-type=4
+  if (control.value.numbers.type === encoderTypeByName('CCAh') && value > 31) {
+    value = 31;
+  }
+
+  // Standard 7-bit range for most number fields
+  if (value < 0) value = 0;
+  else if (value > 127) value = 127;
+
+  control.value.numbers.number = value;
+}
+
+function handleNumberHInput(e: Event) {
+  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
+  let value = isNaN(asNumber) ? 0 : asNumber;
+
+  // NRPN high byte: 0-127 range
+  if (value < 0) value = 0;
+  else if (value > 127) value = 127;
+
+  control.value.numbers.number_h = value;
+}
+
+function handlePbNumberInput(e: Event) {
+  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
+  let value = isNaN(asNumber) ? 0 : asNumber;
+
+  // Standard 7-bit range for pushbutton number fields
+  if (value < 0) value = 0;
+  else if (value > 127) value = 127;
+
+  control.value.numbers.pb_number = value;
+}
+
+function handleLowerInput(e: Event) {
+  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
+  let value = isNaN(asNumber) ? 0 : asNumber;
+
+  // High-resolution range: 0-4095 or 16383
+  if (value < 0) {
+    value = 0;
+  } else if (value > 4095) {
+    value = 16383;
+  }
+
+  control.value.numbers.lower = value;
+}
+
+function handleUpperInput(e: Event) {
+  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
+  let value = isNaN(asNumber) ? 0 : asNumber;
+
+  // High-resolution range: 0-4095 or 16383
+  if (value < 0) {
+    value = 0;
+  } else if (value > 4094) {
+    value = 16383;
+  }
+
+  control.value.numbers.upper = value;
+}
+
+function handlePbLowerInput(e: Event) {
+  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
+  let value = isNaN(asNumber) ? 0 : asNumber;
+
+  // Standard 7-bit range for pushbutton lower
+  if (value < 0) value = 0;
+  else if (value > 127) value = 127;
+
+  control.value.numbers.pb_lower = value;
+}
+
+function handlePbUpperInput(e: Event) {
+  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
+  let value = isNaN(asNumber) ? 0 : asNumber;
+
+  // Standard 7-bit range for pushbutton upper
+  if (value < 0) value = 0;
+  else if (value > 127) value = 127;
+
+  control.value.numbers.pb_upper = value;
+}
 </script>
 
 <template>
@@ -255,12 +344,14 @@ onKeyStroke('End', (e) => {
             id="encoderNumber"
             ref="numberInput"
             maxlength="3"
-            v-model="control.numbers.number_h"
+            :value="control.numbers.number_h"
+            @input="handleNumberHInput"
             @focus="setActiveField('number', $event.target)"
           />
           <input
             maxlength="3"
-            v-model="control.numbers.number"
+            :value="control.numbers.number"
+            @input="handleNumberInput"
             @focus="setActiveField('number', $event.target)"
           />
         </span>
@@ -296,7 +387,8 @@ onKeyStroke('End', (e) => {
           id="encoderNumber"
           ref="numberInput"
           maxlength="3"
-          v-model="control.numbers.number"
+          :value="control.numbers.number"
+          @input="handleNumberInput"
           @focus="setActiveField('number', $event.target)"
           :class="{ hidden: isHidden('number', control) }"
         />
@@ -332,7 +424,8 @@ onKeyStroke('End', (e) => {
         <input
           id="encoderNumber"
           ref="pbNumberInput"
-          v-model="control.numbers.pb_number"
+          :value="control.numbers.pb_number"
+          @input="handlePbNumberInput"
           :class="{ hidden: isHidden('pb_number', control) }"
           @focus="setActiveField('pb_number', $event.target)"
         />
@@ -382,7 +475,8 @@ onKeyStroke('End', (e) => {
       <input
         id="encoderLowerLimit"
         ref="lowerLimitInput"
-        v-model="control.numbers.lower"
+        :value="control.numbers.lower"
+        @input="handleLowerInput"
         @focus="setActiveField('lower', $event.target)"
         :class="{ hidden: isHidden('lower', control) }"
         type="number"
@@ -400,7 +494,8 @@ onKeyStroke('End', (e) => {
       <input
         id="encoderLowerLimit"
         ref="pbLowerLimitInput"
-        v-model="control.numbers.pb_lower"
+        :value="control.numbers.pb_lower"
+        @input="handlePbLowerInput"
         @focus="setActiveField('pb_lower', $event.target)"
         :class="{ hidden: isHidden('pb_lower', control) }"
         type="number"
@@ -462,7 +557,8 @@ onKeyStroke('End', (e) => {
       <input
         id="encoderUpperLimit"
         ref="upperLimitInput"
-        v-model="control.numbers.upper"
+        :value="control.numbers.upper"
+        @input="handleUpperInput"
         @focus="setActiveField('upper', $event.target)"
         :class="{ hidden: isHidden('upper', control) }"
         type="number"
@@ -480,7 +576,8 @@ onKeyStroke('End', (e) => {
       <input
         id="encoderUpperLimit"
         ref="pbUpperLimitInput"
-        v-model="control.numbers.pb_upper"
+        :value="control.numbers.pb_upper"
+        @input="handlePbUpperInput"
         @focus="setActiveField('pb_upper', $event.target)"
         :class="{ hidden: isHidden('pb_upper', control) }"
         type="number"

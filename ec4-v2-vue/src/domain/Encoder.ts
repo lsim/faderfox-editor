@@ -194,9 +194,7 @@ export class Control {
       number: getMemField(bytes, setupId, groupId, encoderId, 'number'),
       number_h: getMemField(bytes, setupId, groupId, encoderId, 'number_h'),
       lower: getMemField(bytes, setupId, groupId, encoderId, 'lower'),
-      lower_msb: getMemField(bytes, setupId, groupId, encoderId, 'lower_msb'),
       upper: getMemField(bytes, setupId, groupId, encoderId, 'upper'),
-      upper_msb: getMemField(bytes, setupId, groupId, encoderId, 'upper_msb'),
       mode: getMemField(bytes, setupId, groupId, encoderId, 'mode'),
       scale: getMemField(bytes, setupId, groupId, encoderId, 'scale'),
       pb_channel: getMemField(bytes, setupId, groupId, encoderId, 'pb_channel'),
@@ -216,9 +214,9 @@ export class Control {
     setMemField(buffer, this.setupId, this.groupId, this.id, 'number', this.numbers.number);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'number_h', this.numbers.number_h);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'lower', this.numbers.lower);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'lower_msb', this.numbers.lower_msb);
+    // Note: lower_msb is now automatically handled by setMemField for 'lower' in high-res mode
     setMemField(buffer, this.setupId, this.groupId, this.id, 'upper', this.numbers.upper);
-    setMemField(buffer, this.setupId, this.groupId, this.id, 'upper_msb', this.numbers.upper_msb);
+    // Note: upper_msb is now automatically handled by setMemField for 'upper' in high-res mode
     setMemField(buffer, this.setupId, this.groupId, this.id, 'mode', this.numbers.mode);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'scale', this.numbers.scale);
     setMemField(buffer, this.setupId, this.groupId, this.id, 'link', this.link);

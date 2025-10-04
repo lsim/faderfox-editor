@@ -253,6 +253,31 @@ describe('Sysex', () => {
       });
     });
 
+    it('should correctly handle the specific 200 -> 4040 bug case', () => {
+      const control = emptySetups[0].groups[0].controls[0];
+
+      // Set up NRPN encoder with high-resolution mode
+      control.type = 8; // NRPN type
+      control.scale = 0; // Display off - enables high resolution
+      control.upper = 200;
+
+      // Initialize upper_msb with garbage value (15) to simulate the bug
+      // 15 << 8 = 3840, so 200 + 3840 = 4040
+      control.upper_msb = 15;
+
+      // Test the round-trip that the user is experiencing
+      const result = roundTripNRPN(200);
+      console.log(
+        `Input 200 with garbage MSB=15, got back: ${result}, difference: ${result - 200}`,
+      );
+
+      // After the fix, this should be 200 regardless of garbage in upper_msb
+      expect(result).toBe(
+        200,
+        `Expected 200 but got ${result}. The fix should ignore garbage MSB values.`,
+      );
+    });
+
     it('should correctly handle MSB values internally (integration test)', () => {
       // The main test is that round-trip values work correctly
       // The MSB fields are internal implementation details that may not be exposed
