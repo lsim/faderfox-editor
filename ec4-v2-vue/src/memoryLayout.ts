@@ -523,8 +523,32 @@ export function setMemField<TVal = number | string>(
   type: MemField,
   value: TVal,
 ) {
-  if (type === 'name') P.setEncoderName(data, setupId, groupId, encoderId, value as string);
-  else P.set(data, setupId, groupId, encoderId, type, value as number);
+  if (type === 'name') {
+    P.setEncoderName(data, setupId, groupId, encoderId, value as string);
+  } else if (type === 'lower' || type === 'upper') {
+    const numValue = value as number;
+    if (useHighres(data, setupId, groupId, encoderId)) {
+      // High-resolution mode: decompose value into LSB and MSB components
+      // Based on reference implementation in ec4.js lines 475-487
+      const lsbs = numValue & 0xff;           // Extract lower 8 bits
+      const msbs = (numValue & 0xf00) >> 8;   // Extract bits 8-11 using 0xF00 mask
+      
+      // Store LSB in the main field
+      P.set(data, setupId, groupId, encoderId, type, lsbs);
+      
+      // Store MSB in the corresponding MSB field
+      if (type === 'lower') {
+        P.set(data, setupId, groupId, encoderId, 'lower_msb', msbs);
+      } else {
+        P.set(data, setupId, groupId, encoderId, 'upper_msb', msbs);
+      }
+    } else {
+      // Normal 7-bit mode
+      P.set(data, setupId, groupId, encoderId, type, numValue);
+    }
+  } else {
+    P.set(data, setupId, groupId, encoderId, type, value as number);
+  }
 }
 
 export function getEncoderName(
