@@ -174,7 +174,7 @@ onMounted(() => {
             <tr>
               <td tabindex="-1" colspan="4">
                 <div class="description-scroller">
-                  <vue-markdown :source="publication.item.description" class="description" />
+                  <vue-markdown :source="publication.item.description || ''" class="description" />
                 </div>
               </td>
             </tr>
