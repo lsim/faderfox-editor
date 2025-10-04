@@ -96,8 +96,8 @@ export type ModeOption = {
 };
 
 export const pushButtonModes: ModeOption[] = [
-  { text: 'Togl', value: 0, long: 'Toggle' },
-  { text: 'Key', value: 1, long: 'While held' },
+  { text: 'Key', value: 0, long: 'While held' },
+  { text: 'Togl', value: 1, long: 'Toggle' },
 ];
 
 export const encoderModes: ModeOption[] = [
