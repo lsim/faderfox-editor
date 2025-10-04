@@ -34,7 +34,7 @@ export default function useFileStorage() {
           parseSetupsFromSysex(bytes, bundle.setups);
           // Create bundle
           await storage.addBundle(bytes, file.name?.replace(/\.syx$/, '') ?? '');
-        } catch (e: any) {
+        } catch (e: unknown) {
           console.warn('Error parsing bundle', e);
           throw Error(`${file.name} does not appear to be a valid ec4 sysex file`);
         }
@@ -42,7 +42,7 @@ export default function useFileStorage() {
     );
   }
 
-  async function onDrop(files: File[] | null, e: DragEvent) {
+  async function onDrop(files: File[] | null) {
     for (const file of files || []) {
       await loadBlobFromDisk(file);
     }

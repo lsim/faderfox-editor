@@ -16,10 +16,10 @@ const canPasteGroup = computed(() => !!copiedGroup.value);
 const canPasteEncoder = computed(() => !!copiedEncoder.value);
 
 const copyMode = ref(false);
-onKeyDown('Alt', (e) => {
+onKeyDown('Alt', () => {
   copyMode.value = true;
 });
-onKeyUp('Alt', (e) => {
+onKeyUp('Alt', () => {
   copyMode.value = false;
 });
 

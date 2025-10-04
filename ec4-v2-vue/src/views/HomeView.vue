@@ -11,7 +11,6 @@ import FillMacros from '@/components/FillMacros.vue';
 import { Earth, SlidersVertical } from 'lucide-vue-next';
 import Store from '@/components/store/Store.vue';
 import useApiClient from '@/composables/api-client.ts';
-import useToast from '@/composables/toast.ts';
 import Toaster from '@/components/Toaster.vue';
 import useMidi from '@/composables/useMidi.ts';
 import useRemoteControl from '@/composables/remote-control.ts';
@@ -21,8 +20,6 @@ const props = defineProps<{
 }>();
 
 const groupId = ref<number>(0);
-
-const toast = useToast();
 
 const ec4 = useEc4Store();
 const apiClient = useApiClient();

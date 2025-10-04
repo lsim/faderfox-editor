@@ -1,12 +1,11 @@
 import { type FieldType } from '@/domain/Encoder.ts';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
-import { generateIds } from '@/stores/faderfox-ec4.ts';
 
 const STR = { sysex: {} as any };
 
 // Constants for the EC4 memory layout
 const deviceId = 0x0b;
-const maxFileSize = 183710;
+// const maxFileSize = 183710;
 
 const MEMORY_SIZE = 0xf500;
 const MEMORY_OFFSET = 0x0b00;
@@ -32,7 +31,7 @@ const MEM = {
   },
 };
 
-const FACTORY_PRESET_PATH = 'EC4-setup-all-factory-V20.syx';
+// const FACTORY_PRESET_PATH = 'EC4-setup-all-factory-V20.syx';
 
 function toHex(d: number, pad?: number) {
   return ('0000' + Number(d).toString(16)).slice(pad ? -pad : -2).toUpperCase();
@@ -160,11 +159,12 @@ function prepareSysexBytes(sysexData: Uint8Array<ArrayBufferLike>) {
   const result = new Uint8Array(MEMORY_SIZE);
   const version = parseSysexData(
     sysexData,
-    (chunk) => {},
+    () => {},
     (addr, pageData) => {
       result.set(pageData, addr - MEMORY_OFFSET);
     },
   );
+  console.log('Sysex version', version);
   return result;
 }
 
@@ -473,7 +473,7 @@ export function parseSetupsFromSysex(
   }
 }
 
-export type MemField = FieldType;
+export type MemField = FieldType | 'upper_msb' | 'lower_msb';
 
 function useHighres(
   data: Uint8Array<ArrayBufferLike>,
@@ -530,12 +530,12 @@ export function setMemField<TVal = number | string>(
     if (useHighres(data, setupId, groupId, encoderId)) {
       // High-resolution mode: decompose value into LSB and MSB components
       // Based on reference implementation in ec4.js lines 475-487
-      const lsbs = numValue & 0xff;           // Extract lower 8 bits
-      const msbs = (numValue & 0xf00) >> 8;   // Extract bits 8-11 using 0xF00 mask
-      
+      const lsbs = numValue & 0xff; // Extract lower 8 bits
+      const msbs = (numValue & 0xf00) >> 8; // Extract bits 8-11 using 0xF00 mask
+
       // Store LSB in the main field
       P.set(data, setupId, groupId, encoderId, type, lsbs);
-      
+
       // Store MSB in the corresponding MSB field
       if (type === 'lower') {
         P.set(data, setupId, groupId, encoderId, 'lower_msb', msbs);

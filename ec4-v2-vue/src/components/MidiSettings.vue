@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useMidi from '@/composables/useMidi.ts';
-import { watch, onBeforeUnmount } from 'vue';
+import { watch } from 'vue';
 
 const midi = useMidi();
 

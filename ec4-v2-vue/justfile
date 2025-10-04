@@ -5,3 +5,10 @@ dependencies:
 
 run: dependencies
   yarn dev
+
+check:
+  yarn lint
+  yarn type-check
+
+test: dependencies
+  yarn test

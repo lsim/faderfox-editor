@@ -276,7 +276,7 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ t('OLED_CHANNEL') }}:</label
       >
-      <channel-input
+      <ChannelInput
         ref="channelInput"
         v-model="control.numbers.channel"
         @focus="setActiveField('channel', $event.target)"
@@ -292,7 +292,7 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ pbChannelLabel }}:</label
       >
-      <channel-input
+      <ChannelInput
         ref="pbChannelInput"
         v-model="control.numbers.pb_channel"
         @focus="setActiveField('pb_channel', $event.target)"

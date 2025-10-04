@@ -47,7 +47,8 @@ const filter = ref('');
 
 const chronologicalPublications = computed(() => {
   if (!apiClient.backendPublications.value) return [];
-  return apiClient.backendPublications.value.sort((a, b) => b.timestamp - a.timestamp);
+
+  return [...apiClient.backendPublications.value].sort((a, b) => b.timestamp - a.timestamp);
 });
 const { results: filteredPublications } = useFuse<Publication>(filter, chronologicalPublications, {
   fuseOptions: {
@@ -58,6 +59,12 @@ const { results: filteredPublications } = useFuse<Publication>(filter, chronolog
   },
   matchAllWhenSearchEmpty: true,
 });
+
+function onPublished(backendId: string | undefined) {
+  if (ec4.setupToPublish) ec4.setupToPublish.backendId = backendId;
+  ec4.setupToPublish = undefined;
+  ec4.publicationToUpdate = undefined;
+}
 
 onMounted(() => {
   apiClient.loadPublications();
@@ -94,10 +101,7 @@ onMounted(() => {
       v-else-if="ec4.setupToPublish || ec4.publicationToUpdate"
       :setup="ec4.setupToPublish"
       :publication="ec4.publicationToUpdate"
-      @done="
-        ec4.setupToPublish = undefined;
-        ec4.publicationToUpdate = undefined;
-      "
+      @done="onPublished"
     />
     <template v-else>
       <nav>

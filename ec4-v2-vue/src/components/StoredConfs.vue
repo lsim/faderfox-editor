@@ -73,7 +73,7 @@ async function sendBundle(meta: DbBundleMeta) {
 async function onDrop(files: File[] | null, e: DragEvent) {
   e.preventDefault();
   try {
-    await fileStorage.onDrop(files, e);
+    await fileStorage.onDrop(files);
   } catch (e) {
     const msg = (e as Error).message;
     // Not a sysex file

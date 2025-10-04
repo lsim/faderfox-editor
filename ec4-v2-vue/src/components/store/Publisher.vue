@@ -9,7 +9,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'done'): void;
+  (event: 'done', backendId?: string): void;
 }>();
 
 const descriptionRef = useTemplateRef<HTMLTextAreaElement>('descriptionRef');
@@ -30,13 +30,14 @@ if (props.setup?.backendId) {
 }
 
 async function publish() {
+  let backendId;
   if (props.setup) {
-    props.setup.backendId =
+    backendId =
       (await apiClient.publishSetup(props.setup, description.value, Date.now())) || undefined;
   } else if (props.publication) {
     await apiClient.patchPublication(props.publication.id, description.value);
   }
-  emit('done');
+  emit('done', backendId);
 }
 
 const headerText = computed(() => {

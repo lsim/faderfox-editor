@@ -1,4 +1,4 @@
-import { computed, type ComputedRef, ref, watch, type WatchHandle } from 'vue';
+import { computed, type ComputedRef, ref, watch } from 'vue';
 import { filter, lastValueFrom, map, Subject, type Subscription, take, timeout } from 'rxjs';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { type DbBundle, useStorage } from '@/composables/storage.ts';
@@ -295,7 +295,7 @@ function initMidi(toast: ReturnType<typeof useToast>) {
     if (!m) return;
     const oldInputs = inputs.value;
     inputs.value = [];
-    for (const [k, v] of m.inputs.entries()) {
+    for (const [, v] of m.inputs.entries()) {
       const old = oldInputs.find((i) => i.device.id === v.id);
       inputs.value.push(old || new MidiInput(v));
     }
@@ -309,7 +309,7 @@ function initMidi(toast: ReturnType<typeof useToast>) {
 
     const oldOutputs = outputs.value;
     outputs.value = [];
-    for (const [k, v] of m.outputs.entries()) {
+    for (const [, v] of m.outputs.entries()) {
       const old = oldOutputs.find((i) => i.device.id === v.id);
       outputs.value.push(old || new MidiOutput(v));
     }
@@ -340,8 +340,8 @@ function initMidi(toast: ReturnType<typeof useToast>) {
   function dispose() {
     console.debug('Disposing MIDI');
     midi.then((_m) => {
-      if (!m) return;
-      m.onstatechange = null;
+      if (!_m) return;
+      _m.onstatechange = null;
     });
     for (const i of inputs.value) (i.device as MIDIInput).onmidimessage = null;
   }
@@ -370,7 +370,7 @@ function initMidi(toast: ReturnType<typeof useToast>) {
       inboundBundlesSubscription?.unsubscribe();
       inboundBundlesSubscription = newLink?.input.receivedMessages$
         .pipe(filter(([msg, bytes]) => msg.type === 'sysex' && bytes.length > 1000))
-        .subscribe(async ([msg, bytes]) => {
+        .subscribe(async ([, bytes]) => {
           toast.show('Received full sysex dump from EC4', 'info');
           await storage.addBundle(bytes, 'Sysex from EC4');
         });

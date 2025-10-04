@@ -5,9 +5,7 @@ export type FieldType =
   | 'number'
   | 'number_h'
   | 'lower'
-  | 'lower_msb'
   | 'upper'
-  | 'upper_msb'
   | 'mode'
   | 'type'
   | 'scale' /* display */
@@ -147,12 +145,8 @@ export class Control {
       number_h: 0,
       // The lower limit of the encoder
       lower: 0,
-      // The MSB of the lower limit of the encoder
-      lower_msb: 0,
       // The upper limit of the encoder
       upper: 0,
-      // The MSB of the upper limit of the encoder
-      upper_msb: 0,
       // The speed of the encoder
       mode: encoderModeByName('Acc3'),
       // The display/range of the encoder
