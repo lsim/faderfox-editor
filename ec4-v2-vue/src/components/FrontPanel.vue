@@ -8,6 +8,7 @@ import LegendButton from '@/components/LegendButton.vue';
 import { onKeyStroke } from '@vueuse/core';
 import { Undo2, Redo2 } from 'lucide-vue-next';
 import Badger from '@/components/Badger.vue';
+import SettingsButton from '@/components/SettingsButton.vue';
 
 const props = defineProps<{
   groupId: number;
@@ -103,6 +104,7 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
       </button>
     </badger>
     <legend-button id="legend-button" />
+    <settings-button id="settings-button" />
     <mode-selector class="mode-selector" />
     <oled
       v-if="ec4.selectedEncoderIndex != null"
@@ -233,6 +235,12 @@ main {
   position: absolute;
   top: 3.9em;
   right: 1.25em;
+}
+
+#settings-button {
+  position: absolute;
+  top: 3.75em;
+  left: 1.1em;
 }
 
 .undo,

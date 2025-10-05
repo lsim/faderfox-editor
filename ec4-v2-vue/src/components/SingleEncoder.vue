@@ -13,7 +13,8 @@ import { computed, ref, type ComputedRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import NoteInput from '@/components/NoteInput.vue';
-import ChannelInput from '@/components/ChannelInput.vue';
+import NumberInput from '@/components/NumberInput.vue';
+import useUiRules from '@/composables/ui-rules.ts';
 
 const { t } = useI18n();
 
@@ -86,94 +87,7 @@ function toggleLink() {
   }
 }
 
-// Input validation handlers based on reference implementation checkValue logic
-function handleNumberInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // CC14bit (CCAh) number field has max 31 when data-type=4
-  if (control.value.numbers.type === encoderTypeByName('CCAh') && value > 31) {
-    value = 31;
-  }
-
-  // Standard 7-bit range for most number fields
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.number = value;
-}
-
-function handleNumberHInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // NRPN high byte: 0-127 range
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.number_h = value;
-}
-
-function handlePbNumberInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // Standard 7-bit range for pushbutton number fields
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.pb_number = value;
-}
-
-function handleLowerInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // High-resolution range: 0-4094 or 16383
-  if (value < 0) {
-    value = 0;
-  } else if (value > 4094) {
-    value = 16383;
-  }
-
-  control.value.numbers.lower = value;
-}
-
-function handleUpperInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // High-resolution range: 0-4094 or 16383
-  if (value < 0) {
-    value = 0;
-  } else if (value > 4094) {
-    value = 16383;
-  }
-
-  control.value.numbers.upper = value;
-}
-
-function handlePbLowerInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // Standard 7-bit range for pushbutton lower
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.pb_lower = value;
-}
-
-function handlePbUpperInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // Standard 7-bit range for pushbutton upper
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.pb_upper = value;
-}
+const { getLimitRanges, getNumberLSBRanges } = useUiRules();
 
 defineExpose({
   focusInput,
@@ -203,13 +117,12 @@ defineExpose({
         v-if="ec4.activeField === 'number' && control.numbers.type === encoderTypeByName('CCab')"
       >
         <label>{{ t('ENCODER_NUMBER') }}</label>
-        <input
+        <number-input
           class="width_3"
           maxlength="3"
           ref="encoderInput"
-          type="number"
-          :value="control.numbers.number"
-          @input="handleNumberInput"
+          v-model="control.numbers.number"
+          :ranges="getNumberLSBRanges(control.numbers.type)"
           @focus="setNameActive(false, $event)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -220,13 +133,12 @@ defineExpose({
         "
       >
         <label>{{ t('ENCODER_NUMBER') }}</label>
-        <input
+        <number-input
           class="width_3"
           maxlength="5"
           ref="encoderInput"
-          type="number"
-          :value="control.numbers.number"
-          @input="handleNumberInput"
+          v-model="control.numbers.number"
+          :ranges="getNumberLSBRanges(control.numbers.type)"
           @focus="setNameActive(false, $event)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -238,20 +150,18 @@ defineExpose({
       >
         <label>{{ t('ENCODER_NUMBER_NRPN') }}</label>
         <div class="double-inputs">
-          <input
+          <number-input
             maxlength="3"
             ref="encoderInput"
-            :value="control.numbers.number_h"
-            @input="handleNumberHInput"
-            type="number"
+            v-model="control.numbers.number_h"
+            :ranges="[{ from: 0, to: 127 }]"
             @focus="setNameActive(false, $event)"
             :tabindex="props.nameActive ? -1 : 0"
           />
-          <input
+          <number-input
             maxlength="3"
-            :value="control.numbers.number"
-            @input="handleNumberInput"
-            type="number"
+            v-model="control.numbers.number"
+            :ranges="getNumberLSBRanges(control.numbers.type)"
             @focus="setNameActive(false, $event)"
             :tabindex="props.nameActive ? -1 : 0"
           />
@@ -279,11 +189,10 @@ defineExpose({
         "
       >
         <label>{{ t('ENCODER_NUMBER') }}</label>
-        <input
+        <number-input
           class="width_3"
-          :value="control.numbers.pb_number"
-          @input="handlePbNumberInput"
-          type="number"
+          v-model="control.numbers.pb_number"
+          :ranges="[{ from: 0, to: 127 }]"
           @focus="setNameActive(false, $event)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -300,68 +209,68 @@ defineExpose({
       </template>
       <template v-else-if="ec4.activeField === 'channel'">
         <label>{{ control.numbers.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
-        <channel-input
+        <number-input
           v-model="control.numbers.channel"
           @focus="setNameActive(false, $event)"
           ref="encoderInput"
+          class="width_3"
+          :ranges="[{ from: 1, to: 16 }]"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
       <template v-else-if="ec4.activeField === 'pb_channel'">
         <label>{{ t('ENCODER_CHANNEL') }}</label>
-        <channel-input
+        <number-input
           v-model="control.numbers.pb_channel"
+          class="width_3"
           @focus="setNameActive(false, $event)"
+          :ranges="[{ from: 1, to: 16 }]"
           ref="encoderInput"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
       <template v-else-if="ec4.activeField === 'lower'">
         <label>{{ t('ENCODER_LOWER') }}</label>
-        <input
+        <number-input
           class="width_4"
-          :value="control.numbers.lower"
-          @input="handleLowerInput"
+          v-model="control.numbers.lower"
+          :ranges="getLimitRanges(control.numbers.type, control.numbers.scale)"
           maxlength="4"
           ref="encoderInput"
-          type="number"
           @focus="setNameActive(false, $event)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
       <template v-else-if="ec4.activeField === 'pb_lower'">
         <label>{{ t('ENCODER_LOWER') }}</label>
-        <input
+        <number-input
           class="width_4"
-          :value="control.numbers.pb_lower"
-          @input="handlePbLowerInput"
+          v-model="control.numbers.pb_lower"
+          :ranges="[{ from: 0, to: 127 }]"
           ref="encoderInput"
-          type="number"
           @focus="setNameActive(false, $event)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
       <template v-else-if="ec4.activeField === 'upper'">
         <label>{{ t('ENCODER_UPPER') }}</label>
-        <input
+        <number-input
           class="width_4"
-          :value="control.numbers.upper"
-          @input="handleUpperInput"
+          v-model="control.numbers.upper"
+          :ranges="getLimitRanges(control.numbers.type, control.numbers.scale)"
           maxlength="4"
           ref="encoderInput"
-          type="number"
           @focus="setNameActive(false, $event)"
           :tabindex="props.nameActive ? -1 : 0"
         />
       </template>
       <template v-else-if="ec4.activeField === 'pb_upper'">
         <label>{{ t('ENCODER_UPPER') }}</label>
-        <input
+        <number-input
           class="width_4"
-          :value="control.numbers.pb_upper"
-          @input="handlePbUpperInput"
+          v-model="control.numbers.pb_upper"
+          :ranges="[{ from: 0, to: 127 }]"
           ref="encoderInput"
-          type="number"
           @focus="setNameActive(false, $event)"
           :tabindex="props.nameActive ? -1 : 0"
         />
@@ -438,6 +347,7 @@ defineExpose({
       </template>
       <div
         class="link-next"
+        v-if="props.encoderId < 15"
         :class="{
           active:
             (ec4.editorMode === 'turn' && control.link) ||

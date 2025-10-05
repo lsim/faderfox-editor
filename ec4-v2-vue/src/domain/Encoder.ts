@@ -79,7 +79,7 @@ export const encoderScaleOptions: ScaleOption[] = [
   { text: 'ON / OFF', short: 'ONOF', value: 7 },
   { text: '9999', short: '9999', value: 8 },
 ];
-export const optionByName = (name: (typeof encoderScaleOptions)[number]['short']) =>
+export const scaleOptionByName = (name: (typeof encoderScaleOptions)[number]['short']) =>
   encoderScaleOptions.findIndex((t) => t.short === name);
 
 export const pushButtonScaleOptions: ScaleOption[] = [

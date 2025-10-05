@@ -15,7 +15,9 @@ import { useI18n } from 'vue-i18n';
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import { onKeyStroke } from '@vueuse/core';
 import NoteInput from '@/components/NoteInput.vue';
-import ChannelInput from '@/components/ChannelInput.vue';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import NumberInput from '@/components/NumberInput.vue';
+import useUiRules from '@/composables/ui-rules.ts';
 
 const { t } = useI18n();
 
@@ -97,42 +99,7 @@ function focusActiveField() {
   doWithActiveField((elm) => elm?.focus?.());
 }
 
-function isHidden(field: FieldType, control: Control): boolean {
-  let excludingTypes: number[] = [];
-  switch (field) {
-    case 'lower':
-    case 'upper':
-      // Hidden for CCR1, CCR2, Note
-      excludingTypes = [0, 1, 7];
-      break;
-    case 'number':
-      // Hidden for PrgC, PBnd, AftT
-      excludingTypes = [3, 5, 6];
-      break;
-    case 'mode':
-      // Hidden for Note
-      excludingTypes = [7];
-      break;
-    case 'pb_display':
-      // Hidden for Off
-      excludingTypes = [0];
-      break;
-    case 'pb_channel':
-      // Hidden for Off, Acc0, Acc3, LSp6, Min, Max
-      excludingTypes = [0, 8, 9, 10, 11, 12];
-      break;
-    case 'pb_mode':
-    case 'pb_lower':
-    case 'pb_upper':
-    case 'pb_number':
-      // Like channel but also hidden for Grp, Set
-      excludingTypes = [0, 6, 7, 8, 9, 10, 11, 12];
-      break;
-  }
-  return ec4.editorMode === 'push'
-    ? excludingTypes.includes(control.numbers.pb_type ?? -1)
-    : excludingTypes.includes(control.numbers.type ?? -1);
-}
+const { isHidden, getLimitRanges, getNumberLSBRanges } = useUiRules();
 
 const pbChannelLabel = computed(() => {
   switch (control.value.numbers.pb_type) {
@@ -164,95 +131,6 @@ onKeyStroke('End', (e) => {
   if (!e.altKey || !e.shiftKey) return;
   focusActiveField();
 });
-
-// Input validation handlers based on reference implementation checkValue logic
-function handleNumberInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // CC14bit (CCAh) number field has max 31 when data-type=4
-  if (control.value.numbers.type === encoderTypeByName('CCAh') && value > 31) {
-    value = 31;
-  }
-
-  // Standard 7-bit range for most number fields
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.number = value;
-}
-
-function handleNumberHInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // NRPN high byte: 0-127 range
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.number_h = value;
-}
-
-function handlePbNumberInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // Standard 7-bit range for pushbutton number fields
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.pb_number = value;
-}
-
-function handleLowerInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // High-resolution range: 0-4095 or 16383
-  if (value < 0) {
-    value = 0;
-  } else if (value > 4095) {
-    value = 16383;
-  }
-
-  control.value.numbers.lower = value;
-}
-
-function handleUpperInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // High-resolution range: 0-4095 or 16383
-  if (value < 0) {
-    value = 0;
-  } else if (value > 4094) {
-    value = 16383;
-  }
-
-  control.value.numbers.upper = value;
-}
-
-function handlePbLowerInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // Standard 7-bit range for pushbutton lower
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.pb_lower = value;
-}
-
-function handlePbUpperInput(e: Event) {
-  const asNumber = parseInt((e.target as HTMLInputElement).value || '0', 10);
-  let value = isNaN(asNumber) ? 0 : asNumber;
-
-  // Standard 7-bit range for pushbutton upper
-  if (value < 0) value = 0;
-  else if (value > 127) value = 127;
-
-  control.value.numbers.pb_upper = value;
-}
 </script>
 
 <template>
@@ -276,9 +154,11 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ t('OLED_CHANNEL') }}:</label
       >
-      <ChannelInput
+      <number-input
         ref="channelInput"
+        class="width_3"
         v-model="control.numbers.channel"
+        :ranges="[{ from: 1, to: 16 }]"
         @focus="setActiveField('channel', $event.target)"
         :class="{ hidden: isHidden('channel', control) }"
       />
@@ -292,9 +172,11 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ pbChannelLabel }}:</label
       >
-      <ChannelInput
+      <number-input
         ref="pbChannelInput"
+        class="width_3"
         v-model="control.numbers.pb_channel"
+        :ranges="[{ from: 1, to: 16 }]"
         @focus="setActiveField('pb_channel', $event.target)"
         :class="{ hidden: isHidden('pb_channel', control) }"
       />
@@ -340,18 +222,20 @@ function handlePbUpperInput(e: Event) {
           >{{ t('OLED_NUMBER') }}:</label
         >
         <span class="two-inputs" :class="{ hidden: isHidden('number', control) }">
-          <input
+          <!-- MSB -->
+          <number-input
             id="encoderNumber"
             ref="numberInput"
             maxlength="3"
-            :value="control.numbers.number_h"
-            @input="handleNumberHInput"
+            v-model="control.numbers.number_h"
+            :ranges="[{ from: 0, to: 127 }]"
             @focus="setActiveField('number', $event.target)"
           />
-          <input
+          <!-- LSB -->
+          <number-input
             maxlength="3"
-            :value="control.numbers.number"
-            @input="handleNumberInput"
+            v-model="control.numbers.number"
+            :ranges="getNumberLSBRanges(control.numbers.type)"
             @focus="setActiveField('number', $event.target)"
           />
         </span>
@@ -374,7 +258,8 @@ function handlePbUpperInput(e: Event) {
         />
       </template>
 
-      <template v-else>
+      <template v-else
+        ><!-- Not NRPN or Note -->
         <label
           for="encoderNumber"
           :class="{
@@ -383,12 +268,12 @@ function handlePbUpperInput(e: Event) {
           }"
           >{{ t('OLED_NUMBER') }}:</label
         >
-        <input
+        <number-input
           id="encoderNumber"
           ref="numberInput"
           maxlength="3"
-          :value="control.numbers.number"
-          @input="handleNumberInput"
+          v-model="control.numbers.number"
+          :ranges="getNumberLSBRanges(control.numbers.type)"
           @focus="setActiveField('number', $event.target)"
           :class="{ hidden: isHidden('number', control) }"
         />
@@ -421,11 +306,11 @@ function handlePbUpperInput(e: Event) {
           }"
           >{{ t('OLED_NUMBER') }}:</label
         >
-        <input
+        <number-input
           id="encoderNumber"
           ref="pbNumberInput"
-          :value="control.numbers.pb_number"
-          @input="handlePbNumberInput"
+          v-model="control.numbers.pb_number"
+          :ranges="[{ from: 0, to: 127 }]"
           :class="{ hidden: isHidden('pb_number', control) }"
           @focus="setActiveField('pb_number', $event.target)"
         />
@@ -472,11 +357,11 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ t('OLED_LOWER') }}:</label
       >
-      <input
+      <number-input
         id="encoderLowerLimit"
         ref="lowerLimitInput"
-        :value="control.numbers.lower"
-        @input="handleLowerInput"
+        v-model="control.numbers.lower"
+        :ranges="getLimitRanges(control.numbers.type, control.numbers.scale)"
         @focus="setActiveField('lower', $event.target)"
         :class="{ hidden: isHidden('lower', control) }"
         type="number"
@@ -491,11 +376,11 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ t('OLED_LOWER') }}:</label
       >
-      <input
+      <number-input
         id="encoderLowerLimit"
         ref="pbLowerLimitInput"
-        :value="control.numbers.pb_lower"
-        @input="handlePbLowerInput"
+        v-model="control.numbers.pb_lower"
+        :ranges="[{ from: 0, to: 127 }]"
         @focus="setActiveField('pb_lower', $event.target)"
         :class="{ hidden: isHidden('pb_lower', control) }"
         type="number"
@@ -554,11 +439,11 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ t('OLED_UPPER') }}:</label
       >
-      <input
+      <number-input
         id="encoderUpperLimit"
         ref="upperLimitInput"
-        :value="control.numbers.upper"
-        @input="handleUpperInput"
+        v-model="control.numbers.upper"
+        :ranges="getLimitRanges(control.numbers.type, control.numbers.scale)"
         @focus="setActiveField('upper', $event.target)"
         :class="{ hidden: isHidden('upper', control) }"
         type="number"
@@ -573,11 +458,11 @@ function handlePbUpperInput(e: Event) {
         }"
         >{{ t('OLED_UPPER') }}:</label
       >
-      <input
+      <number-input
         id="encoderUpperLimit"
         ref="pbUpperLimitInput"
-        :value="control.numbers.pb_upper"
-        @input="handlePbUpperInput"
+        v-model="control.numbers.pb_upper"
+        :ranges="[{ from: 0, to: 127 }]"
         @focus="setActiveField('pb_upper', $event.target)"
         :class="{ hidden: isHidden('pb_upper', control) }"
         type="number"
