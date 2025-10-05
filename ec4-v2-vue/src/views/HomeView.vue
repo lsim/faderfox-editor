@@ -119,6 +119,28 @@ onKeyStroke('PageDown', (e) => {
     </template>
     <store v-else class="the-store" />
     <div class="credits" v-if="!ec4.showStore">
+      <h2>News</h2>
+      <p>
+        This page is still maintained. Please report any issues you find. You can create an issue
+        <a href="https://github.com/lsim/faderfox-editor/issues" tabindex="-1">here</a>.
+      </p>
+      <p>
+        To make sure you are running the latest version, do a couple of hard refreshes of the page.
+      </p>
+      <p>Recent changes:</p>
+      <strong>October 2025</strong>:
+      <ul>
+        <li>
+          Fixed incorrect push button modes. If you got used to swapping them, you should stop doing
+          that now
+        </li>
+        <li>Fixed bug in handling of high resolution upper/lower limits</li>
+        <li>
+          You can now disable input editing with up/down arrow if you are bothered by accidental
+          edits
+        </li>
+        <li>Push button group numbers are correctly labeled now</li>
+      </ul>
       <h3>Credits</h3>
       <p>
         This version of the EC4 Web-MIDI editor for the Faderfox EC4 was (re)built by Lars Ole Avery
