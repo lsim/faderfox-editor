@@ -208,7 +208,7 @@ defineExpose({
         />
       </template>
       <template v-else-if="ec4.activeField === 'channel'">
-        <label>{{ control.numbers.type === 6 ? t('ENCODER_GROUP') : t('ENCODER_CHANNEL') }}</label>
+        <label>{{ t('ENCODER_CHANNEL') }}</label>
         <number-input
           v-model="control.numbers.channel"
           @focus="setNameActive(false, $event)"
@@ -219,7 +219,13 @@ defineExpose({
         />
       </template>
       <template v-else-if="ec4.activeField === 'pb_channel'">
-        <label>{{ t('ENCODER_CHANNEL') }}</label>
+        <label>{{
+          control.numbers.pb_type === 6
+            ? t('ENCODER_GROUP')
+            : control.numbers.pb_type === 7
+              ? t('ENCODER_SETUP')
+              : t('ENCODER_CHANNEL')
+        }}</label>
         <number-input
           v-model="control.numbers.pb_channel"
           class="width_3"

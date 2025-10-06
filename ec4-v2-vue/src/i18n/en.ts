@@ -2,6 +2,7 @@ export default {
   ENCODER_TYPE: 'type',
   ENCODER_CHANNEL: 'channel',
   ENCODER_GROUP: 'group',
+  ENCODER_SETUP: 'setup',
   ENCODER_NUMBER: 'number',
   ENCODER_NUMBER_NOTE: 'note',
   ENCODER_NUMBER_H: 'MSB',
