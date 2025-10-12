@@ -57,15 +57,6 @@ watch(
         {{ o.device.name }}
       </option>
     </select>
-    <!--    <button-->
-    <!--      @click="saveSetupsToDisk"-->
-    <!--      type="button"-->
-    <!--      id="btnfilesave"-->
-    <!--      title="Save editor data as Sysex file"-->
-    <!--      tabindex="-1"-->
-    <!--    >-->
-    <!--      Save to disk-->
-    <!--    </button>-->
   </form>
 </template>
 
@@ -80,6 +71,7 @@ watch(
   }
   select {
     font-size: small;
+    text-align: left;
   }
   display: grid;
   align-items: baseline;

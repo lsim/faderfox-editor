@@ -419,13 +419,6 @@ defineExpose({
       }
     }
 
-    select {
-      width: 100%;
-      text-align: center;
-      background-color: transparent;
-      color: $textColor;
-    }
-
     .link-next {
       text-transform: uppercase;
       ::before {

@@ -4,7 +4,7 @@ dependencies:
   yarn
 
 run: dependencies
-  yarn dev
+  yarn dev --host
 
 check:
   yarn lint

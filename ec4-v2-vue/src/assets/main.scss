@@ -49,3 +49,16 @@ html {
   box-shadow: 0 0 1.5rem rgba($white, 0.1);
 }
 
+select {
+  width: 100%;
+  text-align: center;
+  background-color: transparent;
+  color: $textColor;
+
+  option {
+    background-color: black;
+    font: inherit;
+    color: inherit;
+  }
+}
+
