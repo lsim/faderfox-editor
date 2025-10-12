@@ -89,17 +89,23 @@ onMounted(() => {
       border-radius: 10px;
 
       // Gently pulse the selected encoder
-      animation: pulse 5s linear infinite;
+      animation: pulse 3s linear infinite;
 
       @keyframes pulse {
         0% {
+          filter: drop-shadow(0px 3px 25px rgba($blue, 1));
+        }
+        30% {
           filter: drop-shadow(0px 3px 20px rgba($blue, 1));
         }
         50% {
           filter: drop-shadow(0px -3px 10px rgba($blue, 0.5));
         }
-        100% {
+        70% {
           filter: drop-shadow(0 3px 20px rgba($blue, 1));
+        }
+        100% {
+          filter: drop-shadow(0 3px 25px rgba($blue, 1));
         }
       }
     }

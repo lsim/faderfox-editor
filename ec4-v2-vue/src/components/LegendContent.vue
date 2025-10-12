@@ -12,6 +12,7 @@ const shortcuts = [
   { keys: ['Ctrl/Cmd', 'Shift', 'PgUp'], help: 'Select previous group' },
   { keys: ['Ctrl/Cmd', 'Shift', 'PgDn'], help: 'Select next group' },
   { keys: ['Alt'], help: 'Hold to copy/paste' },
+  { keys: ['F2'], help: 'Tap to show/hide symbol keyboard' },
   { keys: ['?'], help: 'Show keyboard shortcuts' },
 ];
 </script>

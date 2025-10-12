@@ -11,6 +11,7 @@ import {
   pushButtonScaleOptions,
   pushButtonTypes,
 } from '@/domain/Encoder.ts';
+import NameInput from '@/components/NameInput.vue';
 
 const ec4 = useEc4Store();
 
@@ -94,7 +95,7 @@ const macros = useMacros();
     <button class="set-name" @click.prevent="macros.setAllNames(nameToSet)" title="Set all names">
       <eraser class="icon" />
     </button>
-    <input
+    <name-input
       type="text"
       placeholder="Name"
       title="Name to set"

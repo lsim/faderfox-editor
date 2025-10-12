@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import useCopyPaste from '@/composables/copy-paste.ts';
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 import CopyPasteWrap from '@/components/CopyPasteWrap.vue';
 import type { EncoderGroup } from '@/domain/EncoderGroup.ts';
 import type { EncoderSetup } from '@/domain/EncoderSetup.ts';
+import NameInput from '@/components/NameInput.vue';
 
 const ec4 = useEc4Store();
 const copyPaste = useCopyPaste();
-
-// const gridRows = computed(() => {
-//   return ec4.activeBundle.setups.map((s, i) => [s, ec4.encoderGroups[i]]);
-// });
 
 function handleFocus(e: Event, setupId: number, groupId: number) {
   ec4.selectedSetupIndex = setupId;
@@ -60,6 +57,8 @@ watch(
   },
 );
 
+const bundle = computed(() => ec4.activeBundleFn());
+
 function startPublishing(setup: EncoderSetup) {
   ec4.setupToPublish = setup;
   ec4.showStore = true;
@@ -71,49 +70,52 @@ function startPublishing(setup: EncoderSetup) {
   <div
     id="setupsandgroups"
     title="Select setup, group and edit name."
+    v-if="bundle"
     :class="{ 'copy-mode': copyPaste.copyMode }"
   >
-    <h3>Setup</h3>
-    <h3>Group</h3>
-    <template v-for="([s, g], idx) in ec4.gridRows" :key="s.id">
+    <h3>Setups</h3>
+    <div class="grid-16">
       <copy-paste-wrap
         class="setup-name"
         :can-paste="copyPaste.canPasteSetup.value"
+        v-for="(s, idx) in bundle.value.setups"
+        :key="s.id"
         @copy="copyPaste.copySetup(s as EncoderSetup)"
         @paste="copyPaste.pasteSetup(idx)"
         :show-publish-link="true"
         @publish="startPublishing(s)"
       >
-        <input
+        <name-input
           v-model="s.name"
           :class="{
             selected: idx === ec4.selectedSetupIndex,
             [`color-${setupColors[idx]}`]: true,
           }"
-          class="matrix_font"
           @focus="handleFocus($event, idx, ec4.selectedGroupIndex)"
-          maxlength="4"
         />
       </copy-paste-wrap>
+    </div>
 
+    <h3>Groups in {{ bundle.value.setups[ec4.selectedSetupIndex].name }}</h3>
+    <div class="grid-16">
       <copy-paste-wrap
         class="group-name"
+        v-for="(g, idx) in bundle.value.setups[ec4.selectedSetupIndex].groups"
+        :key="g.id"
         :can-paste="copyPaste.canPasteGroup.value"
         @copy="copyPaste.copyGroup(g as EncoderGroup)"
         @paste="copyPaste.pasteGroup(idx)"
       >
-        <input
+        <name-input
           v-model="g.name"
           :class="{
             selected: idx === ec4.selectedGroupIndex,
             [`color-${setupColors[ec4.selectedSetupIndex]}`]: true,
           }"
-          class="matrix_font"
           @focus="handleFocus($event, ec4.selectedSetupIndex, idx)"
-          maxlength="4"
         />
       </copy-paste-wrap>
-    </template>
+    </div>
   </div>
 </template>
 
@@ -147,31 +149,15 @@ $picoColors: (
   ('slate', $slate-700)
 );
 
-//@function red($c) {
-//  @return color.channel($c, 'red');
-//}
-//@function green($c) {
-//  @return color.channel($c, 'green');
-//}
-//@function blue($c) {
-//  @return color.channel($c, 'blue');
-//}
-//
-//@mixin text-contrast($n) {
-//  $color-brightness: round(math.div((red($n) * 299) + (green($n) * 587) + (blue($n) * 114), 1000));
-//  $light-color: round(
-//    math.div((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114), 1000)
-//  );
-//  @if abs($color-brightness) < (math.div($light-color, 2)) {
-//    color: white;
-//  } @else {
-//    color: black;
-//  }
-//}
+.grid-16 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
 
 #setupsandgroups {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto 1fr;
   border: 3px solid #c0c0c0;
   border-radius: 7px;
   text-align: center;

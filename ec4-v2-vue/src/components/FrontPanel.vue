@@ -9,6 +9,7 @@ import { onKeyStroke } from '@vueuse/core';
 import { Undo2, Redo2 } from 'lucide-vue-next';
 import Badger from '@/components/Badger.vue';
 import SettingsButton from '@/components/SettingsButton.vue';
+import Ec4Keyboard from '@/components/Ec4Keyboard.vue';
 
 const props = defineProps<{
   groupId: number;
@@ -71,6 +72,7 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
 
 <template>
   <main>
+    <ec4-keyboard class="keyboard-placement" />
     <div class="beta-notice dymo-label">BETA</div>
     <div id="save-indicator" v-if="showSaveIndicator">💾</div>
     <badger
@@ -229,6 +231,10 @@ main {
     left: 3em;
     top: 1.4em;
     rotate: -10deg;
+  }
+  .keyboard-placement {
+    left: 0;
+    top: 0;
   }
 }
 #legend-button {

@@ -1,4 +1,4 @@
-import { ref, computed, type Ref, type ComputedRef } from 'vue';
+import { ref, computed, type Ref } from 'vue';
 import { defineStore } from 'pinia';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
 import { Ec4Bundle } from '@/domain/Ec4Bundle.ts';
@@ -84,7 +84,7 @@ export const useEc4Store = defineStore('ec4', () => {
     activeBundle,
     async (newBundle, oldBundle) => {
       // No auto save if we are loading a bundle
-      if (!newBundle || newBundle !== oldBundle) return;
+      if (!newBundle || newBundle.id !== oldBundle.id) return;
       const delta = await setBusy(storage.saveBundle(newBundle));
       if (delta && !historyPaused) {
         history.pushEdit(delta);
@@ -110,10 +110,6 @@ export const useEc4Store = defineStore('ec4', () => {
       : null;
   });
 
-  const gridRows: ComputedRef<[EncoderSetup, EncoderGroup][]> = computed(() => {
-    return activeBundle.value.setups.map((s, i) => [s, encoderGroups.value[i]]);
-  });
-
   return {
     selectedSetupIndex,
     encoderGroups,
@@ -131,7 +127,6 @@ export const useEc4Store = defineStore('ec4', () => {
     lastStateSaved,
     activeField,
     activeNumberField,
-    gridRows,
     setupToPublish,
     publicationToUpdate,
     activeBundleId: computed(() => activeBundle.value?.id),
@@ -168,5 +163,6 @@ export const useEc4Store = defineStore('ec4', () => {
       historyPaused = true;
     },
     showStore,
+    activeBundleFn: () => activeBundle,
   };
 });

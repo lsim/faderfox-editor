@@ -15,6 +15,7 @@ import { useEc4Store } from '@/stores/faderfox-ec4.ts';
 import NoteInput from '@/components/NoteInput.vue';
 import NumberInput from '@/components/NumberInput.vue';
 import useUiRules from '@/composables/ui-rules.ts';
+import NameInput from '@/components/NameInput.vue';
 
 const { t } = useI18n();
 
@@ -32,7 +33,7 @@ const control: ComputedRef<Control> = computed(() => {
   return ec4.selectedGroup.controls[props.encoderId];
 });
 
-const nameInput = ref<HTMLInputElement | null>(null);
+const nameInputRef = ref<HTMLInputElement | null>(null);
 const encoderInput = ref<HTMLInputElement | null>(null);
 
 function focusInput() {
@@ -40,7 +41,7 @@ function focusInput() {
   const x = window.scrollX;
   const y = window.scrollY;
   if (props.nameActive) {
-    nameInput.value?.focus();
+    nameInputRef.value?.focus();
   } else {
     encoderInput.value?.focus();
   }
@@ -103,10 +104,8 @@ defineExpose({
     <div class="knob"></div>
     <div class="inputs">
       <div class="name">
-        <input
-          ref="nameInput"
-          class="matrix_font name"
-          maxlength="4"
+        <name-input
+          ref="nameInputRef"
           v-model="control.name"
           title="Edit name of encoder/button"
           @focus="setNameActive(true, $event)"
@@ -405,13 +404,10 @@ defineExpose({
       &.name {
         background-color: $active-field-color;
         color: $yellow;
-        border-style: none;
-        width: 3.3em;
         &:focus {
           margin-top: -1px;
         }
         box-sizing: border-box;
-        text-align: left;
       }
     }
 

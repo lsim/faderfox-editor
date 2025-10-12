@@ -1,5 +1,8 @@
 import { type FieldType } from '@/domain/Encoder.ts';
 import { EncoderSetup } from '@/domain/EncoderSetup.ts';
+import { useCharacters } from '@/composables/characters.ts';
+
+const { deviceStringToEditorString, editorStringToDeviceString } = useCharacters();
 
 const STR = { sysex: {} as any };
 
@@ -339,8 +342,6 @@ const P = {
     let addr = P._getMemAddr(spec, setupId, groupId);
 
     addr += encoderId;
-    // const oldValue = data[addr];
-    // value = parseInt(value);
     if (type === P.channel || type === P.pb_channel) value--;
     const shift = spec.lsb || 0;
     if (spec.mask != 0xff) {
@@ -351,7 +352,6 @@ const P = {
       value = value & 0xff; // ensure 8 bit
       data[addr] = value;
     }
-    // isDirty = isDirty | (data[addr] != oldValue); // TODO: what is this?
   },
   setEncoderName: function (
     data: Uint8Array<ArrayBufferLike>,
@@ -363,23 +363,11 @@ const P = {
     const spec = this._dataFormat['name'];
     let addr = MEM.addrPresets + (setupId * 16 + groupId) * MEM.lengthGroup + spec.pos;
     addr += encoderId * 4;
-    while (name.length < 4) {
-      name += ' ';
-    }
-    for (let i = 0; i < 4; i++) {
-      // const oldValue = data[addr + i];
-      data[addr + i] = name.charCodeAt(i);
-      // isDirty = isDirty | (data[addr + i] != oldValue);
-    }
+    P.stringToPosition(data, addr, name);
   },
   setSetupName: function (data: Uint8Array<ArrayBufferLike>, setupId: number, name: string) {
-    while (name.length < 4) {
-      name += ' ';
-    }
     const addr = MEM.addrSetupNames + setupId * 4;
-    for (let i = 0; i < 4; i++) {
-      data[addr + i] = name.charCodeAt(i);
-    }
+    P.stringToPosition(data, addr, name);
   },
   setGroupName: function (
     data: Uint8Array<ArrayBufferLike>,
@@ -387,12 +375,16 @@ const P = {
     groupId: number,
     name: string,
   ) {
-    while (name.length < 4) {
-      name += ' ';
-    }
     const addr = MEM.addrGroupNames + setupId * 64 + groupId * 4;
+    P.stringToPosition(data, addr, name);
+  },
+  stringToPosition: function (data: Uint8Array<ArrayBufferLike>, position: number, name: string) {
+    let deviceName = editorStringToDeviceString(name);
+    while (deviceName.length < 4) {
+      deviceName += ' ';
+    }
     for (let i = 0; i < 4; i++) {
-      data[addr + i] = name.charCodeAt(i);
+      data[position + i] = deviceName.charCodeAt(i);
     }
   },
   getGroupName: function (data: Uint8Array<ArrayBufferLike>, setupId: number, groupId: number) {
@@ -403,7 +395,9 @@ const P = {
   },
   stringFromPosition: function (data: Uint8Array<ArrayBufferLike>, position: number) {
     const characters = data.subarray(position, position + 4);
-    return String.fromCharCode(...characters);
+    const sysexString = String.fromCharCode(...characters);
+
+    return deviceStringToEditorString(sysexString);
   },
 };
 

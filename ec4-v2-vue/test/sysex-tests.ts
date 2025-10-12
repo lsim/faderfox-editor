@@ -52,14 +52,14 @@ describe('Sysex', () => {
       emptySetups[10].name = 'Foo';
       roundTrip();
       // Right padded with spaces
-      expect(emptySetups[10].name).toBe('Foo ');
+      expect(emptySetups[10].name).toBe('Foo␣');
     });
 
     it('should round trip group name', () => {
       emptySetups[10].groups[10].name = 'Foo';
       roundTrip();
       // Right padded with spaces
-      expect(emptySetups[10].groups[10].name).toBe('Foo ');
+      expect(emptySetups[10].groups[10].name).toBe('Foo␣');
     });
 
     it('should round trip channel', () => {
@@ -126,7 +126,7 @@ describe('Sysex', () => {
       emptySetups[10].groups[10].controls[10].name = 'Foo';
       roundTrip();
       // Right padded with spaces
-      expect(emptySetups[10].groups[10].controls[10].name).toBe('Foo ');
+      expect(emptySetups[10].groups[10].controls[10].name).toBe('Foo␣');
     });
 
     it('should round trip link', () => {
@@ -272,10 +272,7 @@ describe('Sysex', () => {
       );
 
       // After the fix, this should be 200 regardless of garbage in upper_msb
-      expect(result).toBe(
-        200,
-        `Expected 200 but got ${result}. The fix should ignore garbage MSB values.`,
-      );
+      expect(result).toBe(200);
     });
 
     it('should correctly handle MSB values internally (integration test)', () => {

@@ -170,7 +170,7 @@ onKeyStroke('PageDown', (e) => {
   margin: 0 auto;
   width: auto;
   display: grid;
-  max-width: 47.8em;
+  max-width: 55em;
   grid-template-areas:
     'header header header'
     'alignment alignment alignment'
@@ -180,7 +180,7 @@ onKeyStroke('PageDown', (e) => {
     'credits credits credits';
   grid-template-columns: 1fr auto 1fr;
   grid-column-gap: 1em;
-  grid-template-rows: auto 0.7em auto 1fr auto;
+  grid-template-rows: auto 0 auto 1fr auto;
 
   .the-store {
     grid-area: alignment;
