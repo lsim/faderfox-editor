@@ -2108,17 +2108,22 @@
   resolved "https://registry.yarnpkg.com/@vueuse/metadata/-/metadata-13.9.0.tgz#57c738d99661c33347080c0bc4cd11160e0d0881"
   integrity sha512-1AFRvuiGphfF7yWixZa0KwjYH8ulyjDCC0aFgrGRz8+P4kvDFSdXLVfTk5xAN9wEuD1J6z4/myMoYbnHoX07zg==
 
-"@vueuse/rxjs@^13.0.0":
-  version "13.9.0"
-  resolved "https://registry.yarnpkg.com/@vueuse/rxjs/-/rxjs-13.9.0.tgz#500679ecdf9b49df35af2df9febca5a97b84d920"
-  integrity sha512-VcEux+0rl1cpi2lUASzldb1o9l3uSFOmovRcsF6+EvDF2d3lXCHabTjwpVrj2CLg5irwTG9FbSPHrmHLHYvXDQ==
+"@vueuse/rxjs@^14.0.0":
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/rxjs/-/rxjs-14.0.0.tgz#78b9f822efa6b2820bc29a962e3934da10fa5821"
+  integrity sha512-3PcbDPDoMrirqCAkyqs59MGUSaqtWUzzrwv6EL4yGFw7r3ZZ8olv59BRromd4nfzybtjaETrkSAUYz6YdBQ2dQ==
   dependencies:
-    "@vueuse/shared" "13.9.0"
+    "@vueuse/shared" "14.0.0"
 
 "@vueuse/shared@13.9.0":
   version "13.9.0"
   resolved "https://registry.yarnpkg.com/@vueuse/shared/-/shared-13.9.0.tgz#7168b4ed647e625b05eb4e7e80fe8aabd00e3923"
   integrity sha512-e89uuTLMh0U5cZ9iDpEI2senqPGfbPRTHM/0AaQkcxnpqjkZqDYP8rpfm7edOz8s+pOCOROEy1PIveSW8+fL5g==
+
+"@vueuse/shared@14.0.0":
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/shared/-/shared-14.0.0.tgz#15a424285fd6d453d1a99d1caba8cc293992868d"
+  integrity sha512-mTCA0uczBgurRlwVaQHfG0Ja7UdGe4g9mwffiJmvLiTtp1G4AQyIjej6si/k8c8pUwTfVpNufck+23gXptPAkw==
 
 abbrev@^2.0.0:
   version "2.0.0"
